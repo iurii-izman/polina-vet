@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Практическая ветеринарная информация">
+  <section class="hero container">
+    <p class="eyebrow">Практическая ветеринарная информация</p>
+    <h1>Ветеринарная помощь начинается с правильного следующего шага</h1>
+    <p class="lead">Практические материалы для владельцев домашних и сельскохозяйственных животных: что проверить, когда не стоит ждать и как подготовиться к обращению.</p>
+  </section>
+  <section class="container gateway-grid" aria-label="Выбор раздела">
+    <a class="gateway pet-gateway" href="/ru/pets/"><span class="eyebrow">Домашние животные</span><h2>Собаки и кошки</h2><p>Болезни, профилактика, подготовка к визиту и полезные памятки.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
+    <a class="gateway farm-gateway" href="/ru/farm/"><span class="eyebrow">Ферма</span><h2>Хозяйство и животные</h2><p>Практические рекомендации для отдельного животного и хозяйства.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
+  </section>
+  <section class="container urgent-strip">
+    <div><p class="eyebrow">Срочно</p><h2>Состояние животного кажется срочным?</h2><p>Посмотрите признаки, при которых не стоит откладывать получение ветеринарной помощи, и что безопасно сделать до обращения.</p><small>POLINA VET не является круглосуточной экстренной службой.</small></div>
+    <a class="button button-light" href="/ru/urgent/">Что делать сейчас <span aria-hidden="true">→</span></a>
+  </section>
+  <section class="container section">
+    <p class="eyebrow">Быстрый маршрут</p><h2>Что вам нужно?</h2>
+    <div class="task-grid">
+      <a href="/ru/pets/">Животное заболело <span>Начните с раздела для вашего животного.</span></a>
+      <a href="/ru/pets/">Профилактика <span>Основные профилактические меры.</span></a>
+      <a href="/ru/farm/">Подготовиться к обращению <span>Что записать и подготовить.</span></a>
+      <a href="/ru/urgent/">Срочная ситуация <span>Признаки, при которых не стоит ждать.</span></a>
+      <a href="/ru/knowledge/">Найти информацию <span>Практические материалы по темам.</span></a>
+    </div>
+  </section>
+  <section class="container trust-block">
+    <div><p class="eyebrow">О проекте</p><h2>Полина [Фамилия]</h2><p>[ТОЧНАЯ ОФИЦИАЛЬНАЯ ДОЛЖНОСТЬ]</p></div>
+    <p>POLINA VET собирает практические материалы и клинические наблюдения. Фактические сведения о профессиональном профиле публикуются только после проверки.</p>
+    <a class="text-link" href="/ru/about/">О Полине <span aria-hidden="true">→</span></a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,52 @@
+---
+const pathname = Astro.url.pathname;
+const nav = [
+  ['/ru/pets/', 'Домашние животные'],
+  ['/ru/farm/', 'Ферма'],
+  ['/ru/knowledge/', 'Знания'],
+  ['/ru/about/', 'О Полине'],
+  ['/ru/contact/', 'Контакты'],
+] as const;
+---
+
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" href="/ru/" aria-label="POLINA VET — главная">POLINA <span>VET</span></a>
+    <nav class="desktop-nav" aria-label="Основная навигация">
+      {nav.map(([href, label]) => (
+        <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>
+      ))}
+    </nav>
+    <div class="header-actions">
+      <details class="language-menu">
+        <summary aria-label="Выбрать язык">RU</summary>
+        <div class="language-popover">
+          <span aria-current="true">Русский</span>
+          <span>Română — нет опубликованной версии</span>
+          <span>Українська — нет опубликованной версии</span>
+        </div>
+      </details>
+      <a class="urgent-action" href="/ru/urgent/">Срочно: что делать</a>
+    </div>
+    <details class="mobile-menu">
+      <summary aria-label="Открыть меню"><span aria-hidden="true">☰</span></summary>
+      <nav aria-label="Мобильная навигация">
+        {nav.map(([href, label]) => <a href={href}>{label}</a>)}
+        <p class="menu-label">Язык</p>
+        <span>Русский</span>
+        <span>Română — нет опубликованной версии</span>
+        <span>Українська — нет опубликованной версии</span>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const openMenu = document.querySelector<HTMLDetailsElement>('details[open]');
+    if (!openMenu) return;
+    openMenu.open = false;
+    openMenu.querySelector<HTMLElement>('summary')?.focus();
+  });
+</script>
