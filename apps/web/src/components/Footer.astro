@@ -1,13 +1,20 @@
+---
+import { route, type Locale } from '../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
 <footer class="site-footer">
   <div class="container footer-grid">
     <div>
-      <a class="brand" href="/ru/">POLINA <span>VET</span></a>
+      <a class="brand" href={route.home(locale)}>POLINA <span>VET</span></a>
       <p>Ветеринарная информация и практические материалы.</p>
     </div>
     <nav aria-label="Навигация в подвале">
-      <a href="/ru/editorial-policy/">Как готовятся материалы</a>
-      <a href="/ru/contact/">Контакты и доступность</a>
-      <a href="/ru/urgent/">Срочно: что делать</a>
+      <a href={route.editorialPolicy(locale)}>Как готовятся материалы</a>
+      <a href={route.contact(locale)}>Контакты и доступность</a>
+      <a href={route.urgent(locale)}>Срочно: что делать</a>
     </nav>
     <p class="footer-boundary">POLINA VET не является круглосуточной экстренной службой.</p>
   </div>

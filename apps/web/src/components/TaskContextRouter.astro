@@ -1,0 +1,46 @@
+---
+import type { Locale } from '../lib/i18n';
+import { route } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  task: 'animal-sick' | 'prepare';
+}
+
+const { locale, task } = Astro.props;
+const isSick = task === 'animal-sick';
+const title = isSick ? 'Животное заболело' : 'Подготовиться к обращению';
+const description = isSick
+  ? 'Сначала выберите контекст. Срочный маршрут остаётся отдельным выбором.'
+  : 'Выберите подходящий чек-лист для визита с домашним животным или работы в хозяйстве.';
+const choices = isSick
+  ? [
+      { title: 'Домашнее животное', body: 'Собака или кошка: начните с раздела для домашнего животного.', href: route.pets(locale), action: 'Перейти к домашним животным' },
+      { title: 'Ферма', body: 'Одно животное, группа и условия хозяйства.', href: route.farm(locale), action: 'Перейти к ферме' },
+    ]
+  : [
+      { title: 'Визит с собакой или кошкой', body: 'Что записать и подготовить до визита.', href: route.beforeVisit(locale), action: 'Открыть чек-лист' },
+      { title: 'Приезд ветеринара в хозяйство', body: 'Что подготовить о животном, группе и условиях.', href: route.beforeVetArrives(locale), action: 'Открыть чек-лист' },
+    ];
+---
+
+<section class="page-intro container">
+  <p class="eyebrow">Быстрый маршрут</p>
+  <h1>{title}</h1>
+  <p class="lead">{description}</p>
+</section>
+<section class="container task-router-grid" aria-label={title}>
+  {choices.map((choice) => (
+    <a class="task-router-choice" href={choice.href}>
+      <h2>{choice.title}</h2>
+      <p>{choice.body}</p>
+      <span>{choice.action} <b aria-hidden="true">→</b></span>
+    </a>
+  ))}
+</section>
+{isSick && (
+  <aside class="container task-router-urgent">
+    <p><strong>Состояние кажется срочным?</strong> Откройте отдельный срочный маршрут.</p>
+    <a class="text-link" href={route.urgent(locale)}>Срочно: что делать <span aria-hidden="true">→</span></a>
+  </aside>
+)}

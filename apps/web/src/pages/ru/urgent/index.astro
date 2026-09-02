@@ -1,13 +1,14 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import UrgentBoundary from '../../../components/UrgentBoundary.astro';
+import { route } from '../../../lib/i18n';
 ---
 
-<BaseLayout title="Срочно: что делать">
+<BaseLayout title="Срочно: что делать" locale="ru">
   <section class="page-intro container"><p class="eyebrow">Быстрый маршрут</p><h1>Состояние животного кажется срочным?</h1><p class="lead">Сначала выберите контекст. Это поможет открыть подходящий маршрут подготовки к срочной ветеринарной помощи.</p></section>
   <section class="container gateway-grid" aria-label="Выбор срочного маршрута">
-    <a class="gateway pet-gateway" href="/ru/pets/urgent/"><span class="eyebrow">Домашнее животное</span><h2>Собака или кошка</h2><p>Срочный маршрут для домашнего животного.</p><span>Открыть <b aria-hidden="true">→</b></span></a>
-    <a class="gateway farm-gateway" href="/ru/farm/urgent/"><span class="eyebrow">Сельскохозяйственное животное</span><h2>Хозяйство</h2><p>Срочный маршрут с учётом группы и условий.</p><span>Открыть <b aria-hidden="true">→</b></span></a>
+    <a class="gateway pet-gateway" href={route.petUrgent('ru')}><span class="eyebrow">Домашнее животное</span><h2>Собака или кошка</h2><p>Срочный маршрут для домашнего животного.</p><span>Открыть <b aria-hidden="true">→</b></span></a>
+    <a class="gateway farm-gateway" href={route.farmUrgent('ru')}><span class="eyebrow">Сельскохозяйственное животное</span><h2>Хозяйство</h2><p>Срочный маршрут с учётом группы и условий.</p><span>Открыть <b aria-hidden="true">→</b></span></a>
   </section>
   <div class="container"><UrgentBoundary /></div>
 </BaseLayout>

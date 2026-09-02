@@ -1,0 +1,14 @@
+---
+import type { Locale } from '../lib/i18n';
+import { route } from '../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<section class="container section featured-knowledge" aria-labelledby="knowledge-title">
+  <p class="eyebrow">Знания</p>
+  <h2 id="knowledge-title">Полезные материалы</h2>
+  <p class="lead">Проверенные материалы появятся здесь после медицинской проверки, указания источников и даты пересмотра.</p>
+  <a class="text-link" href={route.knowledge(locale)}>Все материалы <span aria-hidden="true">→</span></a>
+</section>

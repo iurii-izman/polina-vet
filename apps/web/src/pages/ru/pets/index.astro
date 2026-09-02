@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { route } from '../../../lib/i18n';
 ---
 
-<BaseLayout title="Домашние животные">
+<BaseLayout title="Домашние животные" locale="ru">
   <section class="page-intro container"><p class="eyebrow">Домашние животные</p><h1>Домашние животные</h1><p class="lead">Практическая информация для владельцев собак и кошек: что оценить, как подготовиться к визиту и когда не стоит ждать.</p></section>
   <section class="container action-grid">
-    <a class="action-card urgent-card" href="/ru/pets/urgent/"><p class="eyebrow">Срочно</p><h2>Животному плохо прямо сейчас?</h2><p>Откройте срочный маршрут для домашних животных.</p><span>Что делать сейчас →</span></a>
-    <a class="action-card" href="/ru/pets/before-visit/"><p class="eyebrow">Подготовка</p><h2>Подготовиться к визиту</h2><p>Что записать, взять с собой и как подготовить животное.</p><span>Открыть чек-лист →</span></a>
+    <a class="action-card urgent-card" href={route.petUrgent('ru')}><p class="eyebrow">Срочно</p><h2>Животному плохо прямо сейчас?</h2><p>Откройте срочный маршрут для домашних животных.</p><span>Что делать сейчас →</span></a>
+    <a class="action-card" href={route.beforeVisit('ru')}><p class="eyebrow">Подготовка</p><h2>Подготовиться к визиту</h2><p>Что записать, взять с собой и как подготовить животное.</p><span>Открыть чек-лист →</span></a>
     <div class="action-card static-card"><p class="eyebrow">Профилактика</p><h2>Профилактика</h2><p>Раздел появится с проверенными материалами.</p></div>
   </section>
   <section class="container section"><p class="eyebrow">Навигация</p><h2>Частые ситуации</h2><div class="plain-grid"><div>Симптомы и изменения состояния</div><div>Профилактика</div><div>Подготовка к визиту</div></div></section>

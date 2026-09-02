@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import UrgentBoundary from '../../../../components/UrgentBoundary.astro';
+import { route } from '../../../../lib/i18n';
+---
+
+<BaseLayout title="Заболели несколько животных" locale="ru">
+  <section class="page-intro container">
+    <p class="eyebrow">Ферма · Групповая ситуация</p>
+    <h1>Заболели несколько животных</h1>
+    <p class="lead">Этот маршрут помогает собрать контекст о группе и подготовиться к обращению. Медицинские рекомендации публикуются только после review.</p>
+    <UrgentBoundary />
+  </section>
+  <section class="container section structural-card" aria-labelledby="group-context-title">
+    <p class="eyebrow">Подготовка</p>
+    <h2 id="group-context-title">Что важно подготовить</h2>
+    <p>Размер группы, число животных с похожими признаками, время первого случая, динамику и недавние изменения в хозяйстве.</p>
+    <a class="text-link" href={route.beforeVetArrives('ru')}>Подготовиться к приезду ветеринара <span aria-hidden="true">→</span></a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,16 @@
+---
+import type { FeaturedCaseContent } from '../data/homepage';
+
+interface Props {
+  content: FeaturedCaseContent;
+}
+
+const { content } = Astro.props;
+---
+
+<section class="container section featured-case" aria-labelledby="case-title">
+  <p class="eyebrow">Клинический случай</p>
+  <h2 id="case-title">{content.title}</h2>
+  <p>{content.summary}</p>
+  <a class="text-link" href={content.href}>Разобрать случай <span aria-hidden="true">→</span></a>
+</section>
