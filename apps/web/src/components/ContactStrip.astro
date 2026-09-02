@@ -1,0 +1,16 @@
+---
+import type { Locale } from '../lib/i18n';
+import { route } from '../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<section class="container contact-strip">
+  <div>
+    <p class="eyebrow">Контакты</p>
+    <h2>Нужна дополнительная информация?</h2>
+    <p>Посмотрите доступные способы связи и актуальную информацию о том, когда и по каким вопросам можно обратиться к Полине.</p>
+  </div>
+  <a class="button" href={route.contact(locale)}>Контакты и доступность <span aria-hidden="true">→</span></a>
+</section>

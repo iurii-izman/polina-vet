@@ -1,0 +1,16 @@
+---
+import type { SeasonalContent } from '../data/homepage';
+
+interface Props {
+  content: SeasonalContent;
+}
+
+const { content } = Astro.props;
+---
+
+<section class="container section seasonal-panel" aria-labelledby="seasonal-title">
+  <p class="eyebrow">Актуально сейчас</p>
+  <h2 id="seasonal-title">{content.title}</h2>
+  <p>{content.summary}</p>
+  <a class="text-link" href={content.href}>Подробнее <span aria-hidden="true">→</span></a>
+</section>

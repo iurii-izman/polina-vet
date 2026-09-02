@@ -1,0 +1,17 @@
+---
+import type { Locale } from '../lib/i18n';
+import { route } from '../lib/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+
+<section class="container trust-block">
+  <div>
+    <p class="eyebrow">Кто готовит материалы</p>
+    <h2>Полина [Фамилия]</h2>
+    <p>[ТОЧНАЯ ОФИЦИАЛЬНАЯ ДОЛЖНОСТЬ]</p>
+  </div>
+  <p>POLINA VET собирает практические материалы и клинические наблюдения. Фактические сведения о профессиональном профиле публикуются только после проверки.</p>
+  <a class="text-link" href={route.about(locale)}>О Полине <span aria-hidden="true">→</span></a>
+</section>

@@ -1,0 +1,11 @@
+---
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+---
+
+<section class="review-pending" aria-labelledby="review-pending-title">
+  <p class="eyebrow">Медицинская проверка</p>
+  <h2 id="review-pending-title">{title}</h2>
+  <p>{description}</p>
+  <p class="caption">Перед публикацией медицинских утверждений требуется финальная клиническая проверка.</p>
+</section>

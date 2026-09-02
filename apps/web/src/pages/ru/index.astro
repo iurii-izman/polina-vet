@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactStrip from '../../components/ContactStrip.astro';
+import ContentMethodology from '../../components/ContentMethodology.astro';
+import FeaturedCase from '../../components/FeaturedCase.astro';
+import FeaturedKnowledge from '../../components/FeaturedKnowledge.astro';
+import PolinaTrust from '../../components/PolinaTrust.astro';
+import SeasonalPanel from '../../components/SeasonalPanel.astro';
+import { homepageContent } from '../../data/homepage';
+import { route } from '../../lib/i18n';
+---
+
+<BaseLayout title="Практическая ветеринарная информация" locale="ru">
+  <section class="hero container">
+    <p class="eyebrow">Практическая ветеринарная информация</p>
+    <h1>Ветеринарная помощь начинается с правильного следующего шага</h1>
+    <p class="lead">Практические материалы для владельцев домашних и сельскохозяйственных животных: что проверить, когда не стоит ждать и как подготовиться к обращению.</p>
+  </section>
+  <section class="container gateway-grid" aria-label="Выбор раздела">
+    <a class="gateway pet-gateway" href={route.pets('ru')}><span class="eyebrow">Домашние животные</span><h2>Собаки и кошки</h2><p>Болезни, профилактика, подготовка к визиту и полезные памятки.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
+    <a class="gateway farm-gateway" href={route.farm('ru')}><span class="eyebrow">Ферма</span><h2>Хозяйство и животные</h2><p>Практические рекомендации для отдельного животного и хозяйства.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
+  </section>
+  <section class="container urgent-strip">
+    <div><p class="eyebrow">Срочно</p><h2>Состояние животного кажется срочным?</h2><p>Посмотрите признаки, при которых не стоит откладывать получение ветеринарной помощи, и что безопасно сделать до обращения.</p><small>POLINA VET не является круглосуточной экстренной службой.</small></div>
+    <a class="button button-light" href={route.urgent('ru')}>Что делать сейчас <span aria-hidden="true">→</span></a>
+  </section>
+  <section class="container section">
+    <p class="eyebrow">Быстрый маршрут</p><h2>Что вам нужно?</h2>
+    <div class="task-grid">
+      <a href={route.animalSick('ru')}>Животное заболело <span>Выберите: домашнее животное или ферма.</span></a>
+      <a href={route.knowledge('ru')}>Профилактика <span>Основные профилактические меры.</span></a>
+      <a href={route.prepare('ru')}>Подготовиться к обращению <span>Выберите подходящий чек-лист.</span></a>
+      <a href={route.urgent('ru')}>Срочная ситуация <span>Признаки, при которых не стоит ждать.</span></a>
+      <a href={route.knowledge('ru')}>Найти информацию <span>Практические материалы по темам.</span></a>
+    </div>
+  </section>
+  {homepageContent.seasonal && <SeasonalPanel content={homepageContent.seasonal} />}
+  <PolinaTrust locale="ru" />
+  <ContentMethodology locale="ru" />
+  <FeaturedKnowledge locale="ru" />
+  {homepageContent.featuredCase && <FeaturedCase content={homepageContent.featuredCase} />}
+  <ContactStrip locale="ru" />
+</BaseLayout>

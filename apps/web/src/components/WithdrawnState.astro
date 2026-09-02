@@ -1,0 +1,11 @@
+---
+interface Props { replacementHref: string }
+const { replacementHref } = Astro.props;
+---
+
+<section class="state-card" aria-labelledby="withdrawn-title">
+  <p class="eyebrow">Состояние материала</p>
+  <h2 id="withdrawn-title">Этот материал больше не используется</h2>
+  <p>Информация снята после обновления рекомендаций. Откройте текущий безопасный маршрут.</p>
+  <a class="text-link" href={replacementHref}>Перейти к актуальному маршруту <span aria-hidden="true">→</span></a>
+</section>

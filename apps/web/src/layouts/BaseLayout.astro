@@ -1,0 +1,35 @@
+---
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { localeFromPath, type Locale } from '../lib/i18n';
+
+interface Props {
+  title: string;
+  description?: string;
+  locale?: Locale;
+}
+
+const { title, description = 'Практическая ветеринарная информация для владельцев домашних и сельскохозяйственных животных.' } = Astro.props;
+const locale = Astro.props.locale ?? localeFromPath(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <title>{title} — POLINA VET</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Перейти к содержанию</a>
+    <SiteHeader locale={locale} />
+    <main id="main-content" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
