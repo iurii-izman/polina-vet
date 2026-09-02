@@ -1,0 +1,27 @@
+{
+  "name": "polina-vet",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.1.1",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @polina-vet/web dev",
+    "build": "pnpm --filter @polina-vet/studio typegen && pnpm --filter @polina-vet/web build && pnpm --filter @polina-vet/studio build",
+    "check": "pnpm format:check && pnpm --filter @polina-vet/web check && pnpm --filter @polina-vet/studio check && pnpm validate:content && pnpm build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate:content": "node scripts/validate-content.mjs",
+    "test:e2e": "pnpm --filter @polina-vet/web test:e2e",
+    "test:a11y": "pnpm --filter @polina-vet/web test:a11y"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

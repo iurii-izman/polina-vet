@@ -1,0 +1,22 @@
+{
+  "name": "@polina-vet/studio",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity start",
+    "build": "sanity build",
+    "typegen": "sanity schema extract --force && sanity typegen generate",
+    "check": "pnpm typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/vision": "^6.12.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sanity": "^6.12.0",
+    "styled-components": "^6.5.3"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

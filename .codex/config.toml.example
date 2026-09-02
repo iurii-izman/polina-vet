@@ -1,0 +1,17 @@
+# Example only. Prefer user-level ~/.codex/config.toml for authenticated/user-specific MCP config.
+# Do not commit API keys or access tokens.
+
+[mcp_servers.sanity]
+url = "https://mcp.sanity.io"
+
+# Context7 is preferably installed as its Codex plugin.
+# Remote MCP alternative:
+# [mcp_servers.context7]
+# url = "https://mcp.context7.com/mcp"
+
+# Windows example for Chrome DevTools MCP.
+[mcp_servers.chrome-devtools]
+command = "cmd"
+args = ["/c", "npx", "-y", "chrome-devtools-mcp@latest"]
+env = { SystemRoot = "C:\\Windows", PROGRAMFILES = "C:\\Program Files" }
+startup_timeout_ms = 20000

@@ -1,0 +1,10 @@
+.agents/
+.codex/
+docs/
+node_modules/
+apps/studio/sanity.types.ts
+AGENTS.md
+BOOTSTRAP_MANIFEST.md
+CODEX_START_PROMPT.md
+pnpm-lock.yaml
+.playwright-cli/
