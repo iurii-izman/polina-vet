@@ -5,7 +5,7 @@ import { loadEnv } from 'vite';
 
 import { SANITY_API_VERSION } from '../../sanity.shared.ts';
 
-const env = loadEnv('development', process.cwd(), '');
+const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 const projectId = env.PUBLIC_SANITY_PROJECT_ID;
 const dataset = env.PUBLIC_SANITY_DATASET;
 

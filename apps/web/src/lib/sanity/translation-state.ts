@@ -3,23 +3,25 @@ export type TranslationState = 'CURRENT' | 'MISSING' | 'REVIEW_REQUIRED' | 'WITH
 export interface TranslationFacts {
   exists: boolean;
   withdrawn?: boolean;
-  medicalRevision?: number;
-  sourceMedicalRevision?: number;
+  /** Current medical revision of the document from which this translation was made. */
+  sourceCurrentMedicalRevision?: number;
+  /** Medical revision of that source recorded when this translation was produced. */
+  translationSourceMedicalRevision?: number;
 }
 
 /** Derives a user-facing translation state from stored editorial facts only. */
 export function getTranslationState({
   exists,
   withdrawn,
-  medicalRevision,
-  sourceMedicalRevision,
+  sourceCurrentMedicalRevision,
+  translationSourceMedicalRevision,
 }: TranslationFacts): TranslationState {
   if (!exists) return 'MISSING';
   if (withdrawn) return 'WITHDRAWN';
   if (
-    medicalRevision !== undefined &&
-    sourceMedicalRevision !== undefined &&
-    medicalRevision !== sourceMedicalRevision
+    sourceCurrentMedicalRevision === undefined ||
+    translationSourceMedicalRevision === undefined ||
+    sourceCurrentMedicalRevision !== translationSourceMedicalRevision
   )
     return 'REVIEW_REQUIRED';
   return 'CURRENT';

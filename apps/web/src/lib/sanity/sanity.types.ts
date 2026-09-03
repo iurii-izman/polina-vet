@@ -436,11 +436,24 @@ export type PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT = {
   }> | null;
 } | null;
 
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: ARTICLE_TRANSLATION_STATE_QUERY
+// Query: *[    _type == "article" &&    translationGroupId == $translationGroupId &&    language == $language &&    defined(slug.current)  ][0]{    _id,    language,    translationGroupId,    "slug": slug.current,    "translationSourceMedicalRevision": sourceMedicalRevision,    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision  }
+export type ARTICLE_TRANSLATION_STATE_QUERY_RESULT = {
+  _id: string;
+  language: 'ro' | 'ru' | 'uk' | null;
+  translationGroupId: string | null;
+  slug: string | null;
+  translationSourceMedicalRevision: number | null;
+  sourceCurrentMedicalRevision: number | null;
+} | null;
+
 // Query TypeMap
 import '@sanity/client';
 declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage\n  }\n': SITE_SETTINGS_QUERY_RESULT;
     '\n  *[\n    _type == "page" &&\n    translationGroupId == $translationGroupId &&\n    language == $language &&\n    defined(slug.current)\n  ][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    language,\n    translationGroupId,\n    body\n  }\n': PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT;
+    '\n  *[\n    _type == "article" &&\n    translationGroupId == $translationGroupId &&\n    language == $language &&\n    defined(slug.current)\n  ][0]{\n    _id,\n    language,\n    translationGroupId,\n    "slug": slug.current,\n    "translationSourceMedicalRevision": sourceMedicalRevision,\n    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision\n  }\n': ARTICLE_TRANSLATION_STATE_QUERY_RESULT;
   }
 }

@@ -3,6 +3,8 @@ import { getCliClient } from 'sanity/cli';
 import { SANITY_API_VERSION } from '../../../sanity.shared';
 
 const client = getCliClient({ apiVersion: SANITY_API_VERSION });
+const canonicalEditorialPolicyId = 'page-editorial-policy-ru';
+const legacyEditorialPolicyId = 'page.editorial-policy.ru';
 
 const block = (key: string, text: string, style: 'normal' | 'h2' = 'normal') => ({
   _key: key,
@@ -20,7 +22,6 @@ const siteSettings = {
 };
 
 const editorialPolicy = {
-  _id: 'page-editorial-policy-ru',
   _type: 'page',
   title: 'Как готовятся материалы POLINA VET',
   slug: { _type: 'slug', current: 'editorial-policy' },
@@ -53,5 +54,29 @@ const editorialPolicy = {
 };
 
 await client.createOrReplace(siteSettings);
-await client.createOrReplace(editorialPolicy);
-console.log('Safe seed completed: siteSettings and page-editorial-policy-ru.');
+
+const matchingEditorialPolicies = await client.fetch<Array<{ _id: string }>>(
+  `*[
+    _type == "page" &&
+    language == "ru" &&
+    translationGroupId == "editorial-policy" &&
+    slug.current == "editorial-policy"
+  ]{_id}`,
+);
+
+if (matchingEditorialPolicies.length > 1)
+  throw new Error(
+    'Safe seed refused: Editorial Policy has multiple documents with the same logical identity.',
+  );
+
+const existingEditorialPolicyId = matchingEditorialPolicies[0]?._id;
+if (existingEditorialPolicyId === legacyEditorialPolicyId) {
+  await client.createOrReplace({ ...editorialPolicy, _id: canonicalEditorialPolicyId });
+  console.log(
+    `Safe seed created canonical ${canonicalEditorialPolicyId}; delete legacy ${legacyEditorialPolicyId} after public verification.`,
+  );
+} else {
+  const editorialPolicyId = existingEditorialPolicyId ?? canonicalEditorialPolicyId;
+  await client.createOrReplace({ ...editorialPolicy, _id: editorialPolicyId });
+  console.log(`Safe seed completed: siteSettings and ${editorialPolicyId}.`);
+}
