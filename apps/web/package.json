@@ -8,17 +8,23 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts",
     "test:e2e": "playwright test tests/smoke.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
-    "astro": "^7.2.10"
+    "@sanity/astro": "^3.5.1",
+    "@sanity/client": "^8.4.0",
+    "astro": "^7.2.10",
+    "astro-portabletext": "^1.0.0",
+    "groq": "^6.12.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
-    "@types/node": "^24.10.0",
     "@playwright/test": "^1.62.1",
-    "typescript": "^6.0.3"
+    "@types/node": "^24.10.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.2"
   }
 }

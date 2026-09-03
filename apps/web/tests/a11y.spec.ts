@@ -11,6 +11,7 @@ for (const path of [
   '/ru/urgent/',
   '/ru/pets/urgent/',
   '/ru/farm/urgent/',
+  '/ru/editorial-policy/',
 ]) {
   test(`has no automatic accessibility violations: ${path}`, async ({ page }) => {
     await page.goto(path);

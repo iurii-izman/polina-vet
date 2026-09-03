@@ -6,6 +6,11 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      PUBLIC_SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      PUBLIC_SANITY_DATASET: ${{ vars.SANITY_DATASET }}
+      SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: ${{ vars.SANITY_DATASET }}
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4

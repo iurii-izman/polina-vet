@@ -7,6 +7,8 @@
     "dev": "sanity start",
     "build": "sanity build",
     "typegen": "sanity schema extract --force && sanity typegen generate",
+    "seed:safe": "sanity exec scripts/seed-safe.ts --with-user-token",
+    "verify:remote": "sanity exec scripts/verify-remote.mjs",
     "check": "pnpm typegen && tsc --noEmit"
   },
   "dependencies": {
@@ -17,6 +19,7 @@
     "styled-components": "^6.5.3"
   },
   "devDependencies": {
+    "@sanity/client": "^8.4.0",
     "typescript": "^6.0.3"
   }
 }

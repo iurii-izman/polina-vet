@@ -29,4 +29,11 @@ export const source = defineType({
     defineField({ name: 'jurisdiction', title: 'Юрисдикция', type: 'string' }),
     defineField({ name: 'identifier', title: 'DOI / идентификатор', type: 'string' }),
   ],
+  validation: (Rule) =>
+    Rule.custom((document) => {
+      const item = document as Record<string, unknown> | undefined;
+      return item?.status !== 'superseded' || item?.supersededBy
+        ? true
+        : 'Заменённому источнику нужен supersededBy.';
+    }),
 });

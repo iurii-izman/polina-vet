@@ -60,6 +60,12 @@ export const clinicalCase = defineType({
       validation: (Rule) => Rule.required().integer().min(1),
     }),
     defineField({
+      name: 'sourceMedicalRevision',
+      title: 'Медицинская редакция источника',
+      type: 'number',
+      validation: (Rule) => Rule.integer().min(1),
+    }),
+    defineField({
       name: 'lastMedicalReview',
       title: 'Последняя медицинская проверка',
       type: 'date',
@@ -100,8 +106,13 @@ export const clinicalCase = defineType({
   validation: (Rule) =>
     Rule.custom((document) => {
       const item = document as Record<string, unknown> | undefined;
-      return item?.consentVerified && item?.anonymisationVerified
-        ? true
-        : 'Публикация кейса требует подтверждённых согласия и анонимизации.';
+      const errors: string[] = [];
+      if (!item?.consentVerified || !item?.anonymisationVerified)
+        errors.push('Публикация кейса требует подтверждённых согласия и анонимизации.');
+      if (item?.language !== 'ru' && (!item?.translatedFrom || !item?.sourceMedicalRevision))
+        errors.push('Переводу нужны translatedFrom и sourceMedicalRevision.');
+      if (item?.language === 'ru' && item?.translatedFrom)
+        errors.push('RU-источник не должен иметь translatedFrom.');
+      return errors.length ? errors.join(' ') : true;
     }),
 });
