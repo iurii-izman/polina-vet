@@ -103,6 +103,59 @@ test('editorial policy renders the safe Sanity page rather than a static placeho
   await expect(page.getByRole('heading', { name: 'Как обновляются переводы' })).toBeVisible();
 });
 
+test('M5 publishes the real profile and contact boundary', async ({ page }) => {
+  await page.goto('/ru/about/');
+  await expect(page.getByRole('heading', { name: 'Изман Полина Андреевна' })).toBeVisible();
+  await expect(page.getByText('Ветеринарный врач', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Заведующая ветеринарным участком с. Кицканы', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('ПГУ им. Т. Г. Шевченко', { exact: true })).toBeVisible();
+  await expect(page.locator('.profile-education')).toContainText('Ветеринарная медицина');
+
+  await page.goto('/ru/contact/');
+  const urgentBoundary = page.locator('.urgent-boundary');
+  expect(
+    await urgentBoundary.evaluate((node) =>
+      Boolean(
+        node.compareDocumentPosition(document.querySelector('#contact-methods-title')!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      ),
+    ),
+  ).toBeTruthy();
+  await expect(page.getByText('+373 777 40970', { exact: true })).toBeVisible();
+  await expect(page.locator('a[href="tel:+37377740970"]')).toBeVisible();
+  await expect(page.getByText('@Polly_My', { exact: true })).toBeVisible();
+  await expect(page.locator('a[href="https://t.me/Polly_My"]')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Открыть на карте' })).toHaveAttribute(
+    'href',
+    'https://maps.app.goo.gl/EKB2oUzbYDr4q2pN9',
+  );
+  await expect(page.getByText('Личное обращение', { exact: true })).toBeVisible();
+  await expect(page.getByText('Приём', { exact: true })).toBeVisible();
+  await expect(page.getByText('Выезд', { exact: true })).toBeVisible();
+  await expect(page.getByText('WhatsApp', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Viber', { exact: true })).toHaveCount(0);
+});
+
+test('M5 featured knowledge is governed and the educational case is an article', async ({
+  page,
+}) => {
+  await page.goto('/ru/');
+  await expect(page.locator('.featured-knowledge .knowledge-card')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: /Рвота и диарея у собаки/ })).toBeVisible();
+
+  await page.goto('/ru/knowledge/');
+  await expect(
+    page.getByRole('heading', { name: 'Учебный клинический разбор: тяжёлое отравление у собаки' }),
+  ).toBeVisible();
+  await page.goto('/ru/pets/educational-dog-poisoning-case/');
+  await expect(page.locator('.medical-block--safety').first()).toContainText(
+    'Сценарий создан для демонстрации клинической логики',
+  );
+  await expect(page.locator('.featured-case')).toHaveCount(0);
+});
+
 test('404 provides useful routes and keeps the urgent action in the global header', async ({
   page,
 }) => {

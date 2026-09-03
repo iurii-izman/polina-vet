@@ -8,6 +8,9 @@ import PolinaTrust from '../../components/PolinaTrust.astro';
 import SeasonalPanel from '../../components/SeasonalPanel.astro';
 import { homepageContent } from '../../data/homepage';
 import { route } from '../../lib/i18n';
+import { getPublicProfile } from '../../lib/sanity/content';
+
+const profile = await getPublicProfile();
 ---
 
 <BaseLayout title="Практическая ветеринарная информация" locale="ru">
@@ -46,9 +49,9 @@ import { route } from '../../lib/i18n';
     </div>
   </section>
   {homepageContent.seasonal && <SeasonalPanel content={homepageContent.seasonal} />}
-  <PolinaTrust locale="ru" />
+  <PolinaTrust locale="ru" profile={profile} />
   <ContentMethodology locale="ru" />
-  <FeaturedKnowledge locale="ru" />
+  <FeaturedKnowledge locale="ru" items={profile?.featuredKnowledge ?? []} />
   {homepageContent.featuredCase && <FeaturedCase content={homepageContent.featuredCase} />}
   <ContactStrip locale="ru" />
 </BaseLayout>

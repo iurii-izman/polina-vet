@@ -32,7 +32,9 @@ const [
   documents,
   routableDocuments,
 ] = await Promise.all([
-  client.fetch('*[_type == "siteSettings" && _id == "siteSettings"]{_id,title,defaultLanguage}'),
+  client.fetch(
+    '*[_type == "siteSettings"]{_id,title,defaultLanguage,primaryAuthor,contacts,location,serviceModes,featuredKnowledge}',
+  ),
   client.fetch('*[_type == "page"]{"id":_id,language,translationGroupId,"slug":slug.current}'),
   client.fetch(`*[_type == "article"]{
     "id": _id,
@@ -56,7 +58,7 @@ const [
     withdrawn,
     "replacement": replacement._ref
   }`),
-  client.fetch('*[_type == "author"]{"id":_id,name,role}'),
+  client.fetch('*[_type == "author"]{"id":_id,name,role,"slug":slug.current}'),
   client.fetch('*[_type == "source"]{"id":_id,status,"supersededBy":supersededBy._ref}'),
   client.fetch(
     '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
@@ -96,8 +98,30 @@ if (siteSettings.length !== 1)
   throw new Error(
     `siteSettings singleton expected exactly one document, found ${siteSettings.length}.`,
   );
-if (siteSettings[0].title !== 'POLINA VET' || siteSettings[0].defaultLanguage !== 'ru')
+if (
+  siteSettings[0]._id !== 'siteSettings' ||
+  siteSettings[0].title !== 'POLINA VET' ||
+  siteSettings[0].defaultLanguage !== 'ru'
+)
   throw new Error('siteSettings singleton is missing or does not contain the safe seed values.');
+const primaryAuthorId = siteSettings[0].primaryAuthor?._ref;
+const publicAuthorIds = new Set(publicAuthors.map((author) => author.id));
+if (!primaryAuthorId || !publicAuthorIds.has(primaryAuthorId))
+  throw new Error('siteSettings.primaryAuthor does not resolve through the public API.');
+if (siteSettings[0].contacts?.primaryPhone !== '+373 777 40970')
+  throw new Error('siteSettings.contacts.primaryPhone is missing or invalid.');
+if (siteSettings[0].contacts?.telegramHandle !== '@Polly_My')
+  throw new Error('siteSettings.contacts.telegramHandle is missing or invalid.');
+if (siteSettings[0].location?.label !== 'Ветеринарный участок, с. Кицканы')
+  throw new Error('siteSettings.location.label is missing or invalid.');
+if (!siteSettings[0].location?.mapUrl?.startsWith('https://'))
+  throw new Error('siteSettings.location.mapUrl must be an HTTPS URL.');
+const allowedServiceModes = new Set(['personalInquiry', 'appointment', 'fieldVisit']);
+if (
+  !siteSettings[0].serviceModes?.length ||
+  siteSettings[0].serviceModes.some((mode) => !allowedServiceModes.has(mode))
+)
+  throw new Error('siteSettings.serviceModes contains an invalid or missing value.');
 const seededEditorialPolicies = routableDocuments.filter(
   (page) =>
     page._type === 'page' &&
@@ -125,7 +149,7 @@ if (inaccessibleDocuments.length)
 
 const policyErrors = validateContent(articles, sources);
 if (policyErrors.length) throw new Error(policyErrors.join('\n'));
-const publicAuthorIds = new Set(publicAuthors.map((author) => author.id));
+const publicSourceIds = new Set(sources.map((source) => source.id));
 for (const article of articles) {
   if (!article.medicalOwner || !publicAuthorIds.has(article.medicalOwner))
     throw new Error(`${article.id}: medicalOwner does not resolve through the public API.`);
@@ -136,7 +160,16 @@ for (const article of articles) {
     throw new Error(`${article.id}: HIGH-risk reviewedBy does not resolve through the public API.`);
   if (article.riskLevel === 'HIGH' && article.reviewedBy === article.medicalOwner)
     throw new Error(`${article.id}: HIGH-risk reviewedBy must be independent from medicalOwner.`);
+  for (const sourceId of article.sources ?? [])
+    if (!publicSourceIds.has(sourceId))
+      throw new Error(`${article.id}: source ${sourceId} does not resolve through the public API.`);
 }
+const publicArticleIds = new Set(publicArticles.map((article) => article.id));
+for (const featured of siteSettings[0].featuredKnowledge ?? [])
+  if (!publicArticleIds.has(featured._ref))
+    throw new Error(
+      `siteSettings.featuredKnowledge reference ${featured._ref} does not resolve publicly.`,
+    );
 const editorialWarnings = collectEditorialWarnings(articles, sources);
 const identityErrors = validateRoutableContentIdentity({ pages, articles });
 if (identityErrors.length) throw new Error(identityErrors.join('\n'));

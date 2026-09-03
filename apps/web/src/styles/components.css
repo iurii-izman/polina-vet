@@ -413,6 +413,15 @@
 .trust-block h2 {
   color: white;
 }
+.trust-block__portrait {
+  display: block;
+  width: min(100%, 11rem);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 20%;
+  margin-bottom: var(--space-5);
+  border-radius: var(--radius-md);
+}
 .trust-block p {
   color: #e9eee9;
 }
@@ -709,6 +718,68 @@
 .page-content h2 {
   margin-top: var(--space-10);
 }
+.profile-grid,
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+.profile-portrait {
+  margin: var(--space-8) 0 0;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--surface-farm);
+}
+.profile-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center 20%;
+}
+.profile-card {
+  align-self: start;
+}
+.profile-education h3 {
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+.profile-education p + p {
+  margin-top: var(--space-4);
+}
+.contact-grid {
+  margin-top: var(--space-5);
+}
+.contact-grid .state-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: 0;
+}
+.contact-grid .state-card h3 {
+  overflow-wrap: anywhere;
+}
+.contact-grid .button {
+  margin-top: auto;
+}
+.contact-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.availability-note {
+  margin-top: var(--space-8);
+  padding: var(--space-6);
+  border-left: 0.35rem solid var(--color-terracotta);
+  background: var(--surface-urgent);
+}
+.availability-note h2 {
+  margin-top: 0;
+}
 .farm-risk-block {
   padding: var(--space-6);
   border-radius: var(--radius-md);
@@ -774,6 +845,10 @@
   }
   .trust-block {
     grid-template-columns: 1fr 1.2fr;
+  }
+  .profile-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 700px) {

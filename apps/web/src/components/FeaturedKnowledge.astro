@@ -1,17 +1,31 @@
 ---
 import type { Locale } from '../lib/i18n';
 import { route } from '../lib/i18n';
+import { articleRoute, type ArticleDomain } from '../lib/articleRoute';
+import type { PUBLIC_PROFILE_QUERY_RESULT } from '../lib/sanity/sanity.types';
 
-interface Props { locale: Locale }
-const { locale } = Astro.props;
+type PublicProfile = NonNullable<PUBLIC_PROFILE_QUERY_RESULT>;
+interface Props { locale: Locale; items?: NonNullable<PublicProfile['featuredKnowledge']> }
+const { locale, items = [] } = Astro.props;
+const routedItems = items.filter(
+  (article): article is (typeof items)[number] & { slug: string; primaryDomain: ArticleDomain } =>
+    Boolean(article.slug && article.primaryDomain && article.language === 'ru'),
+);
 ---
 
 <section class="container section featured-knowledge" aria-labelledby="knowledge-title">
   <p class="eyebrow">Знания</p>
   <h2 id="knowledge-title">Полезные материалы</h2>
-  <div class="empty-state">
+  {routedItems.length ? <div class="card-grid">
+    {routedItems.map((article) => <a class="knowledge-card" href={articleRoute({ language: 'ru', primaryDomain: article.primaryDomain, slug: article.slug })}>
+      <p class="eyebrow">{article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания'}</p>
+      <h3>{article.title}</h3>
+      <p>{article.summary}</p>
+      <span class="action-card__link">Читать материал <span aria-hidden="true">→</span></span>
+    </a>)}
+  </div> : <div class="empty-state">
     <h3>Материалы готовятся</h3>
     <p>Проверенные материалы появятся здесь после медицинской проверки, указания источников и даты пересмотра.</p>
     <a class="text-link" href={route.knowledge(locale)}>Открыть раздел «Знания» <span aria-hidden="true">→</span></a>
-  </div>
+  </div>}
 </section>

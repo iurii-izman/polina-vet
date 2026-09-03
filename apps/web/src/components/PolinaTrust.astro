@@ -1,16 +1,31 @@
 ---
 import type { Locale } from '../lib/i18n';
 import { route } from '../lib/i18n';
+import { sanityImageUrl } from '../lib/sanity/image';
+import type { PUBLIC_PROFILE_QUERY_RESULT } from '../lib/sanity/sanity.types';
 
-interface Props { locale: Locale }
-const { locale } = Astro.props;
+type PublicProfile = NonNullable<PUBLIC_PROFILE_QUERY_RESULT>;
+interface Props { locale: Locale; profile?: PublicProfile | null }
+const { locale, profile } = Astro.props;
+const author = profile?.primaryAuthor;
+const portrait = author?.portrait;
+const portraitImage = portrait
+  ? {
+      src: sanityImageUrl(portrait, 480),
+      alt: portrait.alt ?? '',
+      width: portrait.dimensions?.width ?? 480,
+      height: portrait.dimensions?.height ?? 600,
+    }
+  : undefined;
 ---
 
 <section class="container trust-block">
   <div>
     <p class="eyebrow">Кто готовит материалы</p>
-    <h2>Полина</h2>
-    <p>Фактические сведения о профессиональном профиле будут добавлены после проверки.</p>
+    {portraitImage?.src && <img class="trust-block__portrait" src={portraitImage.src} alt={portraitImage.alt} width={portraitImage.width} height={portraitImage.height} loading="lazy" />}
+    <h2>{author?.name ?? 'Полина'}</h2>
+    {author?.role && <p>{author.role}</p>}
+    {author?.shortBio && <p>{author.shortBio}</p>}
     <a class="button button--light" href={route.about(locale)}>О Полине <span aria-hidden="true">→</span></a>
   </div>
   <div>
