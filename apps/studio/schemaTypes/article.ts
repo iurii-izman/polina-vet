@@ -129,6 +129,8 @@ export const article = defineType({
       title: 'Заметки по проверке',
       type: 'text',
       rows: 3,
+      description:
+        'Production dataset is public. Не добавляйте персональные данные владельцев/пациентов или конфиденциальные внутренние сведения.',
       fieldset: 'governance',
     }),
     defineField({
@@ -214,8 +216,8 @@ export const article = defineType({
       const errors: string[] = [];
       if (item.language !== 'ru' && (!item.translatedFrom || !item.sourceMedicalRevision))
         errors.push('Переводу нужны translatedFrom и sourceMedicalRevision.');
-      if (item.language === 'ru' && item.translatedFrom)
-        errors.push('RU-источник не должен иметь translatedFrom.');
+      if (item.language === 'ru' && (item.translatedFrom || item.sourceMedicalRevision))
+        errors.push('RU-источник не должен иметь translatedFrom или sourceMedicalRevision.');
       if (item.riskLevel === 'HIGH' && !item.reviewedBy)
         errors.push('Для HIGH-risk материала нужен независимый рецензент.');
       if (item.withdrawn && !item.replacement)

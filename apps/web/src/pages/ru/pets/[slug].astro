@@ -5,7 +5,7 @@ import { getRussianArticlePaths } from '../../../lib/articlePaths';
 import { sanityClient } from 'sanity:client';
 export async function getStaticPaths() { return (await getRussianArticlePaths()).filter((entry: Awaited<ReturnType<typeof getRussianArticlePaths>>[number]) => entry.props.domain === 'pet'); }
 const { slug } = Astro.params;
-const article = await sanityClient.fetch(ARTICLE_DETAIL_QUERY, { language: 'ru', slug });
+const article = await sanityClient.fetch(ARTICLE_DETAIL_QUERY, { language: 'ru', primaryDomain: 'pet', slug });
 if (!article || article.primaryDomain !== 'pet') throw new Error(`Published article not found: ${slug}`);
 ---
 <ArticlePage article={article} now={new Date().toISOString().slice(0, 10)} />

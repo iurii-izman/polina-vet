@@ -1,6 +1,11 @@
+import { RESERVED_ARTICLE_ROUTES, reservedArticleRouteKey } from './reserved-routes.mjs';
+
 const languages = new Set(['ru', 'ro', 'uk']);
 const domains = new Set(['pet', 'farm', 'shared']);
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const referenceId = (reference) =>
+  typeof reference === 'string' ? reference : (reference?.id ?? reference?._ref ?? reference?._id);
 
 export function validateContent(documents, sources = []) {
   const errors = [];
@@ -44,13 +49,16 @@ export function validateContent(documents, sources = []) {
       errors.push(`${document.id}: translation lineage is incomplete`);
     if (document.language === 'ru' && (document.translatedFrom || document.sourceMedicalRevision))
       errors.push(`${document.id}: RU source cannot have translation lineage`);
-    if (document.withdrawn && (!document.replacement || document.replacement === document.id))
+    if (
+      document.withdrawn &&
+      (!document.replacement || referenceId(document.replacement) === document.id)
+    )
       errors.push(`${document.id}: withdrawn content needs a different safe replacement`);
+    if (RESERVED_ARTICLE_ROUTES.has(reservedArticleRouteKey(document)))
+      errors.push(`${document.id}: article route collides with a reserved static route`);
     for (const sourceId of document.sources ?? []) {
       const source = sourceIds.get(sourceId);
       if (!source) errors.push(`${document.id}: unresolved source ${sourceId}`);
-      if (source?.status === 'withdrawn')
-        errors.push(`${document.id}: withdrawn source ${sourceId}`);
     }
   }
   for (const document of documents) {
@@ -61,8 +69,21 @@ export function validateContent(documents, sources = []) {
       ids.get(document.translatedFrom)?.translationGroupId !== document.translationGroupId
     )
       errors.push(`${document.id}: translation family does not match its source`);
-    if (document.replacement && !ids.has(document.replacement))
-      errors.push(`${document.id}: replacement does not exist`);
+    const replacementId = referenceId(document.replacement);
+    const replacement = replacementId ? ids.get(replacementId) : undefined;
+    if (replacementId && !replacement) errors.push(`${document.id}: replacement does not exist`);
+    if (replacementId && replacement && (replacement.withdrawn || replacement.archived))
+      errors.push(`${document.id}: replacement must be active and routable`);
+    if (
+      replacementId &&
+      replacement &&
+      (!replacement.slug ||
+        !languages.has(replacement.language) ||
+        !domains.has(replacement.primaryDomain))
+    )
+      errors.push(`${document.id}: replacement is not routable`);
+    if (replacementId && replacement && referenceId(replacement.replacement) === document.id)
+      errors.push(`${document.id}: replacement creates an obvious two-document cycle`);
     if (document.previousSlugs?.includes(document.slug))
       errors.push(`${document.id}: current slug is duplicated in previousSlugs`);
   }
@@ -100,6 +121,22 @@ export function validateRoutableContentIdentity({ pages, articles }) {
     (article) => `${article.language}:${article.primaryDomain}:${article.slug}`,
   );
   return errors;
+}
+
+export function collectEditorialWarnings(documents, sources = []) {
+  const sourceIds = new Map(sources.map((source) => [source.id, source]));
+  return documents.flatMap((document) =>
+    (document.sources ?? [])
+      .filter(
+        (sourceId) =>
+          sourceIds.get(referenceId(sourceId))?.status === 'withdrawn' ||
+          sourceIds.get(referenceId(sourceId))?.status === 'superseded',
+      )
+      .map(
+        (sourceId) =>
+          `${document.id}: source ${referenceId(sourceId)} is ${sourceIds.get(referenceId(sourceId)).status}`,
+      ),
+  );
 }
 
 const fixtures = [
@@ -197,10 +234,15 @@ const withdrawnSourceFixture = {
   sources: ['synthetic-withdrawn'],
 };
 if (
-  !validateContent(
+  validateContent([withdrawnSourceFixture], [{ id: 'synthetic-withdrawn', status: 'withdrawn' }])
+    .length
+)
+  throw new Error('Withdrawn-source fixture must be a valid build input.');
+if (
+  !collectEditorialWarnings(
     [withdrawnSourceFixture],
     [{ id: 'synthetic-withdrawn', status: 'withdrawn' }],
-  ).some((error) => error.includes('withdrawn source'))
+  ).length
 )
-  throw new Error('Withdrawn-source fixture did not fail policy validation.');
+  throw new Error('Withdrawn-source fixture did not produce an editorial warning.');
 console.log('Local synthetic content policy validation passed. Fixtures are not seeded.');

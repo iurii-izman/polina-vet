@@ -4,7 +4,7 @@ import test from 'node:test';
 import { getSafeReplacement, getTranslationState } from './translation-state.ts';
 
 test('derives current, missing, review-required, and withdrawn translation states', () => {
-  assert.equal(getTranslationState({ exists: false }), 'MISSING');
+  assert.equal(getTranslationState({ exists: false }), 'PENDING');
   assert.equal(
     getTranslationState({
       exists: true,

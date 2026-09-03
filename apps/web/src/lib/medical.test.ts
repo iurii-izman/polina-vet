@@ -4,11 +4,11 @@ import {
   deriveMedicalReviewState,
   derivePublicSafetyState,
   deriveSourceHealth,
-  deriveTranslationState,
   addCalendarMonths,
   isDiscoveryEligible,
 } from './medical.ts';
 import { articleRoute, previousSlugRoutes } from './articleRoute.ts';
+import { getTranslationState } from './sanity/translation-state.ts';
 
 describe('medical governance helpers', () => {
   it('clamps calendar month addition to the target month', () => {
@@ -84,26 +84,33 @@ describe('medical governance helpers', () => {
       }),
       'CURRENT',
     );
+    assert.equal(
+      isDiscoveryEligible(
+        { withdrawn: true, riskLevel: 'STANDARD', sourceStatuses: ['current'] },
+        '2026-09-03',
+      ),
+      false,
+    );
   });
   it('uses source revision for translation freshness', () => {
     assert.equal(
-      deriveTranslationState({
-        language: 'ro',
-        translatedFromMedicalRevision: 3,
-        sourceMedicalRevision: 3,
+      getTranslationState({
+        exists: true,
+        sourceCurrentMedicalRevision: 3,
+        translationSourceMedicalRevision: 3,
       }),
       'CURRENT',
     );
     assert.equal(
-      deriveTranslationState({
-        language: 'ro',
-        translatedFromMedicalRevision: 2,
-        sourceMedicalRevision: 3,
+      getTranslationState({
+        exists: true,
+        sourceCurrentMedicalRevision: 2,
+        translationSourceMedicalRevision: 3,
       }),
       'REVIEW_REQUIRED',
     );
-    assert.equal(deriveTranslationState({ language: 'ro' }), 'REVIEW_REQUIRED');
-    assert.equal(deriveTranslationState(undefined), 'PENDING');
+    assert.equal(getTranslationState({ exists: true }), 'REVIEW_REQUIRED');
+    assert.equal(getTranslationState({ exists: false }), 'PENDING');
   });
   it('maps canonical domains and previous slugs', () => {
     assert.equal(articleRoute({ language: 'ru', primaryDomain: 'pet', slug: 'a' }), '/ru/pets/a/');

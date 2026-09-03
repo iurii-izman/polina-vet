@@ -2,6 +2,7 @@ import { createClient } from '@sanity/client';
 import { getCliClient } from 'sanity/cli';
 
 import {
+  collectEditorialWarnings,
   validateContent,
   validateRoutableContentIdentity,
 } from '../../../scripts/validate-content.mjs';
@@ -22,11 +23,18 @@ const client = createClient({
 });
 const authenticatedClient = getCliClient({ apiVersion: SANITY_API_VERSION });
 
-const [siteSettings, publicPages, publicArticles, sources, documents, routableDocuments] =
-  await Promise.all([
-    client.fetch('*[_type == "siteSettings" && _id == "siteSettings"]{_id,title,defaultLanguage}'),
-    client.fetch('*[_type == "page"]{"id":_id,language,translationGroupId,"slug":slug.current}'),
-    client.fetch(`*[_type == "article"]{
+const [
+  siteSettings,
+  publicPages,
+  publicArticles,
+  publicAuthors,
+  sources,
+  documents,
+  routableDocuments,
+] = await Promise.all([
+  client.fetch('*[_type == "siteSettings" && _id == "siteSettings"]{_id,title,defaultLanguage}'),
+  client.fetch('*[_type == "page"]{"id":_id,language,translationGroupId,"slug":slug.current}'),
+  client.fetch(`*[_type == "article"]{
     "id": _id,
     title, summary,
     language,
@@ -35,6 +43,7 @@ const [siteSettings, publicPages, publicArticles, sources, documents, routableDo
     translationGroupId,
     riskLevel,
     "medicalOwner": medicalOwner._ref,
+    "reviewedBy": reviewedBy._ref,
     lastMedicalReview,
     reviewIntervalMonths,
     medicalRevision,
@@ -45,11 +54,12 @@ const [siteSettings, publicPages, publicArticles, sources, documents, routableDo
     withdrawn,
     "replacement": replacement._ref
   }`),
-    client.fetch('*[_type == "source"]{"id":_id,status}'),
-    client.fetch(
-      '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
-    ),
-    authenticatedClient.fetch(`
+  client.fetch('*[_type == "author"]{"id":_id,name,role}'),
+  client.fetch('*[_type == "source"]{"id":_id,status}'),
+  client.fetch(
+    '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
+  ),
+  authenticatedClient.fetch(`
     *[
       _type in ["page", "article"] &&
       !(_id in path("drafts.**"))
@@ -64,6 +74,7 @@ const [siteSettings, publicPages, publicArticles, sources, documents, routableDo
       primaryDomain,
       riskLevel,
       "medicalOwner": medicalOwner._ref,
+      "reviewedBy": reviewedBy._ref,
       lastMedicalReview,
       reviewIntervalMonths,
       medicalRevision,
@@ -75,7 +86,7 @@ const [siteSettings, publicPages, publicArticles, sources, documents, routableDo
       "replacement": replacement._ref
     }
   `),
-  ]);
+]);
 
 if (siteSettings.length !== 1)
   throw new Error(
@@ -110,6 +121,17 @@ if (inaccessibleDocuments.length)
 
 const policyErrors = validateContent(articles, sources);
 if (policyErrors.length) throw new Error(policyErrors.join('\n'));
+const publicAuthorIds = new Set(publicAuthors.map((author) => author.id));
+for (const article of articles) {
+  if (!article.medicalOwner || !publicAuthorIds.has(article.medicalOwner))
+    throw new Error(`${article.id}: medicalOwner does not resolve through the public API.`);
+  if (
+    article.riskLevel === 'HIGH' &&
+    (!article.reviewedBy || !publicAuthorIds.has(article.reviewedBy))
+  )
+    throw new Error(`${article.id}: HIGH-risk reviewedBy does not resolve through the public API.`);
+}
+const editorialWarnings = collectEditorialWarnings(articles, sources);
 const identityErrors = validateRoutableContentIdentity({ pages, articles });
 if (identityErrors.length) throw new Error(identityErrors.join('\n'));
 if (
@@ -122,5 +144,5 @@ if (
   throw new Error('A medical placeholder must never be published to the public dataset.');
 
 console.log(
-  `Remote Sanity verification passed. pages=${pages.length}; articles=${articles.length}; clinicalCases=${documents.filter((document) => document._type === 'clinicalCase').length}.`,
+  `Remote Sanity verification passed. pages=${pages.length}; articles=${articles.length}; clinicalCases=${documents.filter((document) => document._type === 'clinicalCase').length}; authors=${publicAuthors.length}; sources=${sources.length}; editorialWarnings=${editorialWarnings.length}.`,
 );

@@ -1,10 +1,11 @@
 ---
+import { medicalBlockId } from '../lib/medicalBlockId';
 interface Props { value: { _type: string; _key?: string; title?: string; description?: string; text?: string; items?: string[] } }
 const { value } = Astro.props;
 const headings: Record<string, string> = { practicalActions: 'Что можно сделать', dontDoBlock: 'Чего не делать', redFlagCategory: 'Признаки для срочной помощи', checklist: 'Чек-лист', nextSteps: 'Следующие шаги', safetyNotice: 'Важное ограничение' };
 const heading = value.title ?? headings[value._type] ?? 'Информация';
 const kind = value._type === 'safetyNotice' ? 'medical-block safety-notice' : value._type === 'redFlagCategory' ? 'medical-block red-flag' : 'medical-block';
-const id = `medical-block-${value._key ?? value._type}`;
+const id = medicalBlockId(value._type, value._key);
 ---
 <section class={kind} aria-labelledby={id}>
   <h2 id={id}>{heading}</h2>

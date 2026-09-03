@@ -1,19 +1,9 @@
 ---
 import MedicalBlock from './MedicalBlock.astro';
 import PortableText from './PortableText.astro';
-import type { Page } from '../lib/sanity/sanity.types';
-interface BodyBlock { _type: string; _key?: string; title?: string; description?: string; text?: string; items?: string[]; children?: Array<{ _type: 'span'; _key: string; text?: string; marks?: string[] }> }
-const { body = [] } = Astro.props as { body?: BodyBlock[] };
-type PortableBlock = NonNullable<Page['body']>[number];
-const segments: Array<{ type: 'portable'; blocks: PortableBlock[] } | { type: 'medical'; block: BodyBlock }> = [];
-for (const block of body) {
-  if (block._type === 'block') {
-    const previous = segments.at(-1);
-    const portableBlock = block as PortableBlock;
-    if (previous?.type === 'portable') previous.blocks.push(portableBlock);
-    else segments.push({ type: 'portable', blocks: [portableBlock] });
-  } else segments.push({ type: 'medical', block });
-}
+import { groupArticleBody, type ArticleBodyBlock } from '../lib/articleBodySegments';
+const { body = [] } = Astro.props as { body?: ArticleBodyBlock[] };
+const segments = groupArticleBody(body);
 ---
 <div class="article-body">
   {segments.map((segment) =>

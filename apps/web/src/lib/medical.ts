@@ -1,6 +1,5 @@
 export type MedicalReviewState = 'CURRENT' | 'REVIEW_REQUIRED';
 export type SourceHealth = 'current' | 'superseded' | 'withdrawn' | 'missing';
-export type TranslationState = 'CURRENT' | 'REVIEW_REQUIRED' | 'PENDING' | 'WITHDRAWN';
 export type PublicSafetyState = 'CURRENT' | 'STALE_HIGH_RISK' | 'WITHDRAWN';
 
 type ReviewFacts = {
@@ -46,33 +45,15 @@ export function deriveSourceHealth(
   return sources.every((source) => source?.status === 'current') ? 'current' : 'missing';
 }
 
-export function deriveTranslationState(
-  input:
-    | {
-        language?: string;
-        translatedFromMedicalRevision?: number;
-        sourceMedicalRevision?: number;
-        withdrawn?: boolean;
-      }
-    | undefined,
-): TranslationState {
-  if (!input) return 'PENDING';
-  if (input.withdrawn) return 'WITHDRAWN';
-  if (input.language === 'ru') return 'CURRENT';
-  if (!input.translatedFromMedicalRevision || !input.sourceMedicalRevision)
-    return 'REVIEW_REQUIRED';
-  return input.translatedFromMedicalRevision === input.sourceMedicalRevision
-    ? 'CURRENT'
-    : 'REVIEW_REQUIRED';
-}
-
 export function derivePublicSafetyState(input: {
   riskLevel?: string;
   withdrawn?: boolean;
   reviewState: MedicalReviewState;
   sourceHealth: SourceHealth;
+  governanceValid?: boolean;
 }): PublicSafetyState {
   if (input.withdrawn) return 'WITHDRAWN';
+  if (input.governanceValid === false) return 'STALE_HIGH_RISK';
   if (
     input.riskLevel === 'HIGH' &&
     (input.reviewState === 'REVIEW_REQUIRED' ||
@@ -86,6 +67,8 @@ export function derivePublicSafetyState(input: {
 export function isDiscoveryEligible(
   input: {
     riskLevel?: 'HIGH' | 'STANDARD' | 'LOW';
+    medicalOwner?: unknown;
+    reviewedBy?: unknown;
     lastMedicalReview?: string;
     reviewIntervalMonths?: number;
     sourceStatuses?: Array<string | null | undefined>;
@@ -102,6 +85,8 @@ export function isDiscoveryEligible(
       reviewState: deriveMedicalReviewState(input, now),
       sourceHealth,
       withdrawn: input.withdrawn,
-    }) !== 'STALE_HIGH_RISK'
+      governanceValid:
+        Boolean(input.medicalOwner) && (input.riskLevel !== 'HIGH' || Boolean(input.reviewedBy)),
+    }) === 'CURRENT'
   );
 }

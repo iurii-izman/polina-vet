@@ -1,4 +1,4 @@
-export type TranslationState = 'CURRENT' | 'MISSING' | 'REVIEW_REQUIRED' | 'WITHDRAWN';
+export type TranslationState = 'CURRENT' | 'REVIEW_REQUIRED' | 'PENDING' | 'WITHDRAWN';
 
 export interface TranslationFacts {
   exists: boolean;
@@ -16,7 +16,7 @@ export function getTranslationState({
   sourceCurrentMedicalRevision,
   translationSourceMedicalRevision,
 }: TranslationFacts): TranslationState {
-  if (!exists) return 'MISSING';
+  if (!exists) return 'PENDING';
   if (withdrawn) return 'WITHDRAWN';
   if (
     sourceCurrentMedicalRevision === undefined ||
