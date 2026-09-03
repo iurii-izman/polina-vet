@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { localeFromPath, type Locale } from '../lib/i18n';
+import { getSiteSettings } from '../lib/sanity/content';
 
 interface Props {
   title: string;
@@ -12,6 +13,8 @@ interface Props {
 
 const { title, description = 'Практическая ветеринарная информация для владельцев домашних и сельскохозяйственных животных.' } = Astro.props;
 const locale = Astro.props.locale ?? localeFromPath(Astro.url.pathname);
+const siteSettings = await getSiteSettings();
+const siteTitle = siteSettings?.title ?? 'POLINA VET';
 ---
 
 <!doctype html>
@@ -22,7 +25,7 @@ const locale = Astro.props.locale ?? localeFromPath(Astro.url.pathname);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light" />
-    <title>{title} — POLINA VET</title>
+    <title>{title} — {siteTitle}</title>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Перейти к содержанию</a>

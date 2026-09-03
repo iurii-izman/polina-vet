@@ -1,0 +1,13 @@
+---
+import { PortableText } from 'astro-portabletext';
+
+import type { Page } from '../lib/sanity/sanity.types';
+
+interface Props {
+  value: Page['body'];
+}
+
+const { value } = Astro.props;
+---
+
+{value?.length ? <PortableText value={value} /> : null}

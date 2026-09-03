@@ -37,6 +37,39 @@ export function validateContent(documents) {
   return errors;
 }
 
+/** Validates one published document per routable identity and translation locale. */
+export function validateRoutableContentIdentity({ pages, articles }) {
+  const errors = [];
+  const validateDocuments = (type, documents, routeIdentity) => {
+    const routes = new Map();
+    const translations = new Map();
+
+    for (const document of documents) {
+      const route = routeIdentity(document);
+      if (routes.has(route))
+        errors.push(
+          `${document.id}: duplicate ${type} route identity ${route} (also ${routes.get(route)})`,
+        );
+      else routes.set(route, document.id);
+
+      const translation = `${document.translationGroupId}:${document.language}`;
+      if (translations.has(translation))
+        errors.push(
+          `${document.id}: duplicate ${type} translation identity ${translation} (also ${translations.get(translation)})`,
+        );
+      else translations.set(translation, document.id);
+    }
+  };
+
+  validateDocuments('page', pages, (page) => `${page.language}:${page.slug}`);
+  validateDocuments(
+    'article',
+    articles,
+    (article) => `${article.language}:${article.primaryDomain}:${article.slug}`,
+  );
+  return errors;
+}
+
 const fixture = [
   {
     id: 'ru-example',

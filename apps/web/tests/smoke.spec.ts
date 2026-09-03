@@ -10,6 +10,7 @@ for (const path of [
   '/ru/urgent/',
   '/ru/pets/urgent/',
   '/ru/farm/urgent/',
+  '/ru/editorial-policy/',
 ]) {
   test(`renders ${path}`, async ({ page }) => {
     await page.goto(path);
@@ -84,4 +85,14 @@ test('RU navigation is locale-prefixed and conditional homepage blocks are absen
   expect(hrefs.every((href) => href?.startsWith('/ru/'))).toBeTruthy();
   await expect(page.locator('.seasonal-panel')).toHaveCount(0);
   await expect(page.locator('.featured-case')).toHaveCount(0);
+});
+
+test('editorial policy renders the safe Sanity page rather than a static placeholder', async ({
+  page,
+}) => {
+  await page.goto('/ru/editorial-policy/');
+  await expect(
+    page.getByRole('heading', { name: 'Как готовятся материалы POLINA VET' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Как обновляются переводы' })).toBeVisible();
 });

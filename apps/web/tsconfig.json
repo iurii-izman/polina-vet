@@ -1,5 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": ["@sanity/astro/module"],
+    "allowImportingTsExtensions": true
+  },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
 }

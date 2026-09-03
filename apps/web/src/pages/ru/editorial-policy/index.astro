@@ -1,4 +1,21 @@
 ---
+import PortableText from '../../../components/PortableText.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getPageByTranslationGroup } from '../../../lib/sanity/content';
+
+const page = await getPageByTranslationGroup('editorial-policy', 'ru');
+
+if (!page) {
+  throw new Error(
+    'The required safe page "editorial-policy" is missing. Run `pnpm sanity:seed:safe` before building.',
+  );
+}
 ---
-<BaseLayout title="Как готовятся материалы"><section class="page-intro container"><p class="eyebrow">Редакционная политика</p><h1>Как готовятся материалы POLINA VET</h1><p class="lead">Медицинские материалы проходят проверку, содержат источники и дату последнего медицинского пересмотра.</p><div class="plain-grid"><div>Медицинский владелец</div><div>Уровень риска и отдельная medicalRevision</div><div>Источники и их жизненный цикл</div><div>Проверяемая связь переводов</div></div></section></BaseLayout>
+
+<BaseLayout title={page.title ?? 'Как готовятся материалы POLINA VET'}>
+  <section class="page-intro container">
+    <p class="eyebrow">Редакционная политика</p>
+    <h1>{page.title}</h1>
+    <PortableText value={page.body ?? undefined} />
+  </section>
+</BaseLayout>

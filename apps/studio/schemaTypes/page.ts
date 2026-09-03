@@ -31,6 +31,12 @@ export const page = defineType({
       options: { list: languages },
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'translationGroupId',
+      title: 'Translation family',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
     defineField({ name: 'body', title: 'Текст', type: 'array', of: [{ type: 'block' }] }),
   ],
 });

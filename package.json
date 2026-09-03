@@ -1,6 +1,7 @@
 {
   "name": "polina-vet",
   "private": true,
+  "type": "module",
   "version": "0.1.0",
   "packageManager": "pnpm@11.1.1",
   "engines": {
@@ -8,11 +9,15 @@
   },
   "scripts": {
     "dev": "pnpm --filter @polina-vet/web dev",
+    "dev:studio": "pnpm --filter @polina-vet/studio dev",
     "build": "pnpm --filter @polina-vet/studio typegen && pnpm --filter @polina-vet/web build && pnpm --filter @polina-vet/studio build",
-    "check": "pnpm format:check && pnpm --filter @polina-vet/web check && pnpm --filter @polina-vet/studio check && pnpm validate:content && pnpm build",
+    "check": "pnpm format:check && pnpm --filter @polina-vet/web check && pnpm --filter @polina-vet/studio check && pnpm --filter @polina-vet/web test:unit && pnpm validate:content && pnpm build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate:content": "node scripts/validate-content.mjs",
+    "validate:content": "node scripts/validate-content.mjs && node --test scripts/validate-content.test.mjs",
+    "sanity:typegen": "pnpm --filter @polina-vet/studio typegen",
+    "sanity:seed:safe": "pnpm --filter @polina-vet/studio seed:safe",
+    "sanity:verify": "pnpm --filter @polina-vet/studio verify:remote",
     "test:e2e": "pnpm --filter @polina-vet/web test:e2e",
     "test:a11y": "pnpm --filter @polina-vet/web test:a11y"
   },
