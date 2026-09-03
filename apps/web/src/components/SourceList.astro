@@ -1,4 +1,6 @@
 ---
+import { stegaClean } from '@sanity/client/stega';
+
 interface Source { title?: string; url?: string; identifier?: string; jurisdiction?: string; status?: string }
 const { sources = [] } = Astro.props as { sources?: Source[] };
 const statusLabel: Record<string, string> = { superseded: 'Источник заменён', withdrawn: 'Источник отозван' };
@@ -10,7 +12,7 @@ const statusLabel: Record<string, string> = { superseded: 'Источник за
       {source.url ? <a class="source-link" href={source.url} rel="noreferrer">{source.title}</a> : <span>{source.title}</span>}
       {source.identifier && <span> · {source.identifier}</span>}
       {source.jurisdiction && <span> · {source.jurisdiction}</span>}
-      {source.status && source.status !== 'current' && <small class="source-status"> · {statusLabel[source.status] ?? 'Статус источника требует внимания'}</small>}
+      {source.status && stegaClean(source.status) !== 'current' && <small class="source-status"> · {statusLabel[stegaClean(source.status)] ?? 'Статус источника требует внимания'}</small>}
     </li>)}
   </ul>
 </section>

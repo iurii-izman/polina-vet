@@ -32,8 +32,13 @@ export const PUBLIC_PROFILE_QUERY = defineQuery(`
 `);
 
 export const ARTICLE_PATHS_QUERY = defineQuery(`
-  *[_type == "article" && language == "ru" && defined(slug.current) && defined(primaryDomain) && !archived && defined(title)]
-  { "slug": slug.current, language, primaryDomain }
+  *[_type == "article" && language in ["ru", "ro", "uk"] && defined(slug.current) && defined(primaryDomain) && !archived && defined(title)]
+  { "slug": slug.current, language, primaryDomain, withdrawn, translationGroupId, sourceMedicalRevision, "sourceCurrentMedicalRevision": translatedFrom->medicalRevision }
+`);
+
+export const ARTICLE_ALTERNATES_QUERY = defineQuery(`
+  *[_type == "article" && translationGroupId == $translationGroupId && !archived && !withdrawn && language in ["ru", "ro", "uk"] && defined(slug.current)]
+  { "slug": slug.current, language, primaryDomain, sourceMedicalRevision, "sourceCurrentMedicalRevision": translatedFrom->medicalRevision }
 `);
 
 export const ARTICLE_DETAIL_QUERY = defineQuery(`
@@ -44,7 +49,7 @@ export const ARTICLE_DETAIL_QUERY = defineQuery(`
     sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },
     species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },
     archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },
-    translatedFrom->{ _id, medicalRevision }, previousSlugs, seoTitle, seoDescription
+    translatedFrom->{ _id, language, medicalRevision }, previousSlugs, seoTitle, seoDescription
   }
 `);
 

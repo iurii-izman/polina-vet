@@ -263,3 +263,36 @@ test('primary navigation keeps the parent current state on nested routes', async
   await page.goto('/ru/task/animal-sick/');
   await expect(page.locator('.desktop-nav a[aria-current="page"]')).toHaveCount(0);
 });
+
+for (const locale of ['ro', 'uk'] as const) {
+  for (const path of [
+    '',
+    'pets',
+    'farm',
+    'urgent',
+    'pets/urgent',
+    'farm/urgent',
+    'about',
+    'contact',
+    'pets/before-visit',
+    'farm/before-vet-arrives',
+    'knowledge',
+    'editorial-policy',
+    'task/animal-sick',
+    'task/prepare',
+    'farm/group-problem',
+  ]) {
+    test(`renders ${locale}/${path || '(home)'} with localized chrome`, async ({ page }) => {
+      await page.goto(`/${locale}/${path}`);
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.locator('h1')).toBeVisible();
+      await expect(page.locator('.urgent-action')).toHaveAttribute('href', `/${locale}/urgent/`);
+      await expect(page.locator('header')).not.toContainText(
+        locale === 'ro' ? 'Домашние животные' : 'Animale de companie',
+      );
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        await page.evaluate(() => window.innerWidth),
+      );
+    });
+  }
+}

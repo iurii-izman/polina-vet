@@ -1,14 +1,15 @@
 ---
-import { route, type Locale } from '../lib/i18n';
+import { route, ui, type Locale } from '../lib/i18n';
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
+const strings = ui[locale];
 ---
 
 <a class="urgent-action" href={route.urgent(locale)}>
-  <span class="urgent-action__full">Срочно: что делать</span>
-  <span class="urgent-action__short">Срочно</span>
+  <span class="urgent-action__full">{strings.urgent}</span>
+  <span class="urgent-action__short">{strings.urgentShort}</span>
 </a>

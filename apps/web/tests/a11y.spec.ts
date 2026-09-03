@@ -25,3 +25,29 @@ for (const path of [
     expect(results.violations).toEqual([]);
   });
 }
+
+for (const locale of ['ro', 'uk'] as const) {
+  for (const path of [
+    '',
+    'pets',
+    'farm',
+    'urgent',
+    'pets/urgent',
+    'farm/urgent',
+    'about',
+    'contact',
+    'pets/before-visit',
+    'farm/before-vet-arrives',
+    'knowledge',
+    'editorial-policy',
+    'task/animal-sick',
+    'task/prepare',
+    'farm/group-problem',
+  ]) {
+    test(`has no automatic accessibility violations: /${locale}/${path}`, async ({ page }) => {
+      await page.goto(`/${locale}/${path}`);
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+}

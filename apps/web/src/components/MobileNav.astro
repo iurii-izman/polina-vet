@@ -1,35 +1,37 @@
 ---
 import LanguageSwitcher from './LanguageSwitcher.astro';
-import { route, type Locale } from '../lib/i18n';
+import { route, ui, type Locale } from '../lib/i18n';
 import { activePrimaryNavigation } from '../lib/navigationCurrent';
 
 interface Props {
   locale: Locale;
   pathname: string;
+  alternates?: Partial<Record<Locale, string | null>>;
 }
 
-const { locale, pathname } = Astro.props;
+const { locale, pathname, alternates } = Astro.props;
+const strings = ui[locale];
 const activeNavigation = activePrimaryNavigation(pathname, locale);
 const links = [
-  ['pets', route.pets(locale), 'Домашние животные'],
-  ['farm', route.farm(locale), 'Ферма'],
-  ['knowledge', route.knowledge(locale), 'Знания'],
-  ['about', route.about(locale), 'О Полине'],
-  ['contact', route.contact(locale), 'Контакты'],
+  ['pets', route.pets(locale), strings.nav.pets],
+  ['farm', route.farm(locale), strings.nav.farm],
+  ['knowledge', route.knowledge(locale), strings.nav.knowledge],
+  ['about', route.about(locale), strings.nav.about],
+  ['contact', route.contact(locale), strings.nav.contact],
 ] as const;
 ---
 
 <details class="mobile-nav" data-mobile-nav>
-  <summary aria-label="Открыть меню" aria-controls="mobile-navigation" aria-expanded="false">
-    Меню
+  <summary aria-label={strings.openMenu} aria-controls="mobile-navigation" aria-expanded="false">
+    {strings.menu}
   </summary>
   <div class="mobile-nav__panel" id="mobile-navigation">
-    <nav aria-label="Мобильная навигация">
+      <nav aria-label={locale === 'ro' ? 'Navigare mobilă' : locale === 'uk' ? 'Мобільна навігація' : 'Мобильная навигация'}>
       {links.map(([key, href, label]) => (
         <a href={href} aria-current={activeNavigation === key ? 'page' : undefined}>{label}</a>
       ))}
     </nav>
-    <LanguageSwitcher locale={locale} mobile />
+    <LanguageSwitcher locale={locale} mobile alternates={alternates} />
   </div>
 </details>
 

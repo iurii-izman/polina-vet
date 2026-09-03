@@ -40,9 +40,13 @@ export function deriveSourceHealth(
   sources: Array<{ status?: string } | null | undefined>,
 ): SourceHealth {
   if (!sources.length || sources.some((source) => !source)) return 'missing';
-  if (sources.some((source) => source?.status === 'withdrawn')) return 'withdrawn';
-  if (sources.some((source) => source?.status === 'superseded')) return 'superseded';
-  return sources.every((source) => source?.status === 'current') ? 'current' : 'missing';
+  if (sources.some((source) => stegaClean(source?.status ?? '') === 'withdrawn'))
+    return 'withdrawn';
+  if (sources.some((source) => stegaClean(source?.status ?? '') === 'superseded'))
+    return 'superseded';
+  return sources.every((source) => stegaClean(source?.status ?? '') === 'current')
+    ? 'current'
+    : 'missing';
 }
 
 export function derivePublicSafetyState(input: {
@@ -55,7 +59,7 @@ export function derivePublicSafetyState(input: {
   if (input.withdrawn) return 'WITHDRAWN';
   if (input.governanceValid === false) return 'STALE_HIGH_RISK';
   if (
-    input.riskLevel === 'HIGH' &&
+    stegaClean(input.riskLevel ?? '') === 'HIGH' &&
     (input.reviewState === 'REVIEW_REQUIRED' ||
       input.sourceHealth === 'withdrawn' ||
       input.sourceHealth === 'missing')
@@ -88,7 +92,9 @@ export function isDiscoveryEligible(
       sourceHealth,
       withdrawn: input.withdrawn,
       governanceValid:
-        Boolean(input.medicalOwner) && (input.riskLevel !== 'HIGH' || Boolean(input.reviewedBy)),
+        Boolean(input.medicalOwner) &&
+        (stegaClean(input.riskLevel ?? '') !== 'HIGH' || Boolean(input.reviewedBy)),
     }) === 'CURRENT'
   );
 }
+import { stegaClean } from '@sanity/client/stega';

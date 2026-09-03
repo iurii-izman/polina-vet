@@ -20,7 +20,8 @@
     "sanity:seed:m5": "pnpm --filter @polina-vet/studio seed:m5",
     "sanity:verify": "pnpm --filter @polina-vet/studio verify:remote",
     "test:e2e": "pnpm --filter @polina-vet/web test:e2e",
-    "test:a11y": "pnpm --filter @polina-vet/web test:a11y"
+    "test:a11y": "pnpm --filter @polina-vet/web test:a11y",
+    "preview:check": "pnpm --filter @polina-vet/web preview:check"
   },
   "devDependencies": {
     "prettier": "^3.9.6"

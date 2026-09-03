@@ -1,3 +1,5 @@
+import { stegaClean } from '@sanity/client/stega';
+
 export type ArticleDomain = 'pet' | 'farm' | 'shared';
 export type ArticleRouteInput = { language: string; primaryDomain: ArticleDomain; slug: string };
 
@@ -7,8 +9,8 @@ export function articleRoute(article: ArticleRouteInput): string {
     farm: 'farm',
     shared: 'knowledge',
   };
-  const section = sections[article.primaryDomain];
-  return `/${article.language}/${section}/${article.slug}/`;
+  const section = sections[stegaClean(article.primaryDomain) as ArticleDomain];
+  return `/${stegaClean(article.language)}/${section}/${stegaClean(article.slug)}/`;
 }
 
 export function previousSlugRoutes(

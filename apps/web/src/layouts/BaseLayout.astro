@@ -2,20 +2,30 @@
 import '../styles/global.css';
 import Footer from '../components/Footer.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { localeFromPath, type Locale } from '../lib/i18n';
+import { localeFromPath, staticAlternates, ui, type Locale } from '../lib/i18n';
 import { getSiteSettings } from '../lib/sanity/content';
+import { getDraftModeProps } from '../lib/sanity/draft-mode';
+import SanityVisualEditing from '../components/SanityVisualEditing';
+import DisableDraftMode from '../components/DisableDraftMode';
 
 interface Props {
   title: string;
   description?: string;
   robots?: string;
   locale?: Locale;
+  alternates?: Partial<Record<Locale, string | null>>;
 }
 
-const { title, description = 'Практическая ветеринарная информация для владельцев домашних и сельскохозяйственных животных.', robots } = Astro.props;
+const { title, description, robots, alternates } = Astro.props;
 const locale = Astro.props.locale ?? localeFromPath(Astro.url.pathname);
-const siteSettings = await getSiteSettings();
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const siteSettings = await getSiteSettings(perspectiveCookie);
 const siteTitle = siteSettings?.title ?? 'POLINA VET';
+const strings = ui[locale];
+const resolvedDescription = description ?? strings.description;
+const draftMode = Boolean(perspectiveCookie);
+const resolvedAlternates = alternates ?? staticAlternates(Astro.url.pathname);
+if (draftMode) Astro.response.headers.set('Cache-Control', 'private, no-store');
 ---
 
 <!doctype html>
@@ -24,17 +34,20 @@ const siteTitle = siteSettings?.title ?? 'POLINA VET';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="description" content={description} />
-    {robots && <meta name="robots" content={robots} />}
+    <meta name="description" content={resolvedDescription} />
+    {(robots || draftMode) && <meta name="robots" content={robots ?? 'noindex, nofollow'} />}
+    <link rel="canonical" href={`${Astro.url.pathname}`} />
+    {Object.entries(resolvedAlternates).map(([lang, href]) => href && <link rel="alternate" hreflang={lang} href={href} />)}
     <meta name="color-scheme" content="light" />
     <title>{title} — {siteTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Перейти к содержанию</a>
-    <SiteHeader locale={locale} />
+    <a class="skip-link" href="#main-content">{strings.skip}</a>
+    <SiteHeader locale={locale} alternates={resolvedAlternates} />
     <main id="main-content" class="site-main" tabindex="-1">
       <slot />
     </main>
     <Footer locale={locale} />
+    {draftMode && <><SanityVisualEditing client:only="react" /><DisableDraftMode client:only="react" /></>}
   </body>
 </html>

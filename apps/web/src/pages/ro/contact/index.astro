@@ -1,0 +1,8 @@
+---
+import LocalizedCorePage from '../../../components/LocalizedCorePage.astro';
+import { getPublicProfile } from '../../../lib/sanity/content';
+import { getDraftModeProps } from '../../../lib/sanity/draft-mode';
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const profile = await getPublicProfile(perspectiveCookie);
+---
+<LocalizedCorePage locale="ro" page="contact" profile={profile} />

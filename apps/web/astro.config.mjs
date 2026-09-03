@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sanity from '@sanity/astro';
+import react from '@astrojs/react';
 import { loadEnv } from 'vite';
 
 import { SANITY_API_VERSION } from '../../sanity.shared.ts';
@@ -24,6 +25,7 @@ export default defineConfig({
       apiVersion: SANITY_API_VERSION,
       useCdn: false,
     }),
+    react(),
   ],
   trailingSlash: 'always',
   i18n: {

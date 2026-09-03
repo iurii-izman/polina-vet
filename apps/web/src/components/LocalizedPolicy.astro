@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortableText from './PortableText.astro';
+import { getPageByTranslationGroup } from '../lib/sanity/content';
+import { route, type Locale } from '../lib/i18n';
+import type { PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT } from '../lib/sanity/sanity.types';
+import { getDraftModeProps } from '../lib/sanity/draft-mode';
+
+const { locale } = Astro.props as { locale: Locale };
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const page = await getPageByTranslationGroup('editorial-policy', locale, perspectiveCookie) as PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT | null;
+const fallback = locale === 'ro' ? { title: 'Cum sunt pregătite materialele POLINA VET', owner: 'Cine răspunde pentru conținut', copy: 'Materialele au caracter informativ. Ele ajută la orientarea în situație, dar nu înlocuiesc evaluarea clinică individuală a animalului.' } : locale === 'uk' ? { title: 'Як готуються матеріали POLINA VET', owner: 'Хто відповідає за вміст', copy: 'Матеріали мають інформаційний характер. Вони допомагають зорієнтуватися в ситуації, але не замінюють індивідуальну клінічну оцінку тварини.' } : { title: 'Как готовятся материалы POLINA VET', owner: 'Кто отвечает за контент', copy: 'Материалы POLINA VET носят информационный характер. Они помогают лучше ориентироваться в ситуации, но не заменяют индивидуальную клиническую оценку животного.' };
+---
+<BaseLayout title={page?.title ?? fallback.title} locale={locale}>
+  <section class="page-intro container"><p class="eyebrow">{locale === 'ro' ? 'Politica editorială' : locale === 'uk' ? 'Редакційна політика' : 'Редакционная политика'}</p><h1>{page?.title ?? fallback.title}</h1>{page?.body ? <PortableText value={page.body} /> : <><h2>{fallback.owner}</h2><p>{fallback.copy}</p></>}</section>
+  <section class="container section"><a class="text-link" href={route.knowledge(locale)}>{locale === 'ro' ? 'Despre materiale' : locale === 'uk' ? 'До матеріалів' : 'К материалам'} →</a></section>
+</BaseLayout>

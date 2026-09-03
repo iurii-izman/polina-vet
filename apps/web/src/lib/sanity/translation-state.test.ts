@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getSafeReplacement, getTranslationState } from './translation-state.ts';
+import {
+  getSafeReplacement,
+  getTranslationState,
+  hasCurrentTranslationLineage,
+} from './translation-state.ts';
 import { ARTICLE_TRANSLATION_STATE_QUERY } from './queries.ts';
 
 test('translation state query projects withdrawn', () => {
@@ -47,4 +51,25 @@ test('keeps a withdrawn document on a safe replacement route', () => {
     '/ru/pets/urgent/',
   );
   assert.equal(getSafeReplacement({ withdrawn: true }), null);
+});
+
+test('requires explicit current translation lineage', () => {
+  assert.equal(
+    hasCurrentTranslationLineage({
+      language: 'ro',
+      translatedFrom: { _id: 'ru-1', medicalRevision: 2 },
+      sourceMedicalRevision: 2,
+    }),
+    true,
+  );
+  assert.equal(
+    hasCurrentTranslationLineage({
+      language: 'ro',
+      translatedFrom: { _id: 'ru-1', medicalRevision: 3 },
+      sourceMedicalRevision: 2,
+    }),
+    false,
+  );
+  assert.equal(hasCurrentTranslationLineage({ language: 'ro', sourceMedicalRevision: 2 }), false);
+  assert.equal(hasCurrentTranslationLineage({ language: 'ru' }), true);
 });

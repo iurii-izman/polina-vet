@@ -1,11 +1,17 @@
 ---
 import ArticlePage from '../../../components/ArticlePage.astro';
 import { ARTICLE_DETAIL_QUERY } from '../../../lib/sanity/queries';
+import type { ARTICLE_DETAIL_QUERY_RESULT } from '../../../lib/sanity/sanity.types';
+import { fetchSanity } from '../../../lib/sanity/load-query';
+import { getDraftModeProps } from '../../../lib/sanity/draft-mode';
+import { stegaClean } from '@sanity/client/stega';
+import { getArticleAlternates } from '../../../lib/articleAlternates';
 import { getRussianArticlePaths } from '../../../lib/articlePaths';
-import { sanityClient } from 'sanity:client';
 export async function getStaticPaths() { return (await getRussianArticlePaths()).filter((entry: Awaited<ReturnType<typeof getRussianArticlePaths>>[number]) => entry.props.domain === 'pet'); }
 const { slug } = Astro.params;
-const article = await sanityClient.fetch(ARTICLE_DETAIL_QUERY, { language: 'ru', primaryDomain: 'pet', slug });
-if (!article || article.primaryDomain !== 'pet') throw new Error(`Published article not found: ${slug}`);
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const article = await fetchSanity<ARTICLE_DETAIL_QUERY_RESULT>(ARTICLE_DETAIL_QUERY, { language: 'ru', primaryDomain: 'pet', slug }, perspectiveCookie);
+if (!article || stegaClean(article.primaryDomain ?? '') !== 'pet') throw new Error(`Published article not found: ${slug}`);
+const alternates = await getArticleAlternates(article, perspectiveCookie);
 ---
-<ArticlePage article={article} now={new Date().toISOString().slice(0, 10)} />
+<ArticlePage article={article} now={new Date().toISOString().slice(0, 10)} alternates={alternates} />

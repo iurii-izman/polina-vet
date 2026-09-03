@@ -9,6 +9,28 @@ export interface TranslationFacts {
   translationSourceMedicalRevision?: number;
 }
 
+export function hasCurrentTranslationLineage(input: {
+  language?: string;
+  translatedFrom?: {
+    _id?: string | null;
+    _ref?: string | null;
+    medicalRevision?: number | null;
+  } | null;
+  sourceMedicalRevision?: number | null;
+}): boolean {
+  if (!input.language) return true;
+  const language = stegaClean(input.language ?? '');
+  if (language === 'ru') return !input.translatedFrom && input.sourceMedicalRevision == null;
+  return Boolean(
+    language &&
+    language !== 'ru' &&
+    (input.translatedFrom?._id || input.translatedFrom?._ref) &&
+    Number.isInteger(input.sourceMedicalRevision) &&
+    Number.isInteger(input.translatedFrom?.medicalRevision) &&
+    input.sourceMedicalRevision === input.translatedFrom?.medicalRevision,
+  );
+}
+
 /** Derives a user-facing translation state from stored editorial facts only. */
 export function getTranslationState({
   exists,
@@ -36,3 +58,4 @@ export interface WithdrawnContentFacts {
 export function getSafeReplacement({ withdrawn, replacement }: WithdrawnContentFacts) {
   return withdrawn && replacement ? replacement : null;
 }
+import { stegaClean } from '@sanity/client/stega';
