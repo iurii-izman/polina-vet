@@ -7,13 +7,13 @@ export const serviceModeLabels: Record<string, string> = {
 export function safePhoneHref(phone: string | null | undefined): string | undefined {
   if (!phone) return undefined;
   const value = phone.replace(/[\s().-]/g, '');
-  return /^\+?[0-9]{7,15}$/.test(value) ? `tel:${value}` : undefined;
+  return /^\+?\d{7,15}$/.test(value) ? `tel:${value}` : undefined;
 }
 
 export function safeTelegramHref(handle: string | null | undefined): string | undefined {
   if (!handle) return undefined;
   const value = handle.replace(/^@/, '');
-  return /^[A-Za-z0-9_]{5,32}$/.test(value) ? `https://t.me/${value}` : undefined;
+  return /^\w{5,32}$/.test(value) ? `https://t.me/${value}` : undefined;
 }
 
 export function safeMapHref(mapUrl: string | null | undefined): string | undefined {
