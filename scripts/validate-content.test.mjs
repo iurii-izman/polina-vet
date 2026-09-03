@@ -92,6 +92,70 @@ test('HIGH-risk reviewer must be independent from medicalOwner', () => {
   assert.ok(errors.some((error) => error.includes('independent from medicalOwner')));
 });
 
+test('medicalRevision must be a positive integer', () => {
+  for (const value of [undefined, 0, 1.5]) {
+    const errors = validateContent(
+      [validArticle({ id: `medical-revision-${String(value)}`, medicalRevision: value })],
+      [{ id: 'source', status: 'current' }],
+    );
+    assert.ok(errors.some((error) => error.includes('publication contract is incomplete')));
+  }
+});
+
+test('reviewIntervalMonths must be a positive integer', () => {
+  for (const value of [undefined, 0]) {
+    const errors = validateContent(
+      [validArticle({ id: `review-interval-${String(value)}`, reviewIntervalMonths: value })],
+      [{ id: 'source', status: 'current' }],
+    );
+    assert.ok(errors.some((error) => error.includes('publication contract is incomplete')));
+  }
+});
+
+test('translation lineage requires a positive sourceMedicalRevision', () => {
+  const source = validArticle({ id: 'translation-source', translationGroupId: 'translation' });
+  const translation = validArticle({
+    id: 'translation-ro',
+    language: 'ro',
+    slug: 'translation-ro',
+    translationGroupId: 'translation',
+    translatedFrom: 'translation-source',
+    sourceMedicalRevision: undefined,
+  });
+  assert.ok(
+    validateContent([source, translation], [{ id: 'source', status: 'current' }]).some((error) =>
+      error.includes('translation lineage is incomplete'),
+    ),
+  );
+});
+
+test('translation lineage with sourceMedicalRevision 1 is valid', () => {
+  const source = validArticle({
+    id: 'translation-source-valid',
+    translationGroupId: 'translation-valid',
+  });
+  const translation = validArticle({
+    id: 'translation-ro-valid',
+    language: 'ro',
+    slug: 'translation-ro-valid',
+    translationGroupId: 'translation-valid',
+    translatedFrom: 'translation-source-valid',
+    sourceMedicalRevision: 1,
+  });
+  assert.deepEqual(
+    validateContent([source, translation], [{ id: 'source', status: 'current' }]),
+    [],
+  );
+});
+
+test('RU source rejects sourceMedicalRevision 0 as present lineage', () => {
+  const errors = validateContent(
+    [validArticle({ id: 'ru-lineage-zero', sourceMedicalRevision: 0 })],
+    [{ id: 'source', status: 'current' }],
+  );
+  assert.ok(errors.some((error) => error.includes('RU source cannot have translation lineage')));
+});
+
 test('withdrawn replacement cannot be archived', () => {
   const errors = validateContent(
     [
@@ -115,6 +179,30 @@ test('superseded source requires a different replacement', () => {
       [article],
       [{ id: 'superseded', status: 'superseded', supersededBy: 'superseded' }],
     ).some((error) => error.includes('different supersededBy')),
+  );
+});
+
+test('superseded source rejects a dangling replacement reference', () => {
+  const article = validArticle({ id: 'source-dangling', sources: ['superseded'] });
+  assert.ok(
+    validateContent(
+      [article],
+      [{ id: 'superseded', status: 'superseded', supersededBy: 'missing-source' }],
+    ).some((error) => error.includes('different supersededBy')),
+  );
+});
+
+test('superseded source with an existing different replacement remains valid', () => {
+  const article = validArticle({ id: 'source-valid-replacement', sources: ['superseded'] });
+  assert.deepEqual(
+    validateContent(
+      [article],
+      [
+        { id: 'superseded', status: 'superseded', supersededBy: 'current-source' },
+        { id: 'current-source', status: 'current' },
+      ],
+    ),
+    [],
   );
 });
 

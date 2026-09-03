@@ -10,6 +10,7 @@ const referenceId = (reference) =>
 const sections = { pet: 'pets', farm: 'farm', shared: 'knowledge' };
 const sectionForDomain = (domain) => sections[domain] ?? 'knowledge';
 const sourceStatuses = new Set(['current', 'superseded', 'withdrawn']);
+const isPositiveInteger = (value) => Number.isInteger(value) && value >= 1;
 
 function validateDocumentFacts(document, sourceIds) {
   const errors = [];
@@ -19,9 +20,9 @@ function validateDocumentFacts(document, sourceIds) {
     !document.translationGroupId ||
     !document.medicalOwner ||
     !document.riskLevel ||
-    document.medicalRevision < 1 ||
+    !isPositiveInteger(document.medicalRevision) ||
     !document.lastMedicalReview ||
-    document.reviewIntervalMonths < 1 ||
+    !isPositiveInteger(document.reviewIntervalMonths) ||
     !document.sources?.length ||
     !document.body?.length;
   if (!languages.has(document.language)) errors.push(`${document.id}: unsupported language`);
@@ -40,10 +41,14 @@ function validateDocumentFacts(document, sourceIds) {
     errors.push(`${document.id}: HIGH-risk reviewer must be independent from medicalOwner`);
   if (
     document.language !== 'ru' &&
-    (!document.translatedFrom || document.sourceMedicalRevision < 1)
+    (!document.translatedFrom || !isPositiveInteger(document.sourceMedicalRevision))
   )
     errors.push(`${document.id}: translation lineage is incomplete`);
-  if (document.language === 'ru' && (document.translatedFrom || document.sourceMedicalRevision))
+  if (
+    document.language === 'ru' &&
+    ((document.translatedFrom !== undefined && document.translatedFrom !== null) ||
+      (document.sourceMedicalRevision !== undefined && document.sourceMedicalRevision !== null))
+  )
     errors.push(`${document.id}: RU source cannot have translation lineage`);
   if (
     document.withdrawn &&
@@ -62,7 +67,9 @@ function validateDocumentFacts(document, sourceIds) {
         errors.push(`${document.id}: source ${sourceId} has invalid status`);
       if (
         source.status === 'superseded' &&
-        (!source.supersededBy || referenceId(source.supersededBy) === sourceId)
+        (!source.supersededBy ||
+          referenceId(source.supersededBy) === sourceId ||
+          !sourceIds.has(referenceId(source.supersededBy)))
       )
         errors.push(`${document.id}: superseded source ${sourceId} needs a different supersededBy`);
     }
