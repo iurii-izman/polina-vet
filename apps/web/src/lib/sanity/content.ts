@@ -37,6 +37,7 @@ async function fetchPublicProfile() {
           lastMedicalReview: article.lastMedicalReview ?? undefined,
           reviewIntervalMonths: article.reviewIntervalMonths ?? undefined,
           sourceStatuses: article.sourceStatuses ?? undefined,
+          archived: article.archived ?? undefined,
           withdrawn: article.withdrawn ?? undefined,
         },
         today,

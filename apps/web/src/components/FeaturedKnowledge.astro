@@ -9,7 +9,7 @@ interface Props { locale: Locale; items?: NonNullable<PublicProfile['featuredKno
 const { locale, items = [] } = Astro.props;
 const routedItems = items.filter(
   (article): article is (typeof items)[number] & { slug: string; primaryDomain: ArticleDomain } =>
-    Boolean(article.slug && article.primaryDomain && article.language === 'ru'),
+    Boolean(article.slug && article.primaryDomain && article.language === locale),
 );
 ---
 
@@ -17,7 +17,7 @@ const routedItems = items.filter(
   <p class="eyebrow">Знания</p>
   <h2 id="knowledge-title">Полезные материалы</h2>
   {routedItems.length ? <div class="card-grid">
-    {routedItems.map((article) => <a class="knowledge-card" href={articleRoute({ language: 'ru', primaryDomain: article.primaryDomain, slug: article.slug })}>
+    {routedItems.map((article) => <a class="knowledge-card" href={articleRoute({ language: locale, primaryDomain: article.primaryDomain, slug: article.slug })}>
       <p class="eyebrow">{article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания'}</p>
       <h3>{article.title}</h3>
       <p>{article.summary}</p>

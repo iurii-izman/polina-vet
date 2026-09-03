@@ -1,13 +1,14 @@
 ---
 import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
 
 import type { Page } from '../lib/sanity/sanity.types';
 
 interface Props {
-  value: Page['body'];
+  value: Page['body'] | TypedObject[] | null | undefined;
 }
 
 const { value } = Astro.props;
 ---
 
-{value?.length ? <PortableText value={value} /> : null}
+{value?.length ? <PortableText value={value as NonNullable<Page['body']>} /> : null}

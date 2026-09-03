@@ -59,7 +59,9 @@ const [
     "replacement": replacement._ref
   }`),
   client.fetch('*[_type == "author"]{"id":_id,name,role,"slug":slug.current}'),
-  client.fetch('*[_type == "source"]{"id":_id,status,"supersededBy":supersededBy._ref}'),
+  client.fetch(
+    '*[_type == "source"]{"id":_id,title,url,status,identifier,"supersededBy":supersededBy._ref}',
+  ),
   client.fetch(
     '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
   ),
@@ -150,6 +152,21 @@ if (inaccessibleDocuments.length)
 const policyErrors = validateContent(articles, sources);
 if (policyErrors.length) throw new Error(policyErrors.join('\n'));
 const publicSourceIds = new Set(sources.map((source) => source.id));
+if (sources.length !== 8) throw new Error(`Expected 8 sources, found ${sources.length}.`);
+const sourceUrls = sources.map((source) => source.url).filter(Boolean);
+if (new Set(sourceUrls).size !== sourceUrls.length)
+  throw new Error('Duplicate source URLs found in the public dataset.');
+const woahSource = sources.find((source) => source.id === 'source-woah-terrestrial-code-2024');
+if (
+  woahSource?.title !== 'WOAH: Terrestrial Animal Health Code — current online edition' ||
+  woahSource?.url !== 'https://sont.woah.org/portal/tool?le=en' ||
+  woahSource?.status !== 'current' ||
+  woahSource.identifier
+)
+  throw new Error('The WOAH source does not contain the current online-edition metadata.');
+const vomitingSource = sources.find((source) => source.id === 'source-msd-vomiting');
+if (vomitingSource?.identifier)
+  throw new Error('The MSD Vomiting source must not use an update date as identifier.');
 for (const article of articles) {
   if (!article.medicalOwner || !publicAuthorIds.has(article.medicalOwner))
     throw new Error(`${article.id}: medicalOwner does not resolve through the public API.`);

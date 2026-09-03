@@ -38,9 +38,16 @@ async function logicalId(query: string, params: Record<string, unknown>, label: 
   return matches[0]?._id;
 }
 
-async function upsert(document: Record<string, unknown>, existingId?: string) {
+async function upsert(
+  document: Record<string, unknown>,
+  existingId?: string,
+  unsetFields: string[] = [],
+) {
   const { _id, _type, ...fields } = document;
-  if (existingId) return client.patch(existingId).set(fields).commit();
+  if (existingId) {
+    const patch = client.patch(existingId).set(fields);
+    return unsetFields.length ? patch.unset(unsetFields).commit() : patch.commit();
+  }
   if (typeof _id !== 'string') throw new Error('M5 seed document is missing a stable _id.');
   if (typeof _type !== 'string') throw new Error(`M5 seed document ${_id} is missing _type.`);
   const createDocument: { _id: string; _type: string; [key: string]: any } = {
@@ -108,7 +115,6 @@ const sources = [
     url: 'https://www.msdvetmanual.com/dog-owners/digestive-disorders-of-dogs/vomiting-in-dogs',
     status: 'current',
     jurisdiction: 'Ветеринарный справочник MSD',
-    identifier: 'Обновлено в сентябре 2024 г.',
   },
   {
     _id: 'source-msd-digestive',
@@ -130,11 +136,10 @@ const sources = [
   {
     _id: 'source-woah-terrestrial-code-2024',
     _type: 'source',
-    title: 'WOAH: Terrestrial Animal Health Code (2024)',
-    url: 'https://www.woah.org/fileadmin/Home/eng/Health_standards/tahc/2024/en_sommaire.htm',
+    title: 'WOAH: Terrestrial Animal Health Code — current online edition',
+    url: 'https://sont.woah.org/portal/tool?le=en',
     status: 'current',
     jurisdiction: 'Международные стандарты здоровья животных WOAH',
-    identifier: '2024',
   },
   {
     _id: 'source-fao-dairy-health-records',
@@ -507,13 +512,13 @@ for (const item of topics) {
 const sourceIds = new Map<string, string>();
 for (const item of sources) {
   const id = await logicalId(
-    '*[_type == "source" && url == $url]{_id}',
-    { url: item.url },
+    '*[_type == "source" && (_id == $id || url == $url)]{_id}',
+    { id: item._id, url: item.url },
     `source ${item.url}`,
   );
   const actualId = id ?? item._id;
   sourceIds.set(item._id, actualId);
-  await upsert(item, id);
+  await upsert(item, id, item.identifier ? [] : ['identifier']);
 }
 
 const seededArticleIds: Record<string, string> = {};

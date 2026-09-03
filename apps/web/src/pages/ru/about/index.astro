@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import PortableText from '../../../components/PortableText.astro';
 import { route } from '../../../lib/i18n';
 import { getPublicProfile } from '../../../lib/sanity/content';
 import { sanityImageUrl } from '../../../lib/sanity/image';
@@ -31,7 +32,7 @@ const portraitUrl = author?.portrait ? sanityImageUrl(author.portrait, 720) : un
     <h2>Как я подхожу к работе</h2>
     <p>Мне близок практический подход: сначала понять, что действительно происходит с животным и какие данные способны изменить решение, а затем выбирать диагностику и лечение с учётом реальных условий.</p>
     <p>В сельской практике не всегда доступна расширенная диагностика или оборудование крупной клиники. Поэтому особенно важны хороший осмотр, правильная оценка риска, понятный план действий и контроль динамики.</p>
-    {author?.bio?.length ? <div class="portable-profile"><p class="eyebrow">О подходе</p>{author.bio.map((block) => <p>{block.children?.map((child) => child.text).join('')}</p>)}</div> : null}
+    {author?.bio?.length ? <div class="portable-profile"><p class="eyebrow">О подходе</p><PortableText value={author.bio} /></div> : null}
     <div class="empty-state"><h3>Материалы и источники</h3><p>Перейдите к разделу «Знания», чтобы следить за появлением проверенных материалов.</p><a class="text-link" href={route.knowledge('ru')}>Открыть «Знания» <span aria-hidden="true">→</span></a></div>
   </section>
 </BaseLayout>
