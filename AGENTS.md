@@ -105,6 +105,12 @@ For browser/UI verification:
 
 ## Required checks
 
+Before starting a milestone or major feature, use the `milestone-start` skill.
+
+For UI, layout, or responsive changes, use the `ui-parity` skill.
+
+Recommended lifecycle: `milestone-start` → implementation → domain-specific skill → `preflight`.
+
 Before declaring a coding task complete:
 1. run the `preflight` skill;
 2. run the relevant `pnpm` checks;
