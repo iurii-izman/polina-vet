@@ -15,3 +15,9 @@ export const riskLevels = [
   { title: 'Стандартный', value: 'STANDARD' },
   { title: 'Низкий', value: 'LOW' },
 ];
+
+export const sourceStatuses = [
+  { title: 'Действующий', value: 'current' },
+  { title: 'Заменён', value: 'superseded' },
+  { title: 'Отозван', value: 'withdrawn' },
+];

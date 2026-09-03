@@ -1,0 +1,11 @@
+---
+import ArticlePage from '../../../components/ArticlePage.astro';
+import { ARTICLE_DETAIL_QUERY } from '../../../lib/sanity/queries';
+import { getRussianArticlePaths } from '../../../lib/articlePaths';
+import { sanityClient } from 'sanity:client';
+export async function getStaticPaths() { return (await getRussianArticlePaths()).filter((entry: Awaited<ReturnType<typeof getRussianArticlePaths>>[number]) => entry.props.domain === 'shared'); }
+const { slug } = Astro.params;
+const article = await sanityClient.fetch(ARTICLE_DETAIL_QUERY, { language: 'ru', primaryDomain: 'shared', slug });
+if (!article || article.primaryDomain !== 'shared') throw new Error(`Published article not found: ${slug}`);
+---
+<ArticlePage article={article} now={new Date().toISOString().slice(0, 10)} />

@@ -602,3 +602,70 @@ small {
     animation-duration: 0.01ms !important;
   }
 }
+
+.medical-article {
+  padding: 70px 0;
+}
+.medical-article > h1 {
+  margin-bottom: 18px;
+}
+.medical-meta,
+.source-list,
+.medical-block {
+  margin-top: 28px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.medical-meta h2,
+.source-list h2,
+.medical-block h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+.medical-meta p:last-child,
+.source-list ul,
+.medical-block ul {
+  margin-bottom: 0;
+}
+.source-list li + li {
+  margin-top: 10px;
+}
+.source-list small {
+  color: var(--urgent);
+}
+.medical-block {
+  border-left: 5px solid var(--forest);
+}
+.medical-block.red-flag {
+  border-left-color: var(--urgent);
+  background: var(--urgent-soft);
+}
+.medical-block.safety-notice {
+  border-left-color: #b27a08;
+}
+.portable-block {
+  max-width: 760px;
+  margin: 32px 0;
+  font-size: 1.1rem;
+}
+@media print {
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .urgent-action,
+  nav {
+    display: none !important;
+  }
+  .medical-article {
+    width: 100%;
+    padding: 0;
+  }
+  .medical-meta,
+  .source-list,
+  .medical-block {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+}

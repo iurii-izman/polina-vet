@@ -1,0 +1,10 @@
+---
+interface Props { owner?: { name?: string; role?: string }; reviewedBy?: { name?: string }; lastMedicalReview?: string }
+const { owner, reviewedBy, lastMedicalReview } = Astro.props;
+---
+<section class="medical-meta" aria-labelledby="medical-meta-title">
+  <h2 id="medical-meta-title">О материале</h2>
+  {lastMedicalReview && <p><strong>Последняя медицинская проверка:</strong> <time datetime={lastMedicalReview}>{lastMedicalReview}</time></p>}
+  {owner?.name && <p><strong>Медицинский владелец:</strong> {owner.name}{owner.role && ` · ${owner.role}`}</p>}
+  {reviewedBy?.name && <p><strong>Независимый review:</strong> {reviewedBy.name}</p>}
+</section>

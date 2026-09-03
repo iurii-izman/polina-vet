@@ -1,0 +1,14 @@
+---
+import MedicalBlock from './MedicalBlock.astro';
+import PortableText from './PortableText.astro';
+import { groupArticleBody, type ArticleBodyBlock } from '../lib/articleBodySegments';
+const { body = [] } = Astro.props as { body?: ArticleBodyBlock[] };
+const segments = groupArticleBody(body);
+---
+<div class="article-body">
+  {segments.map((segment) =>
+    segment.type === 'portable'
+      ? <PortableText value={segment.blocks} />
+      : <MedicalBlock value={segment.block} />
+  )}
+</div>

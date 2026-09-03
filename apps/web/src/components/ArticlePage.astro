@@ -1,0 +1,27 @@
+---
+import ArticleBody from './ArticleBody.astro';
+import MedicalMeta from './MedicalMeta.astro';
+import SourceList from './SourceList.astro';
+import StaleHighRiskState from './StaleHighRiskState.astro';
+import WithdrawnState from './WithdrawnState.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { articleRoute } from '../lib/articleRoute';
+import { getArticlePresentation } from '../lib/articlePresentation';
+const { article, now } = Astro.props;
+const presentation = getArticlePresentation(article, now);
+const safetyState = presentation.safetyState;
+const replacementHref = article.replacement ? articleRoute({ language: article.replacement.language, primaryDomain: article.replacement.primaryDomain, slug: article.replacement.slug }) : (article.primaryDomain === 'farm' ? '/ru/farm/urgent/' : article.primaryDomain === 'pet' ? '/ru/pets/urgent/' : '/ru/urgent/');
+const pageTitle = article.seoTitle ?? article.title;
+---
+<BaseLayout title={pageTitle} description={presentation.description} robots={presentation.robots} locale="ru">
+  <article class="medical-article container">
+    <p class="eyebrow">{article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания'}</p>
+    <h1>{article.title}</h1>
+    {presentation.showMedicalContent && <p class="lead">{article.summary}</p>}
+    {safetyState === 'CURRENT' ? <>
+      <MedicalMeta owner={article.medicalOwner} reviewedBy={article.reviewedBy} lastMedicalReview={article.lastMedicalReview} />
+      <ArticleBody body={article.body} />
+      <SourceList sources={article.sources} />
+    </> : safetyState === 'STALE_HIGH_RISK' ? <StaleHighRiskState replacementHref={replacementHref} /> : <WithdrawnState replacementHref={replacementHref} />}
+  </article>
+</BaseLayout>

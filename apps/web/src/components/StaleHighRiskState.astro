@@ -1,0 +1,10 @@
+---
+interface Props { replacementHref: string }
+const { replacementHref } = Astro.props;
+---
+<section class="state-card stale-high-risk" aria-labelledby="stale-high-risk-title">
+  <p class="eyebrow">Состояние материала</p>
+  <h2 id="stale-high-risk-title">Материал временно скрыт для проверки</h2>
+  <p>Эта страница не показывает прежний медицинский текст, пока его актуальность не подтверждена.</p>
+  <a class="text-link" href={replacementHref}>Перейти к актуальному маршруту <span aria-hidden="true">→</span></a>
+</section>

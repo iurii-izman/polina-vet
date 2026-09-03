@@ -6,6 +6,7 @@ import { siteSettings } from './siteSettings';
 import { source } from './source';
 import { species } from './species';
 import { topic } from './topic';
+import { medicalBlockTypes } from './medicalBlocks';
 
 export const schemaTypes = [
   article,
@@ -16,4 +17,5 @@ export const schemaTypes = [
   source,
   siteSettings,
   clinicalCase,
+  ...medicalBlockTypes,
 ];
