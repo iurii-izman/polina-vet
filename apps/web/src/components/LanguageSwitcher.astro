@@ -53,6 +53,12 @@ const languages = ['ru', 'ro', 'uk'] as const;
       const syncExpanded = () => summary?.setAttribute('aria-expanded', String(details.open));
       details.addEventListener('toggle', syncExpanded);
       syncExpanded();
+      details.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !details.open) return;
+        event.preventDefault();
+        details.open = false;
+        summary?.focus();
+      });
     });
   </script>
 )}

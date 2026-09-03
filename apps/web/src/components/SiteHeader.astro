@@ -3,17 +3,19 @@ import LanguageSwitcher from './LanguageSwitcher.astro';
 import MobileNav from './MobileNav.astro';
 import UrgentAction from './UrgentAction.astro';
 import { route, type Locale } from '../lib/i18n';
+import { activePrimaryNavigation } from '../lib/navigationCurrent';
 
 interface Props { locale: Locale }
 
 const { locale } = Astro.props;
 const pathname = Astro.url.pathname;
+const activeNavigation = activePrimaryNavigation(pathname, locale);
 const nav = [
-  [route.pets(locale), 'Домашние животные'],
-  [route.farm(locale), 'Ферма'],
-  [route.knowledge(locale), 'Знания'],
-  [route.about(locale), 'О Полине'],
-  [route.contact(locale), 'Контакты'],
+  ['pets', route.pets(locale), 'Домашние животные'],
+  ['farm', route.farm(locale), 'Ферма'],
+  ['knowledge', route.knowledge(locale), 'Знания'],
+  ['about', route.about(locale), 'О Полине'],
+  ['contact', route.contact(locale), 'Контакты'],
 ] as const;
 ---
 
@@ -21,7 +23,7 @@ const nav = [
   <div class="container header-inner">
     <a class="brand" href={route.home(locale)} aria-label="POLINA VET — главная">POLINA <span>VET</span></a>
     <nav class="desktop-nav" aria-label="Основная навигация">
-      {nav.map(([href, label]) => <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>)}
+      {nav.map(([key, href, label]) => <a href={href} aria-current={activeNavigation === key ? 'page' : undefined}>{label}</a>)}
     </nav>
     <div class="header-actions">
       <LanguageSwitcher locale={locale} />

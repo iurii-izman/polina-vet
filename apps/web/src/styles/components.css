@@ -486,6 +486,20 @@
 .urgent-boundary p:first-child {
   margin-bottom: var(--space-2);
 }
+.urgent-safety-notice {
+  margin-top: var(--space-5);
+  padding: var(--space-5) var(--space-6);
+  border-left: 0.35rem solid var(--color-terracotta);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-urgent);
+}
+.urgent-safety-notice p:last-child {
+  margin-bottom: 0;
+}
+.urgent-safety-notice--farm {
+  border-left-color: var(--color-forest);
+  background: var(--surface-farm);
+}
 .urgent-page {
   padding-bottom: var(--space-4);
 }

@@ -159,3 +159,54 @@ test('mobile menu exposes expanded state and remains keyboard closable', async (
   await expect(summary).toHaveAttribute('aria-expanded', 'false');
   await expect(summary).toBeFocused();
 });
+
+test('pet urgent shows the non-exhaustive-list safety notice', async ({ page }) => {
+  await page.goto('/ru/pets/urgent/');
+  const notice = page.locator('.urgent-safety-notice--pet');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText(
+    'Отсутствие перечисленных признаков не исключает серьёзную проблему.',
+  );
+  await expect(notice).toContainText('ориентируйтесь на динамику');
+});
+
+test('farm urgent shows the mandatory group safety notice', async ({ page }) => {
+  await page.goto('/ru/farm/urgent/');
+  const notice = page.locator('.urgent-safety-notice--farm');
+  await expect(notice).toBeVisible();
+  await expect(notice).toContainText('одновременно заболели несколько животных');
+  await expect(notice).toContainText('потенциально групповую');
+});
+
+test('desktop language menu closes on Escape and restores focus', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/ru/');
+  const trigger = page.locator('.language-menu summary');
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Escape');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(trigger).toBeFocused();
+});
+
+test('primary navigation keeps the parent current state on nested routes', async ({ page }) => {
+  const cases = [
+    ['/ru/pets/urgent/', 'Домашние животные'],
+    ['/ru/farm/before-vet-arrives/', 'Ферма'],
+    ['/ru/knowledge/', 'Знания'],
+  ] as const;
+
+  for (const [path, label] of cases) {
+    await page.goto(path);
+    await expect(page.locator('.desktop-nav a', { hasText: label })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  }
+
+  await page.goto('/ru/urgent/');
+  await expect(page.locator('.desktop-nav a[aria-current="page"]')).toHaveCount(0);
+  await page.goto('/ru/task/animal-sick/');
+  await expect(page.locator('.desktop-nav a[aria-current="page"]')).toHaveCount(0);
+});

@@ -1,6 +1,7 @@
 ---
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { route, type Locale } from '../lib/i18n';
+import { activePrimaryNavigation } from '../lib/navigationCurrent';
 
 interface Props {
   locale: Locale;
@@ -8,12 +9,13 @@ interface Props {
 }
 
 const { locale, pathname } = Astro.props;
+const activeNavigation = activePrimaryNavigation(pathname, locale);
 const links = [
-  [route.pets(locale), 'Домашние животные'],
-  [route.farm(locale), 'Ферма'],
-  [route.knowledge(locale), 'Знания'],
-  [route.about(locale), 'О Полине'],
-  [route.contact(locale), 'Контакты'],
+  ['pets', route.pets(locale), 'Домашние животные'],
+  ['farm', route.farm(locale), 'Ферма'],
+  ['knowledge', route.knowledge(locale), 'Знания'],
+  ['about', route.about(locale), 'О Полине'],
+  ['contact', route.contact(locale), 'Контакты'],
 ] as const;
 ---
 
@@ -23,8 +25,8 @@ const links = [
   </summary>
   <div class="mobile-nav__panel" id="mobile-navigation">
     <nav aria-label="Мобильная навигация">
-      {links.map(([href, label]) => (
-        <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>
+      {links.map(([key, href, label]) => (
+        <a href={href} aria-current={activeNavigation === key ? 'page' : undefined}>{label}</a>
       ))}
     </nav>
     <LanguageSwitcher locale={locale} mobile />
