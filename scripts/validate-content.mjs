@@ -9,6 +9,7 @@ const referenceId = (reference) =>
 
 const sections = { pet: 'pets', farm: 'farm', shared: 'knowledge' };
 const sectionForDomain = (domain) => sections[domain] ?? 'knowledge';
+const sourceStatuses = new Set(['current', 'superseded', 'withdrawn']);
 
 function validateDocumentFacts(document, sourceIds) {
   const errors = [];
@@ -31,6 +32,13 @@ function validateDocumentFacts(document, sourceIds) {
   if (document.riskLevel === 'HIGH' && !document.reviewedBy)
     errors.push(`${document.id}: HIGH-risk reviewer is required`);
   if (
+    document.riskLevel === 'HIGH' &&
+    document.medicalOwner &&
+    document.reviewedBy &&
+    referenceId(document.medicalOwner) === referenceId(document.reviewedBy)
+  )
+    errors.push(`${document.id}: HIGH-risk reviewer must be independent from medicalOwner`);
+  if (
     document.language !== 'ru' &&
     (!document.translatedFrom || document.sourceMedicalRevision < 1)
   )
@@ -46,7 +54,18 @@ function validateDocumentFacts(document, sourceIds) {
     errors.push(`${document.id}: article route collides with a reserved static route`);
   for (const sourceReference of document.sources ?? []) {
     const sourceId = referenceId(sourceReference);
-    if (!sourceIds.has(sourceId)) errors.push(`${document.id}: unresolved source ${sourceId}`);
+    const source = sourceIds.get(sourceId);
+    if (!source) {
+      errors.push(`${document.id}: unresolved source ${sourceId}`);
+    } else {
+      if (!sourceStatuses.has(source.status))
+        errors.push(`${document.id}: source ${sourceId} has invalid status`);
+      if (
+        source.status === 'superseded' &&
+        (!source.supersededBy || referenceId(source.supersededBy) === sourceId)
+      )
+        errors.push(`${document.id}: superseded source ${sourceId} needs a different supersededBy`);
+    }
   }
   return errors;
 }

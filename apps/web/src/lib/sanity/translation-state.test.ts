@@ -2,6 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { getSafeReplacement, getTranslationState } from './translation-state.ts';
+import { ARTICLE_TRANSLATION_STATE_QUERY } from './queries.ts';
+
+test('translation state query projects withdrawn', () => {
+  assert.match(ARTICLE_TRANSLATION_STATE_QUERY, /withdrawn/);
+});
 
 test('derives current, missing, review-required, and withdrawn translation states', () => {
   assert.equal(getTranslationState({ exists: false }), 'PENDING');

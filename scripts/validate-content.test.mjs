@@ -84,6 +84,40 @@ test('withdrawn sources warn without blocking a safe rebuild', () => {
   );
 });
 
+test('HIGH-risk reviewer must be independent from medicalOwner', () => {
+  const errors = validateContent(
+    [validArticle({ id: 'high-same-reviewer', riskLevel: 'HIGH', reviewedBy: 'author' })],
+    [{ id: 'source', status: 'current' }],
+  );
+  assert.ok(errors.some((error) => error.includes('independent from medicalOwner')));
+});
+
+test('withdrawn replacement cannot be archived', () => {
+  const errors = validateContent(
+    [
+      validArticle({
+        id: 'withdrawn-a',
+        slug: 'old',
+        withdrawn: true,
+        replacement: 'replacement-b',
+      }),
+      validArticle({ id: 'replacement-b', slug: 'new', archived: true }),
+    ],
+    [{ id: 'source', status: 'current' }],
+  );
+  assert.ok(errors.some((error) => error.includes('active and routable')));
+});
+
+test('superseded source requires a different replacement', () => {
+  const article = validArticle({ id: 'source-lifecycle', sources: ['superseded'] });
+  assert.ok(
+    validateContent(
+      [article],
+      [{ id: 'superseded', status: 'superseded', supersededBy: 'superseded' }],
+    ).some((error) => error.includes('different supersededBy')),
+  );
+});
+
 test('replacement must be active and routable', () => {
   const errors = validateContent(
     [

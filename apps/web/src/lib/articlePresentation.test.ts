@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { getArticlePresentation } from './articlePresentation.ts';
+import { getArticlePresentation, hasValidPublicationContract } from './articlePresentation.ts';
 import { groupArticleBody } from './articleBodySegments.ts';
 import { ARTICLE_DETAIL_QUERY, ARTICLE_PATHS_QUERY } from './sanity/queries.ts';
 import { medicalBlockId } from './medicalBlockId.ts';
@@ -16,6 +16,8 @@ const baseArticle = {
   lastMedicalReview: '2026-01-01',
   reviewIntervalMonths: 12,
   sources: [{ status: 'current' }],
+  body: [{ _type: 'block' }],
+  primaryDomain: 'pet',
 };
 
 test('detail identity includes language, primaryDomain, and slug', () => {
@@ -76,4 +78,32 @@ test('current, stale-high-risk, and withdrawn presentation states protect summar
   assert.equal(withdrawn.showMedicalContent, false);
   assert.notEqual(withdrawn.description, baseArticle.summary);
   assert.equal(withdrawn.robots, 'noindex,follow');
+});
+
+test('publication contract withholds structurally incomplete medical content', () => {
+  assert.equal(
+    getArticlePresentation({ ...baseArticle, medicalRevision: undefined }, '2026-06-01')
+      .showMedicalContent,
+    false,
+  );
+  assert.equal(
+    getArticlePresentation({ ...baseArticle, sources: [] }, '2026-06-01').showMedicalContent,
+    false,
+  );
+  assert.equal(
+    getArticlePresentation(
+      { ...baseArticle, riskLevel: 'HIGH', reviewedBy: baseArticle.medicalOwner },
+      '2026-06-01',
+    ).showMedicalContent,
+    false,
+  );
+  assert.equal(getArticlePresentation(baseArticle, '2026-06-01').showMedicalContent, true);
+  assert.equal(
+    hasValidPublicationContract({
+      ...baseArticle,
+      riskLevel: 'HIGH',
+      reviewedBy: { _id: 'reviewer' },
+    }),
+    true,
+  );
 });

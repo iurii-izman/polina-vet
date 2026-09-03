@@ -64,6 +64,7 @@ export const ARTICLE_TRANSLATION_STATE_QUERY = defineQuery(`
     translationGroupId,
     "slug": slug.current,
     "translationSourceMedicalRevision": sourceMedicalRevision,
-    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision
+    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision,
+    withdrawn
   }
 `);

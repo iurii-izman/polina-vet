@@ -220,6 +220,18 @@ export const article = defineType({
         errors.push('RU-источник не должен иметь translatedFrom или sourceMedicalRevision.');
       if (item.riskLevel === 'HIGH' && !item.reviewedBy)
         errors.push('Для HIGH-risk материала нужен независимый рецензент.');
+      if (
+        item.riskLevel === 'HIGH' &&
+        item.medicalOwner &&
+        item.reviewedBy &&
+        typeof item.medicalOwner === 'object' &&
+        typeof item.reviewedBy === 'object' &&
+        (item.medicalOwner as { _ref?: unknown })._ref ===
+          (item.reviewedBy as { _ref?: unknown })._ref
+      )
+        errors.push(
+          'Для HIGH-risk материала medicalOwner и reviewedBy должны быть разными авторами.',
+        );
       if (item.withdrawn && !item.replacement)
         errors.push('Снятому материалу нужна безопасная замена.');
       if (!Array.isArray(item.body) || item.body.length === 0)

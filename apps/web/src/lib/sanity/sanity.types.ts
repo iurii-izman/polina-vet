@@ -661,7 +661,7 @@ export type PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT = {
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: ARTICLE_TRANSLATION_STATE_QUERY
-// Query: *[    _type == "article" &&    translationGroupId == $translationGroupId &&    language == $language &&    defined(slug.current)  ][0]{    _id,    language,    translationGroupId,    "slug": slug.current,    "translationSourceMedicalRevision": sourceMedicalRevision,    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision  }
+// Query: *[    _type == "article" &&    translationGroupId == $translationGroupId &&    language == $language &&    defined(slug.current)  ][0]{    _id,    language,    translationGroupId,    "slug": slug.current,    "translationSourceMedicalRevision": sourceMedicalRevision,    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision,    withdrawn  }
 export type ARTICLE_TRANSLATION_STATE_QUERY_RESULT = {
   _id: string;
   language: 'ro' | 'ru' | 'uk' | null;
@@ -669,6 +669,7 @@ export type ARTICLE_TRANSLATION_STATE_QUERY_RESULT = {
   slug: string | null;
   translationSourceMedicalRevision: number | null;
   sourceCurrentMedicalRevision: number | null;
+  withdrawn: boolean | null;
 } | null;
 
 // Query TypeMap
@@ -680,6 +681,6 @@ declare module '@sanity/client' {
     '\n  *[_type == "article" && language == $language && primaryDomain == $primaryDomain && slug.current == $slug][0]{\n    _id, title, summary, "slug": slug.current, language, translationGroupId, primaryDomain,\n    medicalOwner->{ _id, name, role }, reviewedBy->{ _id, name, role }, riskLevel,\n    medicalRevision, sourceMedicalRevision, lastMedicalReview, reviewIntervalMonths,\n    sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },\n    species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n    archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },\n    translatedFrom->{ _id, medicalRevision }, previousSlugs, seoTitle, seoDescription\n  }\n': ARTICLE_DETAIL_QUERY_RESULT;
     '\n  *[_type == "article" && defined(slug.current) && !archived && !withdrawn && language == $language &&\n    defined(title) && defined(summary) && defined(medicalOwner) && defined(riskLevel) &&\n    defined(medicalRevision) && defined(lastMedicalReview) && defined(reviewIntervalMonths) && count(sources) > 0 && count(body) > 0 &&\n    !(riskLevel == "HIGH" && !defined(reviewedBy))]\n  { _id, title, summary, "slug": slug.current, language, primaryDomain, riskLevel, medicalOwner, reviewedBy,\n    lastMedicalReview, reviewIntervalMonths, "sourceStatuses": sources[]->status }\n': ELIGIBLE_KNOWLEDGE_QUERY_RESULT;
     '\n  *[\n    _type == "page" &&\n    translationGroupId == $translationGroupId &&\n    language == $language &&\n    defined(slug.current)\n  ][0]{\n    _id,\n    title,\n    "slug": slug.current,\n    language,\n    translationGroupId,\n    body\n  }\n': PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT;
-    '\n  *[\n    _type == "article" &&\n    translationGroupId == $translationGroupId &&\n    language == $language &&\n    defined(slug.current)\n  ][0]{\n    _id,\n    language,\n    translationGroupId,\n    "slug": slug.current,\n    "translationSourceMedicalRevision": sourceMedicalRevision,\n    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision\n  }\n': ARTICLE_TRANSLATION_STATE_QUERY_RESULT;
+    '\n  *[\n    _type == "article" &&\n    translationGroupId == $translationGroupId &&\n    language == $language &&\n    defined(slug.current)\n  ][0]{\n    _id,\n    language,\n    translationGroupId,\n    "slug": slug.current,\n    "translationSourceMedicalRevision": sourceMedicalRevision,\n    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision,\n    withdrawn\n  }\n': ARTICLE_TRANSLATION_STATE_QUERY_RESULT;
   }
 }

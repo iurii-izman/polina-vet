@@ -51,11 +51,13 @@ const [
     "sources": sources[]._ref,
     "translatedFrom": translatedFrom._ref,
     sourceMedicalRevision,
+    previousSlugs,
+    archived,
     withdrawn,
     "replacement": replacement._ref
   }`),
   client.fetch('*[_type == "author"]{"id":_id,name,role}'),
-  client.fetch('*[_type == "source"]{"id":_id,status}'),
+  client.fetch('*[_type == "source"]{"id":_id,status,"supersededBy":supersededBy._ref}'),
   client.fetch(
     '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
   ),
@@ -82,6 +84,8 @@ const [
       "sources": sources[]._ref,
       "translatedFrom": translatedFrom._ref,
       sourceMedicalRevision,
+      previousSlugs,
+      archived,
       withdrawn,
       "replacement": replacement._ref
     }
@@ -130,6 +134,8 @@ for (const article of articles) {
     (!article.reviewedBy || !publicAuthorIds.has(article.reviewedBy))
   )
     throw new Error(`${article.id}: HIGH-risk reviewedBy does not resolve through the public API.`);
+  if (article.riskLevel === 'HIGH' && article.reviewedBy === article.medicalOwner)
+    throw new Error(`${article.id}: HIGH-risk reviewedBy must be independent from medicalOwner.`);
 }
 const editorialWarnings = collectEditorialWarnings(articles, sources);
 const identityErrors = validateRoutableContentIdentity({ pages, articles });
