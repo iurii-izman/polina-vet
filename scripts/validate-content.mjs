@@ -12,21 +12,35 @@ const sectionForDomain = (domain) => sections[domain] ?? 'knowledge';
 
 function validateDocumentFacts(document, sourceIds) {
   const errors = [];
-  const incomplete = !document.title || !document.summary || !document.translationGroupId ||
-    !document.medicalOwner || !document.riskLevel || document.medicalRevision < 1 ||
-    !document.lastMedicalReview || document.reviewIntervalMonths < 1 ||
-    !document.sources?.length || !document.body?.length;
+  const incomplete =
+    !document.title ||
+    !document.summary ||
+    !document.translationGroupId ||
+    !document.medicalOwner ||
+    !document.riskLevel ||
+    document.medicalRevision < 1 ||
+    !document.lastMedicalReview ||
+    document.reviewIntervalMonths < 1 ||
+    !document.sources?.length ||
+    !document.body?.length;
   if (!languages.has(document.language)) errors.push(`${document.id}: unsupported language`);
   if (!domains.has(document.primaryDomain)) errors.push(`${document.id}: invalid primaryDomain`);
-  if (!document.slug || !slugPattern.test(document.slug)) errors.push(`${document.id}: invalid slug`);
+  if (!document.slug || !slugPattern.test(document.slug))
+    errors.push(`${document.id}: invalid slug`);
   if (incomplete) errors.push(`${document.id}: required publication contract is incomplete`);
   if (document.riskLevel === 'HIGH' && !document.reviewedBy)
     errors.push(`${document.id}: HIGH-risk reviewer is required`);
-  if (document.language !== 'ru' && (!document.translatedFrom || document.sourceMedicalRevision < 1))
+  if (
+    document.language !== 'ru' &&
+    (!document.translatedFrom || document.sourceMedicalRevision < 1)
+  )
     errors.push(`${document.id}: translation lineage is incomplete`);
   if (document.language === 'ru' && (document.translatedFrom || document.sourceMedicalRevision))
     errors.push(`${document.id}: RU source cannot have translation lineage`);
-  if (document.withdrawn && (!document.replacement || referenceId(document.replacement) === document.id))
+  if (
+    document.withdrawn &&
+    (!document.replacement || referenceId(document.replacement) === document.id)
+  )
     errors.push(`${document.id}: withdrawn content needs a different safe replacement`);
   if (RESERVED_ARTICLE_ROUTES.has(reservedArticleRouteKey(document)))
     errors.push(`${document.id}: article route collides with a reserved static route`);

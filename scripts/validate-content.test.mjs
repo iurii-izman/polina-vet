@@ -87,7 +87,13 @@ test('withdrawn sources warn without blocking a safe rebuild', () => {
 test('replacement must be active and routable', () => {
   const errors = validateContent(
     [
-      validArticle({ id: 'withdrawn', slug: 'old', translationGroupId: 'old', withdrawn: true, replacement: 'replacement' }),
+      validArticle({
+        id: 'withdrawn',
+        slug: 'old',
+        translationGroupId: 'old',
+        withdrawn: true,
+        replacement: 'replacement',
+      }),
       validArticle({ id: 'replacement', slug: 'new', translationGroupId: 'new', archived: true }),
     ],
     [{ id: 'source', status: 'current' }],
