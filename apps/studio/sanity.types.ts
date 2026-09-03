@@ -15,6 +15,43 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type SafetyNotice = {
+  _type: 'safetyNotice';
+  title?: string;
+  text?: string;
+};
+
+export type NextSteps = {
+  _type: 'nextSteps';
+  title?: string;
+  items?: Array<string>;
+};
+
+export type Checklist = {
+  _type: 'checklist';
+  title?: string;
+  items?: Array<string>;
+};
+
+export type RedFlagCategory = {
+  _type: 'redFlagCategory';
+  title?: string;
+  description?: string;
+  items?: Array<string>;
+};
+
+export type DontDoBlock = {
+  _type: 'dontDoBlock';
+  title?: string;
+  items?: Array<string>;
+};
+
+export type PracticalActions = {
+  _type: 'practicalActions';
+  title?: string;
+  items?: Array<string>;
+};
+
 export type ClinicalCaseReference = {
   _ref: string;
   _type: 'reference';
@@ -195,6 +232,7 @@ export type Article = {
   _updatedAt: string;
   _rev: string;
   title?: string;
+  summary?: string;
   slug?: Slug;
   language?: 'ru' | 'ro' | 'uk';
   translationGroupId?: string;
@@ -207,6 +245,7 @@ export type Article = {
   sourceMedicalRevision?: number;
   lastMedicalReview?: string;
   reviewIntervalMonths?: number;
+  reviewNotes?: string;
   sources?: Array<
     {
       _key: string;
@@ -222,28 +261,50 @@ export type Article = {
       _key: string;
     } & TopicReference
   >;
-  body?: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: 'span';
-      _key: string;
-    }>;
-    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
-    listItem?: 'bullet' | 'number';
-    markDefs?: Array<{
-      href?: string;
-      _type: 'link';
-      _key: string;
-    }>;
-    level?: number;
-    _type: 'block';
-    _key: string;
-  }>;
+  body?: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
+        listItem?: 'bullet' | 'number';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }
+    | ({
+        _key: string;
+      } & PracticalActions)
+    | ({
+        _key: string;
+      } & DontDoBlock)
+    | ({
+        _key: string;
+      } & RedFlagCategory)
+    | ({
+        _key: string;
+      } & Checklist)
+    | ({
+        _key: string;
+      } & NextSteps)
+    | ({
+        _key: string;
+      } & SafetyNotice)
+  >;
   previousSlugs?: Array<string>;
   archived?: boolean;
   withdrawn?: boolean;
   replacement?: ArticleReference;
+  seoTitle?: string;
+  seoDescription?: string;
 };
 
 export type Author = {
@@ -370,6 +431,12 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | SafetyNotice
+  | NextSteps
+  | Checklist
+  | RedFlagCategory
+  | DontDoBlock
+  | PracticalActions
   | ClinicalCaseReference
   | AuthorReference
   | SourceReference
@@ -395,3 +462,164 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint;
+
+// Source: queries/article.ts
+// Variable: publishedArticlePathsQuery
+// Query: *[_type == "article" && language == "ru" && defined(slug.current) && !archived && !withdrawn &&    defined(title) && defined(summary) && defined(medicalOwner) && defined(riskLevel) &&    defined(medicalRevision) && defined(lastMedicalReview) && defined(reviewIntervalMonths) && count(sources) > 0 && count(body) > 0]  { "slug": slug.current, language, primaryDomain }
+export type PublishedArticlePathsQueryResult = Array<{
+  slug: string | null;
+  language: 'ro' | 'ru' | 'uk' | null;
+  primaryDomain: 'farm' | 'pet' | 'shared' | null;
+}>;
+
+// Source: queries/article.ts
+// Variable: publishedArticleDetailQuery
+// Query: *[_type == "article" && language == $language && slug.current == $slug][0]{    _id, title, summary, "slug": slug.current, language, translationGroupId, primaryDomain,    medicalOwner->{ _id, name, role }, reviewedBy->{ _id, name, role }, riskLevel,    medicalRevision, sourceMedicalRevision, lastMedicalReview, reviewIntervalMonths, reviewNotes,    sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },    species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },    archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },    translatedFrom->{ _id, medicalRevision }, previousSlugs, seoTitle, seoDescription  }
+export type PublishedArticleDetailQueryResult = {
+  _id: string;
+  title: string | null;
+  summary: string | null;
+  slug: string | null;
+  language: 'ro' | 'ru' | 'uk' | null;
+  translationGroupId: string | null;
+  primaryDomain: 'farm' | 'pet' | 'shared' | null;
+  medicalOwner: {
+    _id: string;
+    name: string | null;
+    role: string | null;
+  } | null;
+  reviewedBy: {
+    _id: string;
+    name: string | null;
+    role: string | null;
+  } | null;
+  riskLevel: 'HIGH' | 'LOW' | 'STANDARD' | null;
+  medicalRevision: number | null;
+  sourceMedicalRevision: number | null;
+  lastMedicalReview: string | null;
+  reviewIntervalMonths: number | null;
+  reviewNotes: string | null;
+  sources: Array<{
+    _id: string;
+    title: string | null;
+    url: string | null;
+    status: 'current' | 'superseded' | 'withdrawn' | null;
+    jurisdiction: string | null;
+    identifier: string | null;
+    supersededBy: {
+      _id: string;
+      title: string | null;
+      url: string | null;
+    } | null;
+  }> | null;
+  species: Array<{
+    _id: string;
+    name: string | null;
+  }> | null;
+  topics: Array<{
+    _id: string;
+    name: string | null;
+  }> | null;
+  body: Array<
+    | {
+        _key: string;
+        _type: 'block';
+        children: Array<{
+          _key: string;
+          _type: 'span';
+          text: string | null;
+          marks: Array<string> | null;
+          markDefs: null;
+        }> | null;
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal';
+        listItem?: 'bullet' | 'number';
+        markDefs?: Array<{
+          href?: string;
+          _type: 'link';
+          _key: string;
+        }>;
+        level?: number;
+      }
+    | {
+        _key: string;
+        _type: 'checklist';
+        title?: string;
+        items?: Array<string>;
+        children: null;
+      }
+    | {
+        _key: string;
+        _type: 'dontDoBlock';
+        title?: string;
+        items?: Array<string>;
+        children: null;
+      }
+    | {
+        _key: string;
+        _type: 'nextSteps';
+        title?: string;
+        items?: Array<string>;
+        children: null;
+      }
+    | {
+        _key: string;
+        _type: 'practicalActions';
+        title?: string;
+        items?: Array<string>;
+        children: null;
+      }
+    | {
+        _key: string;
+        _type: 'redFlagCategory';
+        title?: string;
+        description?: string;
+        items?: Array<string>;
+        children: null;
+      }
+    | {
+        _key: string;
+        _type: 'safetyNotice';
+        title?: string;
+        text?: string;
+        children: null;
+      }
+  > | null;
+  archived: boolean | null;
+  withdrawn: boolean | null;
+  replacement: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    primaryDomain: 'farm' | 'pet' | 'shared' | null;
+    language: 'ro' | 'ru' | 'uk' | null;
+  } | null;
+  translatedFrom: {
+    _id: string;
+    medicalRevision: number | null;
+  } | null;
+  previousSlugs: Array<string> | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+} | null;
+
+// Source: queries/article.ts
+// Variable: eligibleKnowledgeQuery
+// Query: *[_type == "article" && defined(slug.current) && !archived && !withdrawn && language == $language &&    !(riskLevel == "HIGH" && (withdrawn == true || !defined(lastMedicalReview) || count(sources[@->status in ["withdrawn"]]) > 0))]  | order(title asc){ _id, title, summary, "slug": slug.current, language, primaryDomain }
+export type EligibleKnowledgeQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  summary: string | null;
+  slug: string | null;
+  language: 'ro' | 'ru' | 'uk' | null;
+  primaryDomain: 'farm' | 'pet' | 'shared' | null;
+}>;
+
+// Query TypeMap
+import '@sanity/client';
+declare module '@sanity/client' {
+  interface SanityQueries {
+    '\n  *[_type == "article" && language == "ru" && defined(slug.current) && !archived && !withdrawn &&\n    defined(title) && defined(summary) && defined(medicalOwner) && defined(riskLevel) &&\n    defined(medicalRevision) && defined(lastMedicalReview) && defined(reviewIntervalMonths) && count(sources) > 0 && count(body) > 0]\n  { "slug": slug.current, language, primaryDomain }\n': PublishedArticlePathsQueryResult;
+    '\n  *[_type == "article" && language == $language && slug.current == $slug][0]{\n    _id, title, summary, "slug": slug.current, language, translationGroupId, primaryDomain,\n    medicalOwner->{ _id, name, role }, reviewedBy->{ _id, name, role }, riskLevel,\n    medicalRevision, sourceMedicalRevision, lastMedicalReview, reviewIntervalMonths, reviewNotes,\n    sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },\n    species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n    archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },\n    translatedFrom->{ _id, medicalRevision }, previousSlugs, seoTitle, seoDescription\n  }\n': PublishedArticleDetailQueryResult;
+    '\n  *[_type == "article" && defined(slug.current) && !archived && !withdrawn && language == $language &&\n    !(riskLevel == "HIGH" && (withdrawn == true || !defined(lastMedicalReview) || count(sources[@->status in ["withdrawn"]]) > 0))]\n  | order(title asc){ _id, title, summary, "slug": slug.current, language, primaryDomain }\n': EligibleKnowledgeQueryResult;
+  }
+}

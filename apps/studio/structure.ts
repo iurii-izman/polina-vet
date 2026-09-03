@@ -21,13 +21,18 @@ export const deskStructure: StructureResolver = (S) =>
           S.list()
             .title('ТРЕБУЕТ ВНИМАНИЯ')
             .items([
-              S.listItem()
-                .title('Материалы высокого риска')
-                .child(
-                  S.documentList()
-                    .title('Материалы высокого риска')
-                    .filter('_type == "article" && riskLevel == "HIGH"'),
-                ),
+              S.listItem().title('Материалы высокого риска').child(
+                S.documentList().title('Материалы высокого риска').filter('_type == "article" && riskLevel == "HIGH"'),
+              ),
+              S.listItem().title('Снятые материалы').child(
+                S.documentList().title('Снятые материалы').filter('_type == "article" && withdrawn == true'),
+              ),
+              S.listItem().title('Проблемные источники').child(
+                S.documentList().title('Проблемные источники').filter('_type == "article" && count(sources[@->status in ["withdrawn", "superseded"]]) > 0'),
+              ),
+              S.listItem().title('Переводы на проверку').child(
+                S.documentList().title('Переводы на проверку').filter('_type == "article" && defined(translatedFrom) && (!defined(sourceMedicalRevision) || sourceMedicalRevision != translatedFrom->medicalRevision)'),
+              ),
             ]),
         ),
       S.listItem()

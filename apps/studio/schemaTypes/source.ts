@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { sourceStatuses } from './shared';
 
 export const source = defineType({
   name: 'source',
@@ -16,7 +17,7 @@ export const source = defineType({
       name: 'status',
       title: 'Статус',
       type: 'string',
-      options: { list: ['current', 'superseded', 'withdrawn'] },
+      options: { list: sourceStatuses, layout: 'radio' },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -25,6 +26,7 @@ export const source = defineType({
       type: 'reference',
       to: [{ type: 'source' }],
       weak: true,
+      hidden: ({ parent }) => parent?.status !== 'superseded',
     }),
     defineField({ name: 'jurisdiction', title: 'Юрисдикция', type: 'string' }),
     defineField({ name: 'identifier', title: 'DOI / идентификатор', type: 'string' }),

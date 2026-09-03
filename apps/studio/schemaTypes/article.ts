@@ -1,17 +1,33 @@
-import { defineField, defineType } from 'sanity';
-
+import { defineArrayMember, defineField, defineType } from 'sanity';
 import { languages, primaryDomains, riskLevels } from './shared';
 
 export const article = defineType({
   name: 'article',
   title: 'Материал',
   type: 'document',
+  fieldsets: [
+    { name: 'content', title: 'CONTENT' },
+    { name: 'routing', title: 'ROUTING', options: { collapsible: true } },
+    { name: 'governance', title: 'MEDICAL GOVERNANCE', options: { collapsible: true } },
+    { name: 'lifecycle', title: 'LIFECYCLE', options: { collapsible: true, collapsed: true } },
+    { name: 'seo', title: 'SEO', options: { collapsible: true, collapsed: true } },
+  ],
   fields: [
     defineField({
       name: 'title',
       title: 'Заголовок',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      fieldset: 'content',
+    }),
+    defineField({
+      name: 'summary',
+      title: 'Краткое описание',
+      type: 'text',
+      rows: 3,
+      description: 'Публичное описание и meta description по умолчанию.',
+      validation: (Rule) => Rule.required().min(1),
+      fieldset: 'content',
     }),
     defineField({
       name: 'slug',
@@ -24,6 +40,7 @@ export const article = defineType({
             ? true
             : 'Slug может содержать только строчные латинские буквы, цифры и дефисы.',
         ),
+      fieldset: 'routing',
     }),
     defineField({
       name: 'language',
@@ -31,12 +48,14 @@ export const article = defineType({
       type: 'string',
       options: { list: languages },
       validation: (Rule) => Rule.required(),
+      fieldset: 'routing',
     }),
     defineField({
       name: 'translationGroupId',
       title: 'Translation family',
       type: 'string',
       validation: (Rule) => Rule.required(),
+      fieldset: 'routing',
     }),
     defineField({
       name: 'translatedFrom',
@@ -44,6 +63,7 @@ export const article = defineType({
       type: 'reference',
       to: [{ type: 'article' }],
       weak: true,
+      fieldset: 'routing',
     }),
     defineField({
       name: 'primaryDomain',
@@ -51,6 +71,7 @@ export const article = defineType({
       type: 'string',
       options: { list: primaryDomains },
       validation: (Rule) => Rule.required(),
+      fieldset: 'routing',
     }),
     defineField({
       name: 'medicalOwner',
@@ -58,12 +79,14 @@ export const article = defineType({
       type: 'reference',
       to: [{ type: 'author' }],
       validation: (Rule) => Rule.required(),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'reviewedBy',
       title: 'Независимый рецензент',
       type: 'reference',
       to: [{ type: 'author' }],
+      fieldset: 'governance',
     }),
     defineField({
       name: 'riskLevel',
@@ -71,63 +94,101 @@ export const article = defineType({
       type: 'string',
       options: { list: riskLevels },
       validation: (Rule) => Rule.required(),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'medicalRevision',
       title: 'Медицинская редакция',
       type: 'number',
       validation: (Rule) => Rule.required().integer().min(1),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'sourceMedicalRevision',
       title: 'Медицинская редакция источника',
       type: 'number',
       validation: (Rule) => Rule.integer().min(1),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'lastMedicalReview',
       title: 'Последняя медицинская проверка',
       type: 'date',
       validation: (Rule) => Rule.required(),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'reviewIntervalMonths',
       title: 'Интервал проверки (месяцев)',
       type: 'number',
       validation: (Rule) => Rule.required().integer().min(1),
+      fieldset: 'governance',
+    }),
+    defineField({
+      name: 'reviewNotes',
+      title: 'Заметки по проверке',
+      type: 'text',
+      rows: 3,
+      fieldset: 'governance',
     }),
     defineField({
       name: 'sources',
       title: 'Источники',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'source' }] }],
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'source' }] })],
       validation: (Rule) => Rule.required().min(1),
+      fieldset: 'governance',
     }),
     defineField({
       name: 'species',
       title: 'Виды животных',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'species' }] }],
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'species' }] })],
+      fieldset: 'content',
     }),
     defineField({
       name: 'topics',
       title: 'Темы',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'topic' }] }],
+      of: [defineArrayMember({ type: 'reference', to: [{ type: 'topic' }] })],
+      fieldset: 'content',
     }),
-    defineField({ name: 'body', title: 'Текст', type: 'array', of: [{ type: 'block' }] }),
+    defineField({
+      name: 'body',
+      title: 'Текст и смысловые блоки',
+      type: 'array',
+      of: [
+        defineArrayMember({ type: 'block' }),
+        defineArrayMember({ type: 'practicalActions' }),
+        defineArrayMember({ type: 'dontDoBlock' }),
+        defineArrayMember({ type: 'redFlagCategory' }),
+        defineArrayMember({ type: 'checklist' }),
+        defineArrayMember({ type: 'nextSteps' }),
+        defineArrayMember({ type: 'safetyNotice' }),
+      ],
+      validation: (Rule) => Rule.required().min(1),
+      fieldset: 'content',
+    }),
     defineField({
       name: 'previousSlugs',
       title: 'Предыдущие slugs',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [defineArrayMember({ type: 'string' })],
+      fieldset: 'lifecycle',
     }),
-    defineField({ name: 'archived', title: 'Архивный', type: 'boolean', initialValue: false }),
+    defineField({
+      name: 'archived',
+      title: 'Архивный',
+      type: 'boolean',
+      initialValue: false,
+      fieldset: 'lifecycle',
+    }),
     defineField({
       name: 'withdrawn',
       title: 'Снят с публикации',
       type: 'boolean',
       initialValue: false,
+      fieldset: 'lifecycle',
     }),
     defineField({
       name: 'replacement',
@@ -135,6 +196,15 @@ export const article = defineType({
       type: 'reference',
       to: [{ type: 'article' }],
       weak: true,
+      fieldset: 'lifecycle',
+    }),
+    defineField({ name: 'seoTitle', title: 'SEO title override', type: 'string', fieldset: 'seo' }),
+    defineField({
+      name: 'seoDescription',
+      title: 'SEO description override',
+      type: 'text',
+      rows: 2,
+      fieldset: 'seo',
     }),
   ],
   validation: (Rule) =>
@@ -150,6 +220,8 @@ export const article = defineType({
         errors.push('Для HIGH-risk материала нужен независимый рецензент.');
       if (item.withdrawn && !item.replacement)
         errors.push('Снятому материалу нужна безопасная замена.');
+      if (!Array.isArray(item.body) || item.body.length === 0)
+        errors.push('Добавьте содержательный body.');
       return errors.length ? errors.join(' ') : true;
     }),
 });

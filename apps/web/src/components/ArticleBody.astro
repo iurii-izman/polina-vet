@@ -1,0 +1,12 @@
+---
+import MedicalBlock from './MedicalBlock.astro';
+import PortableText from './PortableText.astro';
+interface BodyBlock { _type: string; _key?: string; title?: string; description?: string; text?: string; items?: string[]; children?: unknown[] }
+const { body = [] } = Astro.props as { body?: BodyBlock[] };
+const standardBlocks = body.filter((block) => block._type === 'block');
+const medicalBlocks = body.filter((block) => block._type !== 'block');
+---
+<div class="article-body">
+  <PortableText value={standardBlocks} />
+  {medicalBlocks.map((block) => <MedicalBlock value={block} />)}
+</div>

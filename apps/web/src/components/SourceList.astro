@@ -1,0 +1,16 @@
+---
+interface Source { title?: string; url?: string; identifier?: string; jurisdiction?: string; status?: string }
+const { sources = [] } = Astro.props as { sources?: Source[] };
+const statusLabel: Record<string, string> = { superseded: 'Источник заменён', withdrawn: 'Источник отозван' };
+---
+<section class="source-list" aria-labelledby="source-list-title">
+  <h2 id="source-list-title">Источники</h2>
+  <ul>
+    {sources.map((source) => <li>
+      {source.url ? <a href={source.url} rel="noreferrer">{source.title}</a> : <span>{source.title}</span>}
+      {source.identifier && <span> · {source.identifier}</span>}
+      {source.jurisdiction && <span> · {source.jurisdiction}</span>}
+      {source.status && source.status !== 'current' && <small> · {statusLabel[source.status] ?? 'Статус источника требует внимания'}</small>}
+    </li>)}
+  </ul>
+</section>
