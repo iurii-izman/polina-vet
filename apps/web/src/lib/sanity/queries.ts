@@ -28,6 +28,7 @@ export const ARTICLE_DETAIL_QUERY = defineQuery(`
 /** Structural candidates; review expiry is filtered by the canonical TS governance helper. */
 export const ELIGIBLE_KNOWLEDGE_QUERY = defineQuery(`
   *[_type == "article" && defined(slug.current) && !archived && !withdrawn && language == $language &&
+    defined(primaryDomain) && primaryDomain in ["pet", "farm", "shared"] &&
     defined(title) && defined(summary) && defined(medicalOwner) && defined(riskLevel) &&
     defined(medicalRevision) && defined(lastMedicalReview) && defined(reviewIntervalMonths) && count(sources) > 0 && count(body) > 0 &&
     !(riskLevel == "HIGH" && !defined(reviewedBy))]

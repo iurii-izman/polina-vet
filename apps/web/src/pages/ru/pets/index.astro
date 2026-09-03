@@ -1,14 +1,23 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ActionCard from '../../../components/ActionCard.astro';
 import { route } from '../../../lib/i18n';
 ---
 
 <BaseLayout title="Домашние животные" locale="ru">
-  <section class="page-intro container"><p class="eyebrow">Домашние животные</p><h1>Домашние животные</h1><p class="lead">Практическая информация для владельцев собак и кошек: что оценить, как подготовиться к визиту и когда не стоит ждать.</p></section>
+  <section class="page-intro container"><p class="eyebrow">Домашние животные</p><h1>Домашние животные</h1><p class="lead">Практическая информация о здоровье собак и кошек: что проверить дома, когда не стоит ждать, как подготовиться к визиту и что важно для профилактики.</p></section>
   <section class="container action-grid">
-    <a class="action-card urgent-card" href={route.petUrgent('ru')}><p class="eyebrow">Срочно</p><h2>Животному плохо прямо сейчас?</h2><p>Откройте срочный маршрут для домашних животных.</p><span>Что делать сейчас →</span></a>
-    <a class="action-card" href={route.beforeVisit('ru')}><p class="eyebrow">Подготовка</p><h2>Подготовиться к визиту</h2><p>Что записать, взять с собой и как подготовить животное.</p><span>Открыть чек-лист →</span></a>
-    <div class="action-card static-card"><p class="eyebrow">Профилактика</p><h2>Профилактика</h2><p>Раздел появится с проверенными материалами.</p></div>
+    <ActionCard tone="urgent" eyebrow="Срочно" title="Животному плохо прямо сейчас?" description="Признаки, при которых лучше не откладывать получение ветеринарной помощи." action="Срочные признаки" href={route.petUrgent('ru')} />
+    <ActionCard tone="pet" eyebrow="Подготовка" title="Подготовиться к визиту" description="Что записать, измерить и взять с собой." action="Открыть памятку" href={route.beforeVisit('ru')} />
+    <ActionCard eyebrow="Профилактика" title="Профилактика" description="Вакцинация, паразиты и основные профилактические материалы." action="Смотреть материалы" href={route.knowledge('ru')} />
   </section>
-  <section class="container section"><p class="eyebrow">Навигация</p><h2>Частые ситуации</h2><div class="plain-grid"><div>Симптомы и изменения состояния</div><div>Профилактика</div><div>Подготовка к визиту</div></div></section>
+  <section class="container section" aria-labelledby="pets-situations-title">
+    <div class="section-heading"><div><p class="eyebrow">Ориентиры</p><h2 id="pets-situations-title">Частые ситуации</h2></div><p>Разделы будут пополняться материалами после проверки. Сейчас доступны срочный маршрут и памятка перед визитом.</p></div>
+    <div class="context-grid">
+      <div class="context-card"><h3>Симптомы и изменения состояния</h3><p>Материалы появятся после медицинской проверки.</p></div>
+      <div class="context-card"><h3>Профилактика</h3><p>Вакцинация и паразиты — в разделе «Знания».</p></div>
+      <div class="context-card"><h3>Подготовка к визиту</h3><p>Откройте практическую памятку перед обращением.</p></div>
+      <div class="context-card"><h3>Когда не стоит ждать</h3><p>Откройте отдельный срочный маршрут для домашних животных.</p></div>
+    </div>
+  </section>
 </BaseLayout>

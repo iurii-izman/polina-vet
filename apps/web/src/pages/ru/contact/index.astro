@@ -1,5 +1,10 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import UrgentBoundary from '../../../components/UrgentBoundary.astro';
 ---
-<BaseLayout title="Контакты и доступность"><section class="page-intro container"><p class="eyebrow">Контакты</p><h1>Контакты и доступность</h1><p class="lead">Контакты публикуются после проверки фактических данных.</p><UrgentBoundary /><div class="plain-grid"><div><b>Телефон</b><br />[FACT REQUIRED]</div><div><b>Мессенджер</b><br />[FACT REQUIRED]</div><div><b>Территория</b><br />[FACT REQUIRED]</div><div><b>Доступность</b><br />[FACT REQUIRED]</div></div></section></BaseLayout>
+<BaseLayout title="Контакты и доступность" locale="ru">
+  <Breadcrumbs items={[{ label: 'Контакты и доступность' }]} />
+  <section class="page-intro container"><p class="eyebrow">Контакты</p><h1>Контакты и доступность</h1><p class="lead">Здесь будут указаны актуальные способы связи с Полиной и пояснение, по каким вопросам и в какое время ими можно пользоваться.</p><UrgentBoundary /></section>
+  <section class="container page-content section" aria-labelledby="contact-methods-title"><div class="empty-state"><p class="eyebrow">Способы связи</p><h2 id="contact-methods-title">Контактные данные пока не опубликованы</h2><p>Телефон, мессенджеры, территория работы и доступность появятся после проверки фактических данных. Не используйте этот сайт как единственный путь получения срочной помощи.</p></div></section>
+</BaseLayout>

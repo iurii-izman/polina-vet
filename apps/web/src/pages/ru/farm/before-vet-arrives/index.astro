@@ -1,4 +1,26 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import { route } from '../../../../lib/i18n';
+
+const items = [
+  { title: 'Найдите животное заранее', description: 'Не заставляйте ветеринара искать нужное животное по всему хозяйству.' },
+  { title: 'Подготовьте безопасную фиксацию', description: 'Животное должно быть доступно для осмотра настолько безопасно, насколько позволяют условия хозяйства.' },
+  { title: 'Подготовьте помощника', items: ['Если животное крупное', 'Если требуется фиксация', 'Если понадобится перемещение'] },
+  { title: 'Соберите историю', items: ['Когда началось', 'Аппетит', 'Температура, если измерена', 'Дефекация', 'Мочеиспускание', 'Продуктивность, если релевантно', 'Отёл или окот', 'Недавние изменения корма', 'Новые животные в хозяйстве'] },
+  { title: 'Подготовьте список препаратов', items: ['Название', 'Количество', 'Путь', 'Когда применяли'] },
+  { title: 'Если заболели несколько животных', items: ['Сколько всего животных в группе', 'Сколько заболело', 'Когда появился первый случай', 'Есть ли похожие симптомы', 'Были ли падежи'] },
+  { title: 'Рабочее место', items: ['Достаточное освещение', 'Доступ к чистой воде', 'Безопасная поверхность', 'Отсутствие лишних людей и животных'] },
+  { title: 'Биобезопасность', description: 'Если есть подозрение на инфекционную проблему, заранее продумайте, как минимизировать перемещение людей и инвентаря между группами животных.' },
+];
 ---
-<BaseLayout title="Подготовиться к приезду ветеринара"><section class="page-intro container"><p class="eyebrow">Ферма · Подготовка</p><h1>Как подготовиться к приезду ветеринара</h1><p class="lead">Подготовьте информацию о животном, группе, условиях и безопасном рабочем месте.</p></section></BaseLayout>
+
+<BaseLayout title="Подготовиться к приезду ветеринара" locale="ru">
+  <Breadcrumbs items={[{ label: 'Ферма', href: route.farm('ru') }, { label: 'Подготовка к приезду ветеринара' }]} />
+  <section class="page-intro container"><p class="eyebrow">Ферма · Подготовка</p><h1>Как подготовиться к приезду ветеринара</h1><p class="lead">Подготовленное животное, история болезни и безопасное рабочее место позволяют быстрее перейти к осмотру и снижают риск для животного и людей.</p></section>
+  <section class="container page-content" aria-labelledby="before-vet-list-title"><div class="section-heading"><div><p class="eyebrow">Памятка для хозяйства</p><h2 id="before-vet-list-title">Что подготовить заранее</h2></div><p>Используйте чек-лист, чтобы собрать данные о животном, группе и условиях.</p></div><Checklist items={items} /><div class="print-actions"><button class="button button--secondary no-print" type="button" data-print>Распечатать чек-лист</button></div></section>
+  <script>
+    document.querySelector<HTMLButtonElement>('[data-print]')?.addEventListener('click', () => window.print());
+  </script>
+</BaseLayout>

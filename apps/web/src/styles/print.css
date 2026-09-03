@@ -1,0 +1,52 @@
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+  html,
+  body {
+    background: white;
+    color: black;
+  }
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .no-print,
+  .urgent-action,
+  .print-actions {
+    display: none !important;
+  }
+  .container,
+  .medical-article,
+  .page-content {
+    width: 100%;
+    max-width: none;
+  }
+  .breadcrumbs {
+    width: 100%;
+    margin: 0 0 1rem;
+  }
+  .medical-article,
+  .page-intro,
+  .hero {
+    padding: 0;
+  }
+  .hero-panel,
+  .gateway,
+  .contact-strip {
+    border: 1px solid #999;
+    background: white;
+    color: black;
+  }
+  .medical-meta,
+  .source-list,
+  .medical-block,
+  .checklist li,
+  .state-card {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+  a {
+    color: black;
+    text-decoration: none;
+  }
+}

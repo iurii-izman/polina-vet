@@ -1,0 +1,19 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  href: string;
+  action: string;
+  tone?: 'pet' | 'farm' | 'urgent' | 'group';
+}
+
+const { eyebrow, title, description, href, action, tone } = Astro.props;
+---
+
+<a class:list={['action-card', tone && `action-card--${tone}`]} href={href}>
+  <p class="eyebrow">{eyebrow}</p>
+  <h2>{title}</h2>
+  <p>{description}</p>
+  <span class="action-card__link">{action} <span aria-hidden="true">→</span></span>
+</a>

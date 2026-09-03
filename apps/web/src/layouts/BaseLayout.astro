@@ -32,7 +32,7 @@ const siteTitle = siteSettings?.title ?? 'POLINA VET';
   <body>
     <a class="skip-link" href="#main-content">Перейти к содержанию</a>
     <SiteHeader locale={locale} />
-    <main id="main-content" tabindex="-1">
+    <main id="main-content" class="site-main" tabindex="-1">
       <slot />
     </main>
     <Footer locale={locale} />
