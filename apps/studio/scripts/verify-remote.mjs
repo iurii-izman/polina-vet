@@ -22,12 +22,13 @@ const client = createClient({
 });
 const authenticatedClient = getCliClient({ apiVersion: SANITY_API_VERSION });
 
-const [siteSettings, publicPages, publicArticles, documents, routableDocuments] = await Promise.all(
-  [
+const [siteSettings, publicPages, publicArticles, sources, documents, routableDocuments] =
+  await Promise.all([
     client.fetch('*[_type == "siteSettings" && _id == "siteSettings"]{_id,title,defaultLanguage}'),
     client.fetch('*[_type == "page"]{"id":_id,language,translationGroupId,"slug":slug.current}'),
     client.fetch(`*[_type == "article"]{
     "id": _id,
+    title, summary,
     language,
     "slug": slug.current,
     primaryDomain,
@@ -36,12 +37,15 @@ const [siteSettings, publicPages, publicArticles, documents, routableDocuments] 
     "medicalOwner": medicalOwner._ref,
     lastMedicalReview,
     reviewIntervalMonths,
+    medicalRevision,
+    body,
     "sources": sources[]._ref,
     "translatedFrom": translatedFrom._ref,
     sourceMedicalRevision,
     withdrawn,
     "replacement": replacement._ref
   }`),
+    client.fetch('*[_type == "source"]{"id":_id,status}'),
     client.fetch(
       '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
     ),
@@ -55,11 +59,15 @@ const [siteSettings, publicPages, publicArticles, documents, routableDocuments] 
       language,
       translationGroupId,
       "slug": slug.current,
+      title,
+      summary,
       primaryDomain,
       riskLevel,
       "medicalOwner": medicalOwner._ref,
       lastMedicalReview,
       reviewIntervalMonths,
+      medicalRevision,
+      body,
       "sources": sources[]._ref,
       "translatedFrom": translatedFrom._ref,
       sourceMedicalRevision,
@@ -67,8 +75,7 @@ const [siteSettings, publicPages, publicArticles, documents, routableDocuments] 
       "replacement": replacement._ref
     }
   `),
-  ],
-);
+  ]);
 
 if (siteSettings.length !== 1)
   throw new Error(
@@ -101,7 +108,7 @@ if (inaccessibleDocuments.length)
     `Routable published content must be available through the unauthenticated published API: ${inaccessibleDocuments.map((document) => document.id).join(', ')}.`,
   );
 
-const policyErrors = validateContent(articles);
+const policyErrors = validateContent(articles, sources);
 if (policyErrors.length) throw new Error(policyErrors.join('\n'));
 const identityErrors = validateRoutableContentIdentity({ pages, articles });
 if (identityErrors.length) throw new Error(identityErrors.join('\n'));

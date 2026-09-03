@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts",
+    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts",
     "test:e2e": "playwright test tests/smoke.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },

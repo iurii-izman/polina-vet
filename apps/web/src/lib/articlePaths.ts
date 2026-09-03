@@ -1,12 +1,12 @@
 import { articleRoute, type ArticleDomain } from './articleRoute';
-import { publishedArticlePathsQuery } from './queries';
-import { sanityClient } from './sanity';
-import type { Article } from '../../../studio/sanity.types';
+import { ARTICLE_PATHS_QUERY } from './sanity/queries';
+import { sanityClient } from 'sanity:client';
+import type { ARTICLE_PATHS_QUERY_RESULT } from './sanity/sanity.types';
 
-type ArticlePath = Pick<Article, 'language' | 'primaryDomain'> & { slug?: string };
+type ArticlePath = ARTICLE_PATHS_QUERY_RESULT[number];
 
 export async function getRussianArticlePaths() {
-  const articles = await sanityClient.fetch<ArticlePath[]>(publishedArticlePathsQuery);
+  const articles = await sanityClient.fetch(ARTICLE_PATHS_QUERY);
   return articles
     .filter((article): article is ArticlePath & { slug: string; primaryDomain: ArticleDomain } =>
       Boolean(article.slug && article.primaryDomain),

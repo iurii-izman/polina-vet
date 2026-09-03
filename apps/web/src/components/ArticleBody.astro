@@ -1,12 +1,24 @@
 ---
 import MedicalBlock from './MedicalBlock.astro';
 import PortableText from './PortableText.astro';
-interface BodyBlock { _type: string; _key?: string; title?: string; description?: string; text?: string; items?: string[]; children?: unknown[] }
+import type { Page } from '../lib/sanity/sanity.types';
+interface BodyBlock { _type: string; _key?: string; title?: string; description?: string; text?: string; items?: string[]; children?: Array<{ _type: 'span'; _key: string; text?: string; marks?: string[] }> }
 const { body = [] } = Astro.props as { body?: BodyBlock[] };
-const standardBlocks = body.filter((block) => block._type === 'block');
-const medicalBlocks = body.filter((block) => block._type !== 'block');
+type PortableBlock = NonNullable<Page['body']>[number];
+const segments: Array<{ type: 'portable'; blocks: PortableBlock[] } | { type: 'medical'; block: BodyBlock }> = [];
+for (const block of body) {
+  if (block._type === 'block') {
+    const previous = segments.at(-1);
+    const portableBlock = block as PortableBlock;
+    if (previous?.type === 'portable') previous.blocks.push(portableBlock);
+    else segments.push({ type: 'portable', blocks: [portableBlock] });
+  } else segments.push({ type: 'medical', block });
+}
 ---
 <div class="article-body">
-  <PortableText value={standardBlocks} />
-  {medicalBlocks.map((block) => <MedicalBlock value={block} />)}
+  {segments.map((segment) =>
+    segment.type === 'portable'
+      ? <PortableText value={segment.blocks} />
+      : <MedicalBlock value={segment.block} />
+  )}
 </div>

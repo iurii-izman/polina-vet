@@ -16,13 +16,24 @@ function calendarDate(value: string): Date | undefined {
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
+export function addCalendarMonths(date: Date, months: number): Date {
+  const result = new Date(date.getTime());
+  const day = result.getUTCDate();
+  result.setUTCDate(1);
+  result.setUTCMonth(result.getUTCMonth() + months);
+  const lastDay = new Date(
+    Date.UTC(result.getUTCFullYear(), result.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  result.setUTCDate(Math.min(day, lastDay));
+  return result;
+}
+
 export function deriveMedicalReviewState(facts: ReviewFacts, now: string): MedicalReviewState {
   const reviewed = facts.lastMedicalReview ? calendarDate(facts.lastMedicalReview) : undefined;
   const today = calendarDate(now);
   if (!reviewed || !today || !facts.reviewIntervalMonths || facts.reviewIntervalMonths < 1)
     return 'REVIEW_REQUIRED';
-  const due = new Date(reviewed);
-  due.setUTCMonth(due.getUTCMonth() + facts.reviewIntervalMonths);
+  const due = addCalendarMonths(reviewed, facts.reviewIntervalMonths);
   return today < due ? 'CURRENT' : 'REVIEW_REQUIRED';
 }
 
@@ -48,8 +59,9 @@ export function deriveTranslationState(
   if (!input) return 'PENDING';
   if (input.withdrawn) return 'WITHDRAWN';
   if (input.language === 'ru') return 'CURRENT';
-  if (!input.translatedFromMedicalRevision || !input.sourceMedicalRevision) return 'PENDING';
-  return input.translatedFromMedicalRevision >= input.sourceMedicalRevision
+  if (!input.translatedFromMedicalRevision || !input.sourceMedicalRevision)
+    return 'REVIEW_REQUIRED';
+  return input.translatedFromMedicalRevision === input.sourceMedicalRevision
     ? 'CURRENT'
     : 'REVIEW_REQUIRED';
 }
@@ -69,4 +81,27 @@ export function derivePublicSafetyState(input: {
   )
     return 'STALE_HIGH_RISK';
   return 'CURRENT';
+}
+
+export function isDiscoveryEligible(
+  input: {
+    riskLevel?: 'HIGH' | 'STANDARD' | 'LOW';
+    lastMedicalReview?: string;
+    reviewIntervalMonths?: number;
+    sourceStatuses?: Array<string | null | undefined>;
+    withdrawn?: boolean;
+  },
+  now: string,
+): boolean {
+  const sourceHealth = deriveSourceHealth(
+    (input.sourceStatuses ?? []).map((status) => (status ? { status } : undefined)),
+  );
+  return (
+    derivePublicSafetyState({
+      riskLevel: input.riskLevel,
+      reviewState: deriveMedicalReviewState(input, now),
+      sourceHealth,
+      withdrawn: input.withdrawn,
+    }) !== 'STALE_HIGH_RISK'
+  );
 }
