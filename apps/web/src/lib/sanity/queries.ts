@@ -8,6 +8,29 @@ export const SITE_SETTINGS_QUERY = defineQuery(`
   }
 `);
 
+export const PUBLIC_PROFILE_QUERY = defineQuery(`
+  *[_type == "siteSettings" && _id == "siteSettings"][0]{
+    _id,
+    title,
+    defaultLanguage,
+    primaryAuthor->{
+      _id, name, role, "slug": slug.current, position, shortBio,
+      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },
+      education[]{ institution, field, qualification, note },
+      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }
+    },
+    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },
+    location{ label, mapUrl },
+    serviceModes,
+    availabilityNote,
+    "featuredKnowledge": featuredKnowledge[]->{
+      _id, title, summary, "slug": slug.current, language, primaryDomain,
+      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,
+      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived
+    }
+  }
+`);
+
 export const ARTICLE_PATHS_QUERY = defineQuery(`
   *[_type == "article" && language == "ru" && defined(slug.current) && defined(primaryDomain) && !archived && defined(title)]
   { "slug": slug.current, language, primaryDomain }

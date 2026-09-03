@@ -118,6 +118,13 @@ export type ClinicalCase = {
   }>;
 };
 
+export type ArticleReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'article';
+};
+
 export type SiteSettings = {
   _id: string;
   _type: 'siteSettings';
@@ -126,6 +133,25 @@ export type SiteSettings = {
   _rev: string;
   title?: string;
   defaultLanguage?: string;
+  primaryAuthor?: AuthorReference;
+  contacts?: {
+    primaryPhone?: string;
+    secondaryPhone?: string;
+    telegramHandle?: string;
+    whatsappPhone?: string;
+    viberPhone?: string;
+  };
+  location?: {
+    label?: string;
+    mapUrl?: string;
+  };
+  serviceModes?: Array<string>;
+  availabilityNote?: string;
+  featuredKnowledge?: Array<
+    {
+      _key: string;
+    } & ArticleReference
+  >;
 };
 
 export type Source = {
@@ -204,13 +230,6 @@ export type Slug = {
   _type: 'slug';
   current?: string;
   source?: string;
-};
-
-export type ArticleReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'article';
 };
 
 export type SpeciesReference = {
@@ -309,6 +328,13 @@ export type Article = {
   seoDescription?: string;
 };
 
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset';
+};
+
 export type Author = {
   _id: string;
   _type: 'author';
@@ -317,6 +343,58 @@ export type Author = {
   _rev: string;
   name?: string;
   role?: string;
+  slug?: Slug;
+  position?: string;
+  shortBio?: string;
+  bio?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: 'span';
+      _key: string;
+    }>;
+    style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
+    listItem?: 'bullet' | 'number';
+    markDefs?: Array<{
+      href?: string;
+      _type: 'link';
+      _key: string;
+    }>;
+    level?: number;
+    _type: 'block';
+    _key: string;
+  }>;
+  education?: Array<{
+    institution?: string;
+    field?: string;
+    qualification?: string;
+    note?: string;
+    _key: string;
+  }>;
+  portrait?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: 'image';
+  };
+};
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop';
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot';
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -355,22 +433,6 @@ export type SanityImageMetadata = {
   thumbHash?: string;
   hasAlpha?: boolean;
   isOpaque?: boolean;
-};
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot';
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop';
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
 };
 
 export type SanityFileAsset = {
@@ -443,23 +505,24 @@ export type AllSanitySchemaTypes =
   | AuthorReference
   | SourceReference
   | ClinicalCase
+  | ArticleReference
   | SiteSettings
   | Source
   | Topic
   | Species
   | Page
   | Slug
-  | ArticleReference
   | SpeciesReference
   | TopicReference
   | Article
+  | SanityImageAssetReference
   | Author
+  | SanityImageCrop
+  | SanityImageHotspot
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
   | SanityImageMetadata
-  | SanityImageHotspot
-  | SanityImageCrop
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
@@ -472,6 +535,85 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   _id: 'siteSettings';
   title: string | null;
   defaultLanguage: string | null;
+} | null;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: PUBLIC_PROFILE_QUERY
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    _id,    title,    defaultLanguage,    primaryAuthor->{      _id, name, role, "slug": slug.current, position, shortBio,      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },      education[]{ institution, field, qualification, note },      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }    },    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },    location{ label, mapUrl },    serviceModes,    availabilityNote,    "featuredKnowledge": featuredKnowledge[]->{      _id, title, summary, "slug": slug.current, language, primaryDomain,      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived    }  }
+export type PUBLIC_PROFILE_QUERY_RESULT = {
+  _id: 'siteSettings';
+  title: string | null;
+  defaultLanguage: string | null;
+  primaryAuthor: {
+    _id: string;
+    name: string | null;
+    role: string | null;
+    slug: string | null;
+    position: string | null;
+    shortBio: string | null;
+    bio: Array<{
+      _key: string;
+      _type: 'block';
+      children: Array<{
+        _key: string;
+        _type: 'span';
+        text: string | null;
+        marks: Array<string> | null;
+        markDefs: null;
+      }> | null;
+      style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal';
+      listItem?: 'bullet' | 'number';
+      markDefs?: Array<{
+        href?: string;
+        _type: 'link';
+        _key: string;
+      }>;
+      level?: number;
+    }> | null;
+    education: Array<{
+      institution: string | null;
+      field: string | null;
+      qualification: string | null;
+      note: string | null;
+    }> | null;
+    portrait: {
+      asset: SanityImageAssetReference | null;
+      alt: string | null;
+      crop: SanityImageCrop | null;
+      hotspot: SanityImageHotspot | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+  } | null;
+  contacts: {
+    primaryPhone: string | null;
+    secondaryPhone: string | null;
+    telegramHandle: string | null;
+    whatsappPhone: string | null;
+    viberPhone: string | null;
+  } | null;
+  location: {
+    label: string | null;
+    mapUrl: string | null;
+  } | null;
+  serviceModes: Array<string> | null;
+  availabilityNote: string | null;
+  featuredKnowledge: Array<{
+    _id: string;
+    title: string | null;
+    summary: string | null;
+    slug: string | null;
+    language: 'ro' | 'ru' | 'uk' | null;
+    primaryDomain: 'farm' | 'pet' | 'shared' | null;
+    riskLevel: 'HIGH' | 'LOW' | 'STANDARD' | null;
+    medicalOwner: AuthorReference | null;
+    reviewedBy: AuthorReference | null;
+    medicalRevision: number | null;
+    lastMedicalReview: string | null;
+    reviewIntervalMonths: number | null;
+    sourceStatuses: Array<'current' | 'superseded' | 'withdrawn' | null> | null;
+    withdrawn: boolean | null;
+    archived: boolean | null;
+  }> | null;
 } | null;
 
 // Source: ../web/src/lib/sanity/queries.ts
@@ -677,6 +819,7 @@ import '@sanity/client';
 declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage\n  }\n': SITE_SETTINGS_QUERY_RESULT;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage,\n    primaryAuthor->{\n      _id, name, role, "slug": slug.current, position, shortBio,\n      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n      education[]{ institution, field, qualification, note },\n      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }\n    },\n    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },\n    location{ label, mapUrl },\n    serviceModes,\n    availabilityNote,\n    "featuredKnowledge": featuredKnowledge[]->{\n      _id, title, summary, "slug": slug.current, language, primaryDomain,\n      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,\n      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived\n    }\n  }\n': PUBLIC_PROFILE_QUERY_RESULT;
     '\n  *[_type == "article" && language == "ru" && defined(slug.current) && defined(primaryDomain) && !archived && defined(title)]\n  { "slug": slug.current, language, primaryDomain }\n': ARTICLE_PATHS_QUERY_RESULT;
     '\n  *[_type == "article" && language == $language && primaryDomain == $primaryDomain && slug.current == $slug][0]{\n    _id, title, summary, "slug": slug.current, language, translationGroupId, primaryDomain,\n    medicalOwner->{ _id, name, role }, reviewedBy->{ _id, name, role }, riskLevel,\n    medicalRevision, sourceMedicalRevision, lastMedicalReview, reviewIntervalMonths,\n    sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },\n    species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n    archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },\n    translatedFrom->{ _id, medicalRevision }, previousSlugs, seoTitle, seoDescription\n  }\n': ARTICLE_DETAIL_QUERY_RESULT;
     '\n  *[_type == "article" && defined(slug.current) && !archived && !withdrawn && language == $language &&\n    defined(primaryDomain) && primaryDomain in ["pet", "farm", "shared"] &&\n    defined(title) && defined(summary) && defined(medicalOwner) && defined(riskLevel) &&\n    defined(medicalRevision) && defined(lastMedicalReview) && defined(reviewIntervalMonths) && count(sources) > 0 && count(body) > 0 &&\n    !(riskLevel == "HIGH" && !defined(reviewedBy))]\n  { _id, title, summary, "slug": slug.current, language, primaryDomain, riskLevel, medicalOwner, reviewedBy,\n    lastMedicalReview, reviewIntervalMonths, "sourceStatuses": sources[]->status }\n': ELIGIBLE_KNOWLEDGE_QUERY_RESULT;

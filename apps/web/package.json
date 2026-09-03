@@ -8,13 +8,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articlePresentation.test.ts",
+    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articlePresentation.test.ts src/lib/profile.test.ts",
     "test:e2e": "playwright test tests/smoke.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
     "@sanity/astro": "^3.5.1",
     "@sanity/client": "^8.4.0",
+    "@sanity/image-url": "^2.0.2",
     "astro": "^7.2.10",
     "astro-portabletext": "^1.0.0",
     "groq": "^6.12.0"

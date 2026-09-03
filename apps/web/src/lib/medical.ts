@@ -72,10 +72,12 @@ export function isDiscoveryEligible(
     lastMedicalReview?: string;
     reviewIntervalMonths?: number;
     sourceStatuses?: Array<string | null | undefined>;
+    archived?: boolean;
     withdrawn?: boolean;
   },
   now: string,
 ): boolean {
+  if (input.archived) return false;
   const sourceHealth = deriveSourceHealth(
     (input.sourceStatuses ?? []).map((status) => (status ? { status } : undefined)),
   );

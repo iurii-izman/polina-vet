@@ -92,6 +92,21 @@ describe('medical governance helpers', () => {
       false,
     );
   });
+  it('does not discover archived articles referenced by featuredKnowledge', () => {
+    const archivedFeaturedArticle = {
+      archived: true,
+      riskLevel: 'STANDARD' as const,
+      medicalOwner: { _ref: 'author-polina-izman' },
+      lastMedicalReview: '2026-01-01',
+      reviewIntervalMonths: 12,
+      sourceStatuses: ['current'],
+    };
+    assert.equal(isDiscoveryEligible(archivedFeaturedArticle, '2026-09-03'), false);
+    assert.equal(
+      isDiscoveryEligible({ ...archivedFeaturedArticle, archived: false }, '2026-09-03'),
+      true,
+    );
+  });
   it('uses source revision for translation freshness', () => {
     assert.equal(
       getTranslationState({

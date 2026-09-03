@@ -8,6 +8,7 @@
     "build": "sanity build",
     "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed:safe": "sanity exec scripts/seed-safe.ts --with-user-token",
+    "seed:m5": "sanity exec scripts/seed-m5.ts --with-user-token",
     "verify:remote": "sanity exec scripts/verify-remote.mjs",
     "check": "pnpm typegen && tsc --noEmit"
   },
