@@ -34,14 +34,7 @@ Do not push secrets or `.env` files.
 
 ## Context7
 
-Preferred Codex plugin path:
-
-```powershell
-codex plugin marketplace add upstash/context7
-codex plugin add context7@context7-marketplace
-```
-
-Restart/new Codex thread after installation if needed.
+Keep exactly one working Context7 integration for the project. Prefer the currently supported Codex plugin/app flow, avoid duplicate plugin and MCP instances, and verify the active integration in the Codex tooling UI or MCP list. Do not add a second Context7 marketplace or configure duplicate servers.
 
 Alternative MCP configuration is available from Context7 documentation.
 
@@ -64,7 +57,7 @@ Prefer OAuth/CLI-auth flows over hardcoding tokens into repository files.
 Windows-friendly Codex configuration:
 
 ```powershell
-codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@latest
+codex mcp add chrome-devtools -- cmd /c npx -y chrome-devtools-mcp@1.8.0
 ```
 
 If startup is unreliable, use a local/user `~/.codex/config.toml` entry with `cmd`, Windows environment variables, and a longer startup timeout. Do not commit user-specific Windows paths or secrets to the repository.
@@ -75,7 +68,15 @@ If startup is unreliable, use a local/user `~/.codex/config.toml` entry with `cm
 codex mcp list
 ```
 
-Confirm that the intended tools are available before asking Codex to rely on them.
+Confirm that the intended tools are available before asking Codex to rely on them. The repository example is pinned to the locally verified `chrome-devtools-mcp` version `1.8.0`; do not change user-level configuration automatically.
+
+## Browser tooling roles
+
+- The official Playwright Codex skill is for exploratory browser automation and agent-driven QA.
+- Project `@playwright/test` is for deterministic regression tests in CI.
+- Chrome DevTools MCP is for interactive inspection, debugging, performance, and accessibility checks.
+
+Do not install a second browser MCP, and do not replace Playwright tests with the exploratory skill.
 
 ## Important
 

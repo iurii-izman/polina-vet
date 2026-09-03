@@ -15,6 +15,7 @@ These files are active sources of truth:
 - `ARCHITECTURE.md`
 - `MEDICAL_SAFETY.md`
 - `TOOLING_WINDOWS.md`
+- `FUTURE_ARCHITECTURE_GUARDRAILS.md` — durable boundaries for future operational and automation architecture.
 - `ADR/`
 
 ## Archive

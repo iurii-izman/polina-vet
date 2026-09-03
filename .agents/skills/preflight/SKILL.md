@@ -9,6 +9,7 @@ Run the smallest complete verification set appropriate to the change.
 
 ## Always
 - inspect `git diff`;
+- run `git diff --check`;
 - confirm no secrets/private data;
 - confirm frozen product decisions were not unintentionally changed;
 - run formatting/lint/type/build checks available through `pnpm check`.
@@ -29,6 +30,9 @@ Use `medical-content-guard`.
 Use `sanity-change`, regenerate/verify types, and report migration impact.
 
 ## Before PR
+- for milestone-sized work, verify branch ancestry against the intended `origin/main` base;
+- confirm unrelated untracked files were not staged;
+
 Run the relevant:
 - `pnpm check`
 - `pnpm test:e2e`
