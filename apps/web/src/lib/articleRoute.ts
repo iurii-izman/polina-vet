@@ -2,12 +2,8 @@ export type ArticleDomain = 'pet' | 'farm' | 'shared';
 export type ArticleRouteInput = { language: string; primaryDomain: ArticleDomain; slug: string };
 
 export function articleRoute(article: ArticleRouteInput): string {
-  const section =
-    article.primaryDomain === 'pet'
-      ? 'pets'
-      : article.primaryDomain === 'farm'
-        ? 'farm'
-        : 'knowledge';
+  const sections: Record<ArticleDomain, string> = { pet: 'pets', farm: 'farm', shared: 'knowledge' };
+  const section = sections[article.primaryDomain];
   return `/${article.language}/${section}/${article.slug}/`;
 }
 

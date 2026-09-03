@@ -7,59 +7,48 @@ const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const referenceId = (reference) =>
   typeof reference === 'string' ? reference : (reference?.id ?? reference?._ref ?? reference?._id);
 
+const sections = { pet: 'pets', farm: 'farm', shared: 'knowledge' };
+const sectionForDomain = (domain) => sections[domain] ?? 'knowledge';
+
+function validateDocumentFacts(document, sourceIds) {
+  const errors = [];
+  const incomplete = !document.title || !document.summary || !document.translationGroupId ||
+    !document.medicalOwner || !document.riskLevel || document.medicalRevision < 1 ||
+    !document.lastMedicalReview || document.reviewIntervalMonths < 1 ||
+    !document.sources?.length || !document.body?.length;
+  if (!languages.has(document.language)) errors.push(`${document.id}: unsupported language`);
+  if (!domains.has(document.primaryDomain)) errors.push(`${document.id}: invalid primaryDomain`);
+  if (!document.slug || !slugPattern.test(document.slug)) errors.push(`${document.id}: invalid slug`);
+  if (incomplete) errors.push(`${document.id}: required publication contract is incomplete`);
+  if (document.riskLevel === 'HIGH' && !document.reviewedBy)
+    errors.push(`${document.id}: HIGH-risk reviewer is required`);
+  if (document.language !== 'ru' && (!document.translatedFrom || document.sourceMedicalRevision < 1))
+    errors.push(`${document.id}: translation lineage is incomplete`);
+  if (document.language === 'ru' && (document.translatedFrom || document.sourceMedicalRevision))
+    errors.push(`${document.id}: RU source cannot have translation lineage`);
+  if (document.withdrawn && (!document.replacement || referenceId(document.replacement) === document.id))
+    errors.push(`${document.id}: withdrawn content needs a different safe replacement`);
+  if (RESERVED_ARTICLE_ROUTES.has(reservedArticleRouteKey(document)))
+    errors.push(`${document.id}: article route collides with a reserved static route`);
+  for (const sourceReference of document.sources ?? []) {
+    const sourceId = referenceId(sourceReference);
+    if (!sourceIds.has(sourceId)) errors.push(`${document.id}: unresolved source ${sourceId}`);
+  }
+  return errors;
+}
+
 export function validateContent(documents, sources = []) {
   const errors = [];
   const ids = new Map(documents.map((document) => [document.id, document]));
   const sourceIds = new Map(sources.map((source) => [source.id, source]));
   const routes = new Map();
   for (const document of documents) {
-    if (!languages.has(document.language)) errors.push(`${document.id}: unsupported language`);
-    if (!domains.has(document.primaryDomain)) errors.push(`${document.id}: invalid primaryDomain`);
-    if (!document.slug || !slugPattern.test(document.slug))
-      errors.push(`${document.id}: invalid slug`);
-    if (
-      !document.title ||
-      !document.summary ||
-      !document.translationGroupId ||
-      !document.medicalOwner ||
-      !document.riskLevel ||
-      document.medicalRevision < 1 ||
-      !document.lastMedicalReview ||
-      document.reviewIntervalMonths < 1 ||
-      !document.sources?.length ||
-      !document.body?.length
-    )
-      errors.push(`${document.id}: required publication contract is incomplete`);
-    const section =
-      document.primaryDomain === 'pet'
-        ? 'pets'
-        : document.primaryDomain === 'farm'
-          ? 'farm'
-          : 'knowledge';
+    errors.push(...validateDocumentFacts(document, sourceIds));
+    const section = sectionForDomain(document.primaryDomain);
     const route = `/${document.language}/${section}/${document.slug}/`;
     if (routes.has(route))
       errors.push(`${document.id}: colliding localized route ${route} (also ${routes.get(route)})`);
     routes.set(route, document.id);
-    if (document.riskLevel === 'HIGH' && !document.reviewedBy)
-      errors.push(`${document.id}: HIGH-risk reviewer is required`);
-    if (
-      document.language !== 'ru' &&
-      (!document.translatedFrom || document.sourceMedicalRevision < 1)
-    )
-      errors.push(`${document.id}: translation lineage is incomplete`);
-    if (document.language === 'ru' && (document.translatedFrom || document.sourceMedicalRevision))
-      errors.push(`${document.id}: RU source cannot have translation lineage`);
-    if (
-      document.withdrawn &&
-      (!document.replacement || referenceId(document.replacement) === document.id)
-    )
-      errors.push(`${document.id}: withdrawn content needs a different safe replacement`);
-    if (RESERVED_ARTICLE_ROUTES.has(reservedArticleRouteKey(document)))
-      errors.push(`${document.id}: article route collides with a reserved static route`);
-    for (const sourceId of document.sources ?? []) {
-      const source = sourceIds.get(sourceId);
-      if (!source) errors.push(`${document.id}: unresolved source ${sourceId}`);
-    }
   }
   for (const document of documents) {
     if (document.translatedFrom && !ids.has(document.translatedFrom))
