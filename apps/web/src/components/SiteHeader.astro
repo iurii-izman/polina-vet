@@ -1,5 +1,8 @@
 ---
-import { localeNames, publishedLocales, route, type Locale } from '../lib/i18n';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import MobileNav from './MobileNav.astro';
+import UrgentAction from './UrgentAction.astro';
+import { route, type Locale } from '../lib/i18n';
 
 interface Props { locale: Locale }
 
@@ -15,39 +18,15 @@ const nav = [
 ---
 
 <header class="site-header">
-  <div class="container header-row">
+  <div class="container header-inner">
     <a class="brand" href={route.home(locale)} aria-label="POLINA VET — главная">POLINA <span>VET</span></a>
     <nav class="desktop-nav" aria-label="Основная навигация">
-      {nav.map(([href, label]) => (
-        <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>
-      ))}
+      {nav.map(([href, label]) => <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>)}
     </nav>
     <div class="header-actions">
-      <details class="language-menu">
-        <summary aria-label="Выбрать язык">{locale.toUpperCase()}</summary>
-        <div class="language-popover">
-          {(['ru', 'ro', 'uk'] as const).map((candidate) => publishedLocales.includes(candidate) ? <span aria-current={candidate === locale ? 'true' : undefined}>{localeNames[candidate]}</span> : <span>{localeNames[candidate]} — нет опубликованной версии</span>)}
-        </div>
-      </details>
-      <a class="urgent-action" href={route.urgent(locale)}>Срочно: что делать</a>
+      <LanguageSwitcher locale={locale} />
+      <UrgentAction locale={locale} />
     </div>
-    <details class="mobile-menu">
-      <summary aria-label="Открыть меню"><span aria-hidden="true">☰</span></summary>
-      <nav aria-label="Мобильная навигация">
-        {nav.map(([href, label]) => <a href={href}>{label}</a>)}
-        <p class="menu-label">Язык</p>
-        {(['ru', 'ro', 'uk'] as const).map((candidate) => publishedLocales.includes(candidate) ? <span aria-current={candidate === locale ? 'true' : undefined}>{localeNames[candidate]}</span> : <span>{localeNames[candidate]} — нет опубликованной версии</span>)}
-      </nav>
-    </details>
+    <MobileNav locale={locale} pathname={pathname} />
   </div>
 </header>
-
-<script>
-  document.addEventListener('keydown', (event) => {
-    if (event.key !== 'Escape') return;
-    const openMenu = document.querySelector<HTMLDetailsElement>('details[open]');
-    if (!openMenu) return;
-    openMenu.open = false;
-    openMenu.querySelector<HTMLElement>('summary')?.focus();
-  });
-</script>

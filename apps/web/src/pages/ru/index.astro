@@ -12,26 +12,37 @@ import { route } from '../../lib/i18n';
 
 <BaseLayout title="Практическая ветеринарная информация" locale="ru">
   <section class="hero container">
-    <p class="eyebrow">Практическая ветеринарная информация</p>
-    <h1>Ветеринарная помощь начинается с правильного следующего шага</h1>
-    <p class="lead">Практические материалы для владельцев домашних и сельскохозяйственных животных: что проверить, когда не стоит ждать и как подготовиться к обращению.</p>
+    <div>
+      <p class="eyebrow">Практическая ветеринарная информация</p>
+      <h1>Ветеринарная помощь начинается с правильного следующего шага</h1>
+      <p class="lead">Практические материалы для владельцев домашних и сельскохозяйственных животных: что проверить, когда не стоит ждать и как подготовиться к обращению.</p>
+      <div class="hero__actions">
+        <a class="button" href={route.pets('ru')}>Перейти к домашним животным <span aria-hidden="true">→</span></a>
+        <a class="button button--secondary" href={route.farm('ru')}>Перейти к ферме <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <aside class="hero-panel">
+      <span class="hero-panel__label">С чего начать</span>
+      <h2>Домашнее животное или хозяйство?</h2>
+      <p>Выберите контекст, чтобы увидеть подходящий следующий шаг и материалы.</p>
+    </aside>
   </section>
   <section class="container gateway-grid" aria-label="Выбор раздела">
-    <a class="gateway pet-gateway" href={route.pets('ru')}><span class="eyebrow">Домашние животные</span><h2>Собаки и кошки</h2><p>Болезни, профилактика, подготовка к визиту и полезные памятки.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
-    <a class="gateway farm-gateway" href={route.farm('ru')}><span class="eyebrow">Ферма</span><h2>Хозяйство и животные</h2><p>Практические рекомендации для отдельного животного и хозяйства.</p><span>Перейти <b aria-hidden="true">→</b></span></a>
+    <a class="gateway gateway--pet" href={route.pets('ru')}><span class="eyebrow">Домашние животные</span><h2>Собаки и кошки</h2><p>Болезни, профилактика, подготовка к визиту и полезные памятки.</p><span class="gateway__action">Перейти <b aria-hidden="true">→</b></span></a>
+    <a class="gateway gateway--farm" href={route.farm('ru')}><span class="eyebrow">Ферма</span><h2>Хозяйство и животные</h2><p>КРС, МРС и другие сельскохозяйственные животные: отдельное животное и хозяйство.</p><span class="gateway__action">Перейти <b aria-hidden="true">→</b></span></a>
   </section>
   <section class="container urgent-strip">
-    <div><p class="eyebrow">Срочно</p><h2>Состояние животного кажется срочным?</h2><p>Посмотрите признаки, при которых не стоит откладывать получение ветеринарной помощи, и что безопасно сделать до обращения.</p><small>POLINA VET не является круглосуточной экстренной службой.</small></div>
-    <a class="button button-light" href={route.urgent('ru')}>Что делать сейчас <span aria-hidden="true">→</span></a>
+    <div class="urgent-strip__copy"><p class="eyebrow">Срочно</p><h2>Состояние животного кажется срочным?</h2><p>Посмотрите признаки, при которых не стоит откладывать получение ветеринарной помощи, и что безопасно сделать до обращения.</p><small>POLINA VET не является круглосуточной экстренной службой.</small></div>
+    <a class="button button--light" href={route.urgent('ru')}>Что делать сейчас <span aria-hidden="true">→</span></a>
   </section>
   <section class="container section">
     <p class="eyebrow">Быстрый маршрут</p><h2>Что вам нужно?</h2>
     <div class="task-grid">
-      <a href={route.animalSick('ru')}>Животное заболело <span>Выберите: домашнее животное или ферма.</span></a>
-      <a href={route.knowledge('ru')}>Профилактика <span>Основные профилактические меры.</span></a>
-      <a href={route.prepare('ru')}>Подготовиться к обращению <span>Выберите подходящий чек-лист.</span></a>
-      <a href={route.urgent('ru')}>Срочная ситуация <span>Признаки, при которых не стоит ждать.</span></a>
-      <a href={route.knowledge('ru')}>Найти информацию <span>Практические материалы по темам.</span></a>
+      <a class="task-card" href={route.animalSick('ru')}><span class="task-card__title">Животное заболело</span><span class="task-card__description">Начните с раздела для вашего животного.</span></a>
+      <a class="task-card" href={route.knowledge('ru')}><span class="task-card__title">Профилактика</span><span class="task-card__description">Вакцинация, паразиты и основные профилактические материалы.</span></a>
+      <a class="task-card" href={route.prepare('ru')}><span class="task-card__title">Подготовиться к обращению</span><span class="task-card__description">Что записать, измерить и взять с собой.</span></a>
+      <a class="task-card" href={route.urgent('ru')}><span class="task-card__title">Срочная ситуация</span><span class="task-card__description">Признаки, при которых не стоит ждать.</span></a>
+      <a class="task-card" href={route.knowledge('ru')}><span class="task-card__title">Найти информацию</span><span class="task-card__description">Практические ветеринарные материалы по темам.</span></a>
     </div>
   </section>
   {homepageContent.seasonal && <SeasonalPanel content={homepageContent.seasonal} />}

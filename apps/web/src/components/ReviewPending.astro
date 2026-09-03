@@ -1,11 +1,12 @@
 ---
 interface Props { title: string; description: string }
 const { title, description } = Astro.props;
+const headingId = `review-pending-${title.toLowerCase().replace(/[^a-zа-яё0-9]+/giu, '-')}`;
 ---
 
-<section class="review-pending" aria-labelledby="review-pending-title">
-  <p class="eyebrow">Медицинская проверка</p>
-  <h2 id="review-pending-title">{title}</h2>
+<section class="review-pending" aria-labelledby={headingId}>
+  <p class="eyebrow review-pending__label">Медицинская проверка</p>
+  <h2 id={headingId}>{title}</h2>
   <p>{description}</p>
-  <p class="caption">Перед публикацией медицинских утверждений требуется финальная клиническая проверка.</p>
+  <p class="caption">Конкретные медицинские формулировки появятся после финальной клинической проверки.</p>
 </section>

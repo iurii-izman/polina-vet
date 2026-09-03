@@ -1,20 +1,35 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import ReviewPending from '../../../../components/ReviewPending.astro';
 import UrgentBoundary from '../../../../components/UrgentBoundary.astro';
 import { route } from '../../../../lib/i18n';
+
+const scaleItems = [
+  { title: 'Масштаб проблемы', items: ['Сколько животных всего', 'Сколько имеют похожие признаки', 'Возраст заболевших'] },
+  { title: 'Динамика', items: ['Когда появился первый случай', 'Как быстро добавлялись новые случаи', 'Есть ли падежи', 'Одинаковы ли симптомы'] },
+  { title: 'Изменения в хозяйстве', items: ['Кормление и вода', 'Помещение и условия', 'Новые животные или перемещения', 'Профилактические мероприятия', 'Препараты'] },
+];
 ---
 
 <BaseLayout title="Заболели несколько животных" locale="ru">
+  <Breadcrumbs items={[{ label: 'Ферма', href: route.farm('ru') }, { label: 'Групповая ситуация' }]} />
   <section class="page-intro container">
     <p class="eyebrow">Ферма · Групповая ситуация</p>
     <h1>Заболели несколько животных</h1>
-    <p class="lead">Этот маршрут помогает собрать контекст о группе и подготовиться к обращению. Медицинские рекомендации публикуются только после review.</p>
+    <p class="lead">Когда похожая проблема появляется у нескольких животных, важно собрать информацию о группе, условиях и недавних изменениях в хозяйстве.</p>
     <UrgentBoundary />
   </section>
-  <section class="container section structural-card" aria-labelledby="group-context-title">
-    <p class="eyebrow">Подготовка</p>
-    <h2 id="group-context-title">Что важно подготовить</h2>
-    <p>Размер группы, число животных с похожими признаками, время первого случая, динамику и недавние изменения в хозяйстве.</p>
-    <a class="text-link" href={route.beforeVetArrives('ru')}>Подготовиться к приезду ветеринара <span aria-hidden="true">→</span></a>
+  <section class="container section page-content" aria-labelledby="group-context-title">
+    <p class="eyebrow">Первое действие</p>
+    <h2 id="group-context-title">Начните с масштаба проблемы</h2>
+    <p>Этот маршрут не ставит диагноз. Он помогает подготовить наблюдения, чтобы быстрее перейти к ветеринарной оценке.</p>
+    <Checklist items={scaleItems} />
+    <div class="print-actions"><a class="button button--secondary" href={route.beforeVetArrives('ru')}>Чек-лист перед приездом ветеринара <span aria-hidden="true">→</span></a></div>
+  </section>
+  <section class="container section do-dont-grid" aria-label="Групповой риск и биобезопасность">
+    <div class="farm-risk-block"><p class="eyebrow">Групповой риск</p><h2>Несколько животных — отдельный контекст</h2><p>Если одновременно заболели несколько животных, ситуацию важно рассматривать с учётом группы и возможного общего фактора.</p></div>
+    <ReviewPending title="Биобезопасность" description="Практические формулировки о перемещении людей, животных и инвентаря появятся после медицинской и биобезопасной проверки." />
   </section>
 </BaseLayout>

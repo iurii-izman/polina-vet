@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { route } from '../lib/i18n';
+---
+
+<BaseLayout title="Страница не найдена" locale="ru">
+  <Breadcrumbs items={[{ label: 'Страница не найдена' }]} />
+  <section class="page-intro container">
+    <p class="eyebrow">404</p>
+    <h1>Такой страницы нет</h1>
+    <p class="lead">Возможно, ссылка устарела или адрес был введён неправильно.</p>
+    <div class="empty-state__actions">
+      <a class="button" href={route.home('ru')}>На главную <span aria-hidden="true">→</span></a>
+      <a class="button button--secondary" href={route.pets('ru')}>Домашние животные <span aria-hidden="true">→</span></a>
+      <a class="button button--secondary" href={route.farm('ru')}>Ферма <span aria-hidden="true">→</span></a>
+      <a class="button button--secondary" href={route.urgent('ru')}>Срочно: что делать <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</BaseLayout>

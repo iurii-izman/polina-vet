@@ -1,0 +1,47 @@
+---
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { route, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  pathname: string;
+}
+
+const { locale, pathname } = Astro.props;
+const links = [
+  [route.pets(locale), 'Домашние животные'],
+  [route.farm(locale), 'Ферма'],
+  [route.knowledge(locale), 'Знания'],
+  [route.about(locale), 'О Полине'],
+  [route.contact(locale), 'Контакты'],
+] as const;
+---
+
+<details class="mobile-nav" data-mobile-nav>
+  <summary aria-label="Открыть меню" aria-controls="mobile-navigation" aria-expanded="false">
+    Меню
+  </summary>
+  <div class="mobile-nav__panel" id="mobile-navigation">
+    <nav aria-label="Мобильная навигация">
+      {links.map(([href, label]) => (
+        <a href={href} aria-current={pathname === href ? 'page' : undefined}>{label}</a>
+      ))}
+    </nav>
+    <LanguageSwitcher locale={locale} mobile />
+  </div>
+</details>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-mobile-nav]').forEach((menu) => {
+    const details = menu as HTMLDetailsElement;
+    const summary = details.querySelector('summary');
+    const syncExpanded = () => summary?.setAttribute('aria-expanded', String(details.open));
+    details.addEventListener('toggle', syncExpanded);
+    syncExpanded();
+    details.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !details.open) return;
+      details.open = false;
+      summary?.focus();
+    });
+  });
+</script>

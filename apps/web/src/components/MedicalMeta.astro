@@ -1,10 +1,25 @@
 ---
-interface Props { owner?: { name?: string; role?: string }; reviewedBy?: { name?: string }; lastMedicalReview?: string }
-const { owner, reviewedBy, lastMedicalReview } = Astro.props;
+interface Props {
+  domain: 'pet' | 'farm' | 'shared';
+  species?: Array<{ name?: string | null }> | null;
+  owner?: { name?: string | null; role?: string | null } | null;
+  reviewedBy?: { name?: string | null; role?: string | null } | null;
+  lastMedicalReview?: string | null;
+  sourceCount?: number;
+}
+
+const { domain, species, owner, reviewedBy, lastMedicalReview, sourceCount = 0 } = Astro.props;
+const audience = domain === 'farm' ? 'Для фермеров' : domain === 'pet' ? 'Для владельцев' : 'Для владельцев и фермеров';
+const speciesLabel = species?.map((item) => item.name).filter(Boolean).join(', ');
 ---
 <section class="medical-meta" aria-labelledby="medical-meta-title">
   <h2 id="medical-meta-title">О материале</h2>
-  {lastMedicalReview && <p><strong>Последняя медицинская проверка:</strong> <time datetime={lastMedicalReview}>{lastMedicalReview}</time></p>}
-  {owner?.name && <p><strong>Медицинский владелец:</strong> {owner.name}{owner.role && ` · ${owner.role}`}</p>}
-  {reviewedBy?.name && <p><strong>Независимый review:</strong> {reviewedBy.name}</p>}
+  <dl class="medical-meta__items">
+    <div><dt>Аудитория</dt><dd>{audience}</dd></div>
+    {speciesLabel && <div><dt>Виды животных</dt><dd>{speciesLabel}</dd></div>}
+    {lastMedicalReview && <div><dt>Последняя медицинская проверка</dt><dd><time datetime={lastMedicalReview}>{lastMedicalReview}</time></dd></div>}
+    {owner?.name && <div><dt>Медицинский владелец</dt><dd>{owner.name}{owner.role && ` · ${owner.role}`}</dd></div>}
+    {reviewedBy?.name && <div><dt>Независимая проверка</dt><dd>{reviewedBy.name}{reviewedBy.role && ` · ${reviewedBy.role}`}</dd></div>}
+    {sourceCount > 0 && <div><dt>Источники</dt><dd>{sourceCount}</dd></div>}
+  </dl>
 </section>

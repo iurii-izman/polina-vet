@@ -10,8 +10,14 @@ createServer((request, response) => {
   let file = join(root, path);
   if (statSync(file, { throwIfNoEntry: false })?.isDirectory()) file = join(file, 'index.html');
   if (!file.startsWith(root) || !existsSync(file)) {
-    response.writeHead(404);
-    response.end('Not found');
+    file = join(root, '404.html');
+    if (!existsSync(file)) {
+      response.writeHead(404);
+      response.end('Not found');
+      return;
+    }
+    response.writeHead(404, { 'content-type': 'text/html; charset=utf-8' });
+    createReadStream(file).pipe(response);
     return;
   }
   response.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' });

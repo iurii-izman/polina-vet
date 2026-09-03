@@ -1,5 +1,7 @@
 ---
 import ArticleBody from './ArticleBody.astro';
+import ArticleNextSteps from './ArticleNextSteps.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
 import MedicalMeta from './MedicalMeta.astro';
 import SourceList from './SourceList.astro';
 import StaleHighRiskState from './StaleHighRiskState.astro';
@@ -12,16 +14,20 @@ const presentation = getArticlePresentation(article, now);
 const safetyState = presentation.safetyState;
 const replacementHref = article.replacement ? articleRoute({ language: article.replacement.language, primaryDomain: article.replacement.primaryDomain, slug: article.replacement.slug }) : (article.primaryDomain === 'farm' ? '/ru/farm/urgent/' : article.primaryDomain === 'pet' ? '/ru/pets/urgent/' : '/ru/urgent/');
 const pageTitle = article.seoTitle ?? article.title;
+const domainLabel = article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания';
+const domainHref = article.primaryDomain === 'farm' ? '/ru/farm/' : article.primaryDomain === 'pet' ? '/ru/pets/' : '/ru/knowledge/';
 ---
 <BaseLayout title={pageTitle} description={presentation.description} robots={presentation.robots} locale="ru">
+  <Breadcrumbs items={[{ label: domainLabel, href: domainHref }, { label: article.title }]} />
   <article class="medical-article container">
-    <p class="eyebrow">{article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания'}</p>
+    <p class="eyebrow">{domainLabel}</p>
     <h1>{article.title}</h1>
-    {presentation.showMedicalContent && <p class="lead">{article.summary}</p>}
+    {presentation.showMedicalContent && <p class="lead medical-article__summary">{article.summary}</p>}
     {safetyState === 'CURRENT' ? <>
-      <MedicalMeta owner={article.medicalOwner} reviewedBy={article.reviewedBy} lastMedicalReview={article.lastMedicalReview} />
+      <MedicalMeta domain={article.primaryDomain} species={article.species} owner={article.medicalOwner} reviewedBy={article.reviewedBy} lastMedicalReview={article.lastMedicalReview} sourceCount={article.sources?.length ?? 0} />
       <ArticleBody body={article.body} />
       <SourceList sources={article.sources} />
+      <ArticleNextSteps locale="ru" domain={article.primaryDomain} />
     </> : safetyState === 'STALE_HIGH_RISK' ? <StaleHighRiskState replacementHref={replacementHref} /> : <WithdrawnState replacementHref={replacementHref} />}
   </article>
 </BaseLayout>

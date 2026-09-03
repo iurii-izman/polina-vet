@@ -31,15 +31,15 @@ const choices = isSick
 </section>
 <section class="container task-router-grid" aria-label={title}>
   {choices.map((choice) => (
-    <a class="task-router-choice" href={choice.href}>
+    <a class="action-card task-router-choice" href={choice.href}>
       <h2>{choice.title}</h2>
       <p>{choice.body}</p>
-      <span>{choice.action} <b aria-hidden="true">→</b></span>
+      <span class="action-card__link">{choice.action} <b aria-hidden="true">→</b></span>
     </a>
   ))}
 </section>
 {isSick && (
-  <aside class="container task-router-urgent">
+  <aside class="container urgent-boundary task-router-urgent">
     <p><strong>Состояние кажется срочным?</strong> Откройте отдельный срочный маршрут.</p>
     <a class="text-link" href={route.urgent(locale)}>Срочно: что делать <span aria-hidden="true">→</span></a>
   </aside>

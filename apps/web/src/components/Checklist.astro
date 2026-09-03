@@ -1,0 +1,23 @@
+---
+interface ChecklistItem {
+  title: string;
+  description?: string;
+  items?: string[];
+}
+
+interface Props {
+  items: ChecklistItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<ol class="checklist">
+  {items.map((item) => (
+    <li>
+      <h3>{item.title}</h3>
+      {item.description && <p>{item.description}</p>}
+      {item.items && <ul>{item.items.map((entry) => <li>{entry}</li>)}</ul>}
+    </li>
+  ))}
+</ol>

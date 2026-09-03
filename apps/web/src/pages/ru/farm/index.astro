@@ -1,15 +1,16 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ActionCard from '../../../components/ActionCard.astro';
 import { route } from '../../../lib/i18n';
 ---
 
 <BaseLayout title="Ферма" locale="ru">
-  <section class="page-intro container farm-intro"><p class="eyebrow">Ферма</p><h1>Ветеринарная информация для хозяйства</h1><p class="lead">Практические материалы для ситуаций с одним животным, группой животных и условиями хозяйства.</p></section>
+  <section class="page-intro container farm-intro"><p class="eyebrow">Ферма</p><h1>Ветеринарная информация для хозяйства</h1><p class="lead">Практические материалы для владельцев сельскохозяйственных животных: от проблемы одного животного до профилактики, биобезопасности и подготовки хозяйства к приезду ветеринара.</p></section>
   <section class="container action-grid farm-actions">
-    <a class="action-card urgent-card" href={route.farmUrgent('ru')}><p class="eyebrow">Срочно</p><h2>Проблема требует быстрого решения?</h2><p>Откройте срочный маршрут для хозяйства.</p><span>Срочные ситуации →</span></a>
-    <a class="action-card group-problem-card" href={route.groupProblem('ru')}><p class="eyebrow">Группа</p><h2>Заболели несколько животных</h2><p>Соберите контекст о группе и возможном общем факторе.</p><span>Открыть маршрут →</span></a>
-    <a class="action-card" href={route.beforeVetArrives('ru')}><p class="eyebrow">Подготовка</p><h2>Перед приездом ветеринара</h2><p>Что подготовить о животном, группе и условиях.</p><span>Открыть чек-лист →</span></a>
-    <a class="action-card" href={route.knowledge('ru')}><p class="eyebrow">Профилактика</p><h2>Профилактика</h2><p>Материалы появятся после проверки.</p><span>Смотреть материалы →</span></a>
+    <ActionCard tone="urgent" eyebrow="Срочно" title="Проблема требует быстрого решения?" description="Срочные признаки у сельскохозяйственных животных и ситуации, которые могут касаться не только одного животного." action="Срочные ситуации" href={route.farmUrgent('ru')} />
+    <ActionCard tone="group" eyebrow="Группа" title="Заболели несколько животных" description="При одновременном заболевании важно оценить общий фактор и риск для группы." action="Открыть маршрут" href={route.groupProblem('ru')} />
+    <ActionCard eyebrow="Подготовка" title="Перед приездом ветеринара" description="Что подготовить заранее, чтобы осмотр и работа на месте были безопаснее и эффективнее." action="Открыть чек-лист" href={route.beforeVetArrives('ru')} />
+    <ActionCard eyebrow="Профилактика" title="Профилактика" description="Сезонные меры, молодняк, паразиты и здоровье группы." action="Смотреть материалы" href={route.knowledge('ru')} />
   </section>
-  <section class="container section"><p class="eyebrow">С чего начать</p><h2>Контекст важен</h2><div class="plain-grid"><div><b>Одно животное</b><br />Соберите динамику и наблюдения.</div><div><b>Несколько животных</b><br />Оцените масштаб, возраст и условия.</div><div><b>Биобезопасность</b><br />Минимизируйте ненужное перемещение между группами.</div></div></section>
+  <section class="container section" aria-labelledby="farm-start-title"><div class="section-heading"><div><p class="eyebrow">С чего начать</p><h2 id="farm-start-title">Контекст важен</h2></div><p>На ферме следующий шаг зависит не только от одного животного, но и от группы, условий и недавних изменений.</p></div><div class="context-grid"><div class="context-card"><h3>Одно животное</h3><p>Соберите основные данные о состоянии и динамике.</p></div><div class="context-card"><h3>Несколько животных</h3><p>Оцените масштаб, возраст и общий контекст.</p></div><div class="context-card"><h3>Биобезопасность</h3><p>Продумайте условия работы и ненужное перемещение между группами.</p></div><div class="context-card"><h3>Подготовка хозяйства</h3><p>Организуйте безопасное рабочее место до приезда ветеринара.</p></div></div></section>
 </BaseLayout>

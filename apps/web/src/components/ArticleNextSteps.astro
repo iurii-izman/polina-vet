@@ -1,0 +1,29 @@
+---
+import { route, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  domain: 'pet' | 'farm' | 'shared';
+}
+
+const { locale, domain } = Astro.props;
+const steps = domain === 'farm'
+  ? [
+      { label: 'Срочные ситуации в хозяйстве', href: route.farmUrgent(locale) },
+      { label: 'Подготовка к приезду ветеринара', href: route.beforeVetArrives(locale) },
+    ]
+  : domain === 'pet'
+    ? [
+        { label: 'Срочные признаки у домашних животных', href: route.petUrgent(locale) },
+        { label: 'Подготовиться к визиту', href: route.beforeVisit(locale) },
+      ]
+    : [{ label: 'Открыть раздел «Знания»', href: route.knowledge(locale) }];
+---
+
+<section class="next-steps" aria-labelledby="next-steps-title">
+  <p class="eyebrow">Следующий шаг</p>
+  <h2 id="next-steps-title">Что дальше?</h2>
+  <div class="next-steps__grid">
+    {steps.map((step) => <a class="next-step" href={step.href}>{step.label} <span aria-hidden="true">→</span></a>)}
+  </div>
+</section>

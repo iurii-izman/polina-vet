@@ -1,4 +1,25 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import { route } from '../../../../lib/i18n';
+
+const items = [
+  { title: 'Запишите, когда началась проблема', description: 'Даже приблизительная последовательность событий часто полезнее длинного описания.' },
+  { title: 'Составьте список препаратов', items: ['Название', 'Дозу, если известна', 'Когда давали последний раз'] },
+  { title: 'Возьмите предыдущие результаты', items: ['Анализы', 'Выписки', 'Рентген', 'УЗИ', 'Паспорт вакцинации'] },
+  { title: 'Снимите симптом на видео', description: 'Полезно, если дома наблюдаются кашель, необычная походка, приступ, нарушение дыхания или эпизодическое поведение, которое может не проявиться на приёме.' },
+  { title: 'Не готовьте анализы «на всякий случай»', description: 'Если нужен кал, моча или другой материал, лучше заранее уточнить, как его правильно собрать и хранить.' },
+  { title: 'Безопасная транспортировка', description: 'Кошка — в закрытой переноске. Собака — на надёжном поводке или в переноске в зависимости от размера и состояния.' },
+  { title: 'Предупредите о сложном поведении', description: 'Если животное кусается, сильно боится или раньше плохо переносило осмотр, сообщите об этом заранее.' },
+];
 ---
-<BaseLayout title="Подготовиться к визиту"><section class="page-intro container"><p class="eyebrow">Домашние животные · Подготовка</p><h1>Как подготовиться к визиту с собакой или кошкой</h1><p class="lead">Структура чек-листа готова; подробные клинические рекомендации публикуются после медицинской проверки.</p></section></BaseLayout>
+
+<BaseLayout title="Подготовиться к визиту" locale="ru">
+  <Breadcrumbs items={[{ label: 'Домашние животные', href: route.pets('ru') }, { label: 'Подготовка к визиту' }]} />
+  <section class="page-intro container"><p class="eyebrow">Домашние животные · Подготовка</p><h1>Как подготовиться к визиту с собакой или кошкой</h1><p class="lead">Несколько простых вещей помогут быстрее получить полезную информацию во время осмотра и не тратить время на восстановление деталей по памяти.</p></section>
+  <section class="container page-content" aria-labelledby="before-visit-list-title"><div class="section-heading"><div><p class="eyebrow">Памятка</p><h2 id="before-visit-list-title">Что подготовить</h2></div><p>Сохраните список или распечатайте его перед обращением.</p></div><Checklist items={items} /><div class="print-actions"><button class="button button--secondary no-print" type="button" data-print>Распечатать памятку</button></div></section>
+  <script>
+    document.querySelector<HTMLButtonElement>('[data-print]')?.addEventListener('click', () => window.print());
+  </script>
+</BaseLayout>
