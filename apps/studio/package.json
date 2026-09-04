@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "sanity start",
-    "build": "sanity build",
+    "build": "sanity build && pnpm verify:build",
+    "verify:build": "node scripts/verify-build.mjs",
     "typegen": "sanity schema extract --force && sanity typegen generate",
     "seed:safe": "sanity exec scripts/seed-safe.ts --with-user-token",
     "seed:m5": "sanity exec scripts/seed-m5.ts --with-user-token",

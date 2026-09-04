@@ -9,12 +9,14 @@
     "preview": "astro preview",
     "preview:server": "astro dev --config astro.preview.config.mjs --mode preview",
     "preview:check": "astro build --config astro.preview.config.mjs --mode preview",
+    "preview:cloudflare:check": "astro build --config astro.hosted-preview.config.mjs --mode preview",
     "check": "astro check",
     "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articleAlternates.test.ts src/lib/articlePresentation.test.ts src/lib/profile.test.ts src/lib/routeContract.test.ts",
     "test:e2e": "playwright test tests/smoke.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.6",
     "@astrojs/node": "^11.1.5",
     "@astrojs/react": "^6.0.5",
     "@portabletext/types": "^4.0.2",
@@ -37,6 +39,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "typescript": "^6.0.3",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "wrangler": "^4.128.0"
   }
 }

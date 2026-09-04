@@ -10,6 +10,7 @@ import { SANITY_API_VERSION } from '../../sanity.shared.ts';
 const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 const projectId = env.PUBLIC_SANITY_PROJECT_ID;
 const dataset = env.PUBLIC_SANITY_DATASET;
+const site = env.SITE_URL || 'http://localhost:4321';
 
 if (!projectId || !dataset) {
   throw new Error(
@@ -19,6 +20,7 @@ if (!projectId || !dataset) {
 
 export default defineConfig({
   output: 'static',
+  site,
   vite: {
     resolve: {
       alias: {

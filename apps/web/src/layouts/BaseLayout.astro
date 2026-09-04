@@ -7,6 +7,7 @@ import { getSiteSettings } from '../lib/sanity/content';
 import { getDraftModeProps } from '../lib/sanity/draft-mode';
 import SanityVisualEditing from 'polina-vet-preview/visual-editing';
 import DisableDraftMode from 'polina-vet-preview/disable-draft-mode';
+import { absoluteUrl, robotsForPage, siteIndexable, siteUrl } from '../lib/site';
 
 interface Props {
   title: string;
@@ -26,6 +27,10 @@ const resolvedDescription = description ?? strings.description;
 const draftMode = Boolean(perspectiveCookie);
 const resolvedAlternates = alternates ?? staticAlternates(Astro.url.pathname);
 if (draftMode) Astro.response.headers.set('Cache-Control', 'private, no-store');
+const resolvedRobots = robotsForPage(robots, draftMode);
+if (!siteIndexable || draftMode) {
+  Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+}
 ---
 
 <!doctype html>
@@ -35,9 +40,20 @@ if (draftMode) Astro.response.headers.set('Cache-Control', 'private, no-store');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="description" content={resolvedDescription} />
-    {(robots || draftMode) && <meta name="robots" content={robots ?? 'noindex, nofollow'} />}
-    <link rel="canonical" href={`${Astro.url.pathname}`} />
-    {Object.entries(resolvedAlternates).map(([lang, href]) => href && <link rel="alternate" hreflang={lang} href={href} />)}
+    <meta name="robots" content={resolvedRobots} />
+    <link rel="canonical" href={absoluteUrl(Astro.url.pathname)} />
+    <meta property="og:url" content={absoluteUrl(Astro.url.pathname)} />
+    <meta property="og:title" content={`${title} — ${siteTitle}`} />
+    <meta property="og:description" content={resolvedDescription} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: siteTitle,
+      url: siteUrl.toString(),
+      inLanguage: locale,
+    })} />
+    {Object.entries(resolvedAlternates).map(([lang, href]) => href && <link rel="alternate" hreflang={lang} href={absoluteUrl(href)} />)}
+    {siteIndexable && <link rel="alternate" hreflang="x-default" href={absoluteUrl(staticAlternates('/ru/')?.ru ?? '/ru/')} />}
     <meta name="color-scheme" content="light" />
     <title>{title} — {siteTitle}</title>
   </head>

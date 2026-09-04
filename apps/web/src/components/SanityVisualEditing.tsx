@@ -27,9 +27,27 @@ export default function SanityVisualEditing() {
     sync();
     window.addEventListener('popstate', sync);
     window.addEventListener('hashchange', sync);
+
+    // Astro uses full document navigations for links, but other preview
+    // integrations can update the iframe through the History API. Sanity's
+    // Presentation Tool relies on observing both methods to keep its URL bar
+    // synchronized with the iframe's localized route.
+    const origPush = window.history.pushState;
+    const origReplace = window.history.replaceState;
+    window.history.pushState = function (...args) {
+      origPush.apply(window.history, args);
+      sync();
+    };
+    window.history.replaceState = function (...args) {
+      origReplace.apply(window.history, args);
+      sync();
+    };
+
     return () => {
       window.removeEventListener('popstate', sync);
       window.removeEventListener('hashchange', sync);
+      window.history.pushState = origPush;
+      window.history.replaceState = origReplace;
     };
   }, []);
   const history = useMemo<HistoryAdapter>(

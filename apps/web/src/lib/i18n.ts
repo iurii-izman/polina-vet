@@ -72,6 +72,11 @@ export function routeFamily(pathname: string): string | null {
 export function staticAlternates(pathname: string): Partial<Record<Locale, string>> {
   const family = routeFamily(pathname);
   if (family === null) return {};
+  // RO/UK Knowledge are honest empty, noindex states until reviewed articles exist.
+  if (family === 'knowledge') {
+    const locale = localeFromPath(pathname);
+    return { [locale]: localeRoute(locale, family) };
+  }
   return Object.fromEntries(
     locales.map((locale) => [locale, localeRoute(locale, family)]),
   ) as Partial<Record<Locale, string>>;
