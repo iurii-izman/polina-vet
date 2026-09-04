@@ -819,8 +819,8 @@ const extra = [
 ] as const;
 
 for (const [id, slug, domain, risk, species, topics, titles, introRu, introUk, introRo] of extra) {
+  // NOSONAR: declarative multilingual fixture assembly
   const make = (language: Locale): ArticleDef['text'][Locale] => ({
-    // NOSONAR: declarative multilingual fixture assembly
     title: titles[language === 'ru' ? 0 : language === 'uk' ? 1 : 2],
     summary: titles[language === 'ru' ? 0 : language === 'uk' ? 1 : 2],
     intro: language === 'ru' ? introRu : language === 'uk' ? introUk : introRo,
