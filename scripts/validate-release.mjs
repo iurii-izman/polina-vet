@@ -6,6 +6,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const configs = [
   ['apps/web/wrangler.jsonc', 'polina-vet-staging', 'polina-vet-dev.aipipeline.cc'],
   ['apps/web/wrangler.preview.jsonc', 'polina-vet-preview', 'preview-polina-vet.aipipeline.cc'],
+  ['apps/web/wrangler.production.jsonc', 'polina-vet-production', 'lina.md'],
   ['apps/studio/wrangler.jsonc', 'polina-vet-studio', 'studio-polina-vet.aipipeline.cc'],
 ];
 for (const [file, name, hostname] of configs) {

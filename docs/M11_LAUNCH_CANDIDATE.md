@@ -5,7 +5,7 @@ Base SHA: `18ac4357c7d1384fca4169707a24120fd47e9a3d`
 Candidate branch: `feat/launch-candidate-m11`  
 Candidate SHA: `3440ee4`  
 M11 PR: [#10](https://github.com/iurii-izman/polina-vet/pull/10)  
-Final domain / canonical hostname: **not supplied — waiting**
+Planned final domain / canonical hostname: `lina.md` (not purchased or verified)
 
 ## Verdict
 
@@ -35,7 +35,7 @@ Final domain / canonical hostname: **not supplied — waiting**
 - Content policy and M10 validation: PASS.
 - Astro diagnostics: PASS (0 errors, warnings, hints).
 - Unit tests: PASS (25 tests).
-- Cloudflare configuration validation: PASS (3 isolated configs).
+- Cloudflare configuration validation: PASS (4 isolated configs, including the prepared production Worker).
 - Local TypeGen/build: blocked by the known hang after schema extraction; CI evidence is required.
 - Deployed candidate draft isolation, Lighthouse, external a11y/security headers, Cloudflare, Sonar, and Search Console: pending deployment/domain access.
 
@@ -49,4 +49,4 @@ Use Cloudflare deployment history to roll back the POLINA VET production Worker 
 
 ## Required user action
 
-Provide the approved final domain and confirm whether the canonical hostname is the apex or `www`. Also provide access needed to verify the Cloudflare zone and Google Search Console property. No domain will be guessed, purchased, or modified automatically.
+Purchase/control `lina.md`, confirm that the apex is the canonical hostname (or explicitly choose `www`), and provide access needed to verify the Cloudflare zone and Google Search Console property. No domain will be purchased or modified automatically.
