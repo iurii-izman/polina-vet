@@ -37,6 +37,18 @@ export default defineConfig({
     optimizeDeps: { exclude: ['@sanity/visual-editing', '@sanity/ui', 'styled-components'] },
     resolve: {
       alias: [
+        {
+          find: 'polina-vet-preview/visual-editing',
+          replacement: fileURLToPath(
+            new URL('./src/components/SanityVisualEditing.tsx', import.meta.url),
+          ),
+        },
+        {
+          find: 'polina-vet-preview/disable-draft-mode',
+          replacement: fileURLToPath(
+            new URL('./src/components/DisableDraftMode.tsx', import.meta.url),
+          ),
+        },
         { find: 'react/compiler-runtime', replacement: reactCompilerRuntime },
         { find: 'react-is', replacement: reactIsShim },
         { find: 'styled-components', replacement: styledComponentsEsm },

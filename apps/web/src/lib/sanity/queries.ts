@@ -37,8 +37,25 @@ export const ARTICLE_PATHS_QUERY = defineQuery(`
 `);
 
 export const ARTICLE_ALTERNATES_QUERY = defineQuery(`
-  *[_type == "article" && translationGroupId == $translationGroupId && !archived && !withdrawn && language in ["ru", "ro", "uk"] && defined(slug.current)]
-  { "slug": slug.current, language, primaryDomain, sourceMedicalRevision, "sourceCurrentMedicalRevision": translatedFrom->medicalRevision }
+  *[_type == "article" && translationGroupId == $translationGroupId && language in ["ru", "ro", "uk"] && defined(slug.current)]
+  {
+    "slug": slug.current,
+    language,
+    primaryDomain,
+    translationGroupId,
+    "translatedFromId": translatedFrom->_id,
+    "translatedFromLanguage": translatedFrom->language,
+    sourceMedicalRevision,
+    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision,
+    archived,
+    withdrawn,
+    riskLevel,
+    medicalOwner,
+    reviewedBy,
+    lastMedicalReview,
+    reviewIntervalMonths,
+    "sourceStatuses": sources[]->status
+  }
 `);
 
 export const ARTICLE_DETAIL_QUERY = defineQuery(`

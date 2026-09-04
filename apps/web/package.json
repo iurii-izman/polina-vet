@@ -10,7 +10,7 @@
     "preview:server": "astro dev --config astro.preview.config.mjs --mode preview",
     "preview:check": "astro build --config astro.preview.config.mjs --mode preview",
     "check": "astro check",
-    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articlePresentation.test.ts src/lib/profile.test.ts src/lib/routeContract.test.ts",
+    "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articleAlternates.test.ts src/lib/articlePresentation.test.ts src/lib/profile.test.ts src/lib/routeContract.test.ts",
     "test:e2e": "playwright test tests/smoke.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },

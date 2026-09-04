@@ -1,8 +1,11 @@
 import { defineLocations } from 'sanity/presentation';
 import type { PresentationPluginOptions } from 'sanity/presentation';
 
-const section = (domain?: string) =>
-  domain === 'farm' ? 'farm' : domain === 'pet' ? 'pets' : 'knowledge';
+function section(domain?: string) {
+  if (domain === 'farm') return 'farm';
+  if (domain === 'pet') return 'pets';
+  return 'knowledge';
+}
 
 export const resolve: PresentationPluginOptions['resolve'] = {
   locations: {

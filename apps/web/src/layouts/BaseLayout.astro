@@ -5,8 +5,8 @@ import SiteHeader from '../components/SiteHeader.astro';
 import { localeFromPath, staticAlternates, ui, type Locale } from '../lib/i18n';
 import { getSiteSettings } from '../lib/sanity/content';
 import { getDraftModeProps } from '../lib/sanity/draft-mode';
-import SanityVisualEditing from '../components/SanityVisualEditing';
-import DisableDraftMode from '../components/DisableDraftMode';
+import SanityVisualEditing from 'polina-vet-preview/visual-editing';
+import DisableDraftMode from 'polina-vet-preview/disable-draft-mode';
 
 interface Props {
   title: string;

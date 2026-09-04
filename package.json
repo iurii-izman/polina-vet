@@ -18,6 +18,7 @@
     "sanity:typegen": "pnpm --filter @polina-vet/studio typegen",
     "sanity:seed:safe": "pnpm --filter @polina-vet/studio seed:safe",
     "sanity:seed:m5": "pnpm --filter @polina-vet/studio seed:m5",
+    "sanity:seed:m6": "pnpm --filter @polina-vet/studio seed:m6",
     "sanity:verify": "pnpm --filter @polina-vet/studio verify:remote",
     "test:e2e": "pnpm --filter @polina-vet/web test:e2e",
     "test:a11y": "pnpm --filter @polina-vet/web test:a11y",

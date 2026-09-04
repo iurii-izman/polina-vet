@@ -5,8 +5,9 @@ export const previewSessionCookieName = 'polina-vet-preview-session';
 const previewSessionMessage = 'polina-vet-preview-session-v1';
 
 function toBase64Url(bytes: ArrayBuffer) {
-  const binary = String.fromCharCode(...new Uint8Array(bytes));
-  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+  const binary = String.fromCodePoint(...new Uint8Array(bytes));
+  const encoded = btoa(binary).replaceAll('+', '-').replaceAll('/', '_');
+  return encoded.replaceAll('=', '');
 }
 
 async function signPreviewSession(token: string) {

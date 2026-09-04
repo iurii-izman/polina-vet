@@ -63,13 +63,11 @@ const species = [
     _id: 'species-dog',
     _type: 'species',
     name: 'Собака',
-    labels: { ru: 'Собака', ro: 'Câine', uk: 'Собака' },
   },
   {
     _id: 'species-cat',
     _type: 'species',
     name: 'Кошка',
-    labels: { ru: 'Кошка', ro: 'Pisică', uk: 'Кішка' },
   },
 ];
 const topics = [
@@ -77,47 +75,36 @@ const topics = [
     _id: 'topic-gi-symptoms',
     _type: 'topic',
     name: 'Желудочно-кишечные симптомы',
-    labels: {
-      ru: 'Желудочно-кишечные симптомы',
-      ro: 'Simptome gastrointestinale',
-      uk: 'Шлунково-кишкові симптоми',
-    },
   },
   {
     _id: 'topic-vaccination',
     _type: 'topic',
     name: 'Вакцинация',
-    labels: { ru: 'Вакцинация', ro: 'Vaccinare', uk: 'Вакцинація' },
   },
   {
     _id: 'topic-parasites',
     _type: 'topic',
     name: 'Паразиты',
-    labels: { ru: 'Паразиты', ro: 'Paraziți', uk: 'Паразити' },
   },
   {
     _id: 'topic-observation',
     _type: 'topic',
     name: 'Наблюдение',
-    labels: { ru: 'Наблюдение', ro: 'Observație', uk: 'Спостереження' },
   },
   {
     _id: 'topic-prevention',
     _type: 'topic',
     name: 'Профилактика',
-    labels: { ru: 'Профилактика', ro: 'Prevenție', uk: 'Профілактика' },
   },
   {
     _id: 'topic-farm',
     _type: 'topic',
     name: 'Хозяйство',
-    labels: { ru: 'Хозяйство', ro: 'Gospodărie', uk: 'Господарство' },
   },
   {
     _id: 'topic-clinical-analysis',
     _type: 'topic',
     name: 'Клинические разборы',
-    labels: { ru: 'Клинические разборы', ro: 'Analize clinice', uk: 'Клінічні розбори' },
   },
 ];
 

@@ -29,6 +29,8 @@ const [
   publicArticles,
   publicAuthors,
   sources,
+  species,
+  topics,
   documents,
   routableDocuments,
 ] = await Promise.all([
@@ -62,6 +64,8 @@ const [
   client.fetch(
     '*[_type == "source"]{"id":_id,title,url,status,identifier,"supersededBy":supersededBy._ref}',
   ),
+  client.fetch('*[_type == "species"]{"id":_id,name,labels}'),
+  client.fetch('*[_type == "topic"]{"id":_id,name,labels}'),
   client.fetch(
     '*[_type in ["article", "clinicalCase"]]{_id,_type,medicalOwner,"sources":sources[]._ref}',
   ),
@@ -127,17 +131,50 @@ if (
 const seededEditorialPolicies = routableDocuments.filter(
   (page) =>
     page._type === 'page' &&
-    page.language === 'ru' &&
     page.translationGroupId === 'editorial-policy' &&
     page.slug === 'editorial-policy',
 );
-if (seededEditorialPolicies.length !== 1)
+const editorialPolicyLanguages = seededEditorialPolicies.map((page) => page.language).sort();
+if (seededEditorialPolicies.length !== 3 || editorialPolicyLanguages.join(',') !== 'ro,ru,uk')
   throw new Error(
-    `The safe editorial-policy page must have exactly one logical identity, found ${seededEditorialPolicies.length}.`,
+    `M6 Editorial Policy baseline must have exactly one published page for ru, ro, and uk; found ${editorialPolicyLanguages.join(',') || 'none'}.`,
   );
+
+const expectedSpecies = new Set(['Собака', 'Кошка']);
+const expectedTopics = new Set([
+  'Желудочно-кишечные симптомы',
+  'Вакцинация',
+  'Паразиты',
+  'Наблюдение',
+  'Профилактика',
+  'Хозяйство',
+  'Клинические разборы',
+]);
+for (const [kind, records, expectedNames] of [
+  ['species', species, expectedSpecies],
+  ['topic', topics, expectedTopics],
+]) {
+  const names = new Set(records.map((record) => record.name));
+  for (const name of expectedNames)
+    if (!names.has(name)) throw new Error(`M6 ${kind} baseline is missing ${name}.`);
+  for (const record of records) {
+    if (
+      !record.labels ||
+      typeof record.labels.ru !== 'string' ||
+      typeof record.labels.ro !== 'string' ||
+      typeof record.labels.uk !== 'string'
+    )
+      throw new Error(`M6 ${kind} ${record.id} must have ru, ro, and uk labels.`);
+  }
+}
 
 const pages = routableDocuments.filter((document) => document._type === 'page');
 const articles = routableDocuments.filter((document) => document._type === 'article');
+const nonRussianArticles = articles.filter((article) => article.language !== 'ru');
+if (nonRussianArticles.length)
+  throw new Error(
+    `M6 baseline must not publish non-RU medical Articles; found ${nonRussianArticles.map((article) => article.id).join(', ')}.`,
+  );
 const inaccessibleDocuments = routableDocuments.filter(
   (document) =>
     ![...publicPages, ...publicArticles].some(
@@ -200,5 +237,5 @@ if (
   throw new Error('A medical placeholder must never be published to the public dataset.');
 
 console.log(
-  `Remote Sanity verification passed. pages=${pages.length}; articles=${articles.length}; clinicalCases=${documents.filter((document) => document._type === 'clinicalCase').length}; authors=${publicAuthors.length}; sources=${sources.length}; editorialWarnings=${editorialWarnings.length}.`,
+  `Remote Sanity verification passed. pages=${pages.length}; articles=${articles.length}; authors=${publicAuthors.length}; sources=${sources.length}; clinicalCases=${documents.filter((document) => document._type === 'clinicalCase').length}; species=${species.length}; topics=${topics.length}; editorialPolicyLanguages=${editorialPolicyLanguages.join(',')}; publishedNonRuMedicalArticles=${nonRussianArticles.length}; editorialWarnings=${editorialWarnings.length}.`,
 );
