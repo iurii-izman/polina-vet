@@ -189,7 +189,8 @@ if (inaccessibleDocuments.length)
 const policyErrors = validateContent(articles, sources);
 if (policyErrors.length) throw new Error(policyErrors.join('\n'));
 const publicSourceIds = new Set(sources.map((source) => source.id));
-if (sources.length !== 8) throw new Error(`Expected 8 sources, found ${sources.length}.`);
+if (sources.length < 8)
+  throw new Error(`Expected at least the eight M5/M6 baseline sources, found ${sources.length}.`);
 const sourceUrls = sources.map((source) => source.url).filter(Boolean);
 if (new Set(sourceUrls).size !== sourceUrls.length)
   throw new Error('Duplicate source URLs found in the public dataset.');

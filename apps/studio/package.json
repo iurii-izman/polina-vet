@@ -11,7 +11,9 @@
     "seed:safe": "sanity exec scripts/seed-safe.ts --with-user-token",
     "seed:m5": "sanity exec scripts/seed-m5.ts --with-user-token",
     "seed:m6": "sanity exec scripts/seed-m6.ts --with-user-token",
+    "seed:m10": "sanity exec scripts/seed-m10.ts --with-user-token",
     "verify:remote": "sanity exec scripts/verify-remote.mjs",
+    "verify:m10:drafts": "sanity exec scripts/verify-m10-drafts.mjs --with-user-token",
     "check": "pnpm typegen && tsc --noEmit"
   },
   "dependencies": {
