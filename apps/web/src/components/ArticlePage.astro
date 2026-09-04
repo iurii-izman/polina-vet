@@ -24,6 +24,13 @@ const domainHref = domain === 'farm' ? route.farm(locale) : domain === 'pet' ? r
 const alternates = articleAlternates ?? ({ [locale]: Astro.url.pathname } as Partial<Record<Locale, string | null>>);
 ---
 <BaseLayout title={pageTitle} description={presentation.description} robots={presentation.robots} locale={locale} alternates={alternates}>
+  {presentation.showMedicalContent && <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: presentation.description,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString() },
+  })} />}
   <Breadcrumbs locale={locale} items={[{ label: domainLabel, href: domainHref }, { label: article.title }]} />
   <article class="medical-article container">
     <p class="eyebrow">{domainLabel}</p>

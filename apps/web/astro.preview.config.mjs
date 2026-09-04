@@ -26,7 +26,7 @@ const styledComponentsEsm = join(
   dirname(visualEditingRequire.resolve('styled-components')),
   'styled-components.esm.js',
 );
-export default defineConfig({
+export const previewConfig = {
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   trailingSlash: 'ignore',
@@ -104,4 +104,6 @@ export default defineConfig({
     defaultLocale: 'ru',
     routing: { prefixDefaultLocale: true },
   },
-});
+};
+
+export default defineConfig(previewConfig);
