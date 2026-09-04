@@ -10,7 +10,19 @@ const configs = [
 ];
 for (const [file, name, hostname] of configs) {
   const text = await readFile(resolve(root, file), 'utf8');
-  const json = JSON.parse(text.replace(/\/\/.*$/gm, '').replace(/,([\r\n\t ]*[}\]])/g, '$1'));
+  const lines = text.split('\n');
+  const jsonText = lines
+    .filter((line) => !line.trimStart().startsWith('//'))
+    .map((line, index, remainingLines) => {
+      const nextLine = remainingLines[index + 1]?.trimStart();
+      const trailingComma = line.trimEnd().endsWith(',');
+      const nextIsClosing = nextLine?.startsWith('}') || nextLine?.startsWith(']');
+
+      if (!trailingComma || !nextIsClosing) return line;
+      return line.trimEnd().slice(0, -1);
+    })
+    .join('\n');
+  const json = JSON.parse(jsonText);
   if (json.name !== name || json.workers_dev !== false || json.preview_urls !== false) {
     throw new Error(`Invalid isolated Worker configuration: ${file}`);
   }
