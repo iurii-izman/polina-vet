@@ -26,6 +26,10 @@ GitHub Actions remains the PR verification gate. Workers Builds should run: inst
 
 Required account-level setup is manual: audit the three exact hostnames and unrelated `aipipeline.cc` records first; create only the three Workers/custom domains; configure per-Worker Access; add the exact Studio CORS origin; create one published-content webhook to the staging Deploy Hook; configure the preview Worker secret; connect Workers Builds to the repository. Do not modify apex, `www`, wildcard routes, zone-wide rules, unrelated Workers, or existing projects.
 
+## Mandatory post-merge release gate
+
+Before M10 starts, run the existing Sanity published-content webhook through the existing Cloudflare Deploy Hook after PR #8 is merged. Confirm that Cloudflare checks out the merged `main`, `pnpm release:validate` passes, the staging deployment succeeds, and `https://polina-vet-dev.aipipeline.cc` is verified while Access-protected and non-indexable. This is a mandatory post-merge smoke gate. A pre-merge build failure caused only by `main` not yet containing the PR's `release:validate` script is an expected branch dependency, not an application defect.
+
 ## Rollback and observability
 
 In the staging Worker’s Deployments history, identify the last known-good version, roll back to it, verify HTTPS, Access, noindex, headers, sitemap, root redirect, and 404, then redeploy the intended version. Inspect Workers Build history, deployment versions, Worker logs, Access events, Sanity webhook delivery history, and GitHub CI. Never test rollback on the unrelated project.
