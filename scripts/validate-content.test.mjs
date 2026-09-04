@@ -148,6 +148,24 @@ test('translation lineage with sourceMedicalRevision 1 is valid', () => {
   );
 });
 
+test('translation lineage rejects a stale source revision or non-RU source', () => {
+  const source = validArticle({
+    id: 'translation-source-stale',
+    translationGroupId: 'translation-stale',
+    medicalRevision: 2,
+  });
+  const translation = validArticle({
+    id: 'translation-ro-stale',
+    language: 'ro',
+    slug: 'translation-ro-stale',
+    translationGroupId: 'translation-stale',
+    translatedFrom: { _ref: 'translation-source-stale' },
+    sourceMedicalRevision: 1,
+  });
+  const errors = validateContent([source, translation], [{ id: 'source', status: 'current' }]);
+  assert.ok(errors.some((error) => error.includes('sourceMedicalRevision does not match')));
+});
+
 test('RU source rejects sourceMedicalRevision 0 as present lineage', () => {
   const errors = validateContent(
     [validArticle({ id: 'ru-lineage-zero', sourceMedicalRevision: 0 })],

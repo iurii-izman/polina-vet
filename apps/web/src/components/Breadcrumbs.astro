@@ -6,13 +6,15 @@ interface Crumb {
 
 interface Props {
   items: Crumb[];
+  locale?: 'ru' | 'ro' | 'uk';
 }
 
-const { items } = Astro.props;
+const { items, locale = 'ru' } = Astro.props;
+const ariaLabel = locale === 'ro' ? 'Firimituri de navigare' : locale === 'uk' ? 'Навігаційний ланцюжок' : 'Хлебные крошки';
 ---
 
 {items.length > 0 && (
-  <nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <nav class="breadcrumbs" aria-label={ariaLabel}>
     <ol>
       {items.map((item, index) => (
         <li>

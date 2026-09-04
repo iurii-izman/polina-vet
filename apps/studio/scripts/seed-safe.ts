@@ -52,7 +52,6 @@ const editorialPolicy = {
     ),
   ],
 };
-
 await client.createOrReplace(siteSettings);
 
 const matchingEditorialPolicies = await client.fetch<Array<{ _id: string }>>(

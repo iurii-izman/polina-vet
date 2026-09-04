@@ -2,7 +2,11 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "types": ["@sanity/astro/module"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "polina-vet-preview/visual-editing": ["./src/components/NoopPreviewIsland.tsx"],
+      "polina-vet-preview/disable-draft-mode": ["./src/components/NoopPreviewIsland.tsx"]
+    }
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]

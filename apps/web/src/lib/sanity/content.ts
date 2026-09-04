@@ -1,4 +1,4 @@
-import { sanityClient } from 'sanity:client';
+import { fetchSanity } from './load-query';
 
 import { isDiscoveryEligible } from '../medical';
 import {
@@ -7,23 +7,35 @@ import {
   PAGE_BY_TRANSLATION_GROUP_QUERY,
   SITE_SETTINGS_QUERY,
 } from './queries';
-import type { PUBLIC_PROFILE_QUERY_RESULT } from './sanity.types';
+import type {
+  ELIGIBLE_KNOWLEDGE_QUERY_RESULT,
+  PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT,
+  PUBLIC_PROFILE_QUERY_RESULT,
+  SITE_SETTINGS_QUERY_RESULT,
+} from './sanity.types';
 
-async function fetchSiteSettings() {
-  return sanityClient.fetch(SITE_SETTINGS_QUERY);
+async function fetchSiteSettings(perspectiveCookie?: string): Promise<SITE_SETTINGS_QUERY_RESULT> {
+  return fetchSanity<SITE_SETTINGS_QUERY_RESULT>(SITE_SETTINGS_QUERY, {}, perspectiveCookie);
 }
 
 let siteSettingsPromise: ReturnType<typeof fetchSiteSettings> | undefined;
 
-export function getSiteSettings() {
+export function getSiteSettings(perspectiveCookie?: string): Promise<SITE_SETTINGS_QUERY_RESULT> {
+  if (perspectiveCookie) return fetchSiteSettings(perspectiveCookie);
   siteSettingsPromise ??= fetchSiteSettings();
   return siteSettingsPromise;
 }
 
 let publicProfilePromise: ReturnType<typeof fetchPublicProfile> | undefined;
 
-async function fetchPublicProfile() {
-  const profile = await sanityClient.fetch(PUBLIC_PROFILE_QUERY);
+async function fetchPublicProfile(
+  perspectiveCookie?: string,
+): Promise<PUBLIC_PROFILE_QUERY_RESULT | null> {
+  const profile = await fetchSanity<PUBLIC_PROFILE_QUERY_RESULT>(
+    PUBLIC_PROFILE_QUERY,
+    {},
+    perspectiveCookie,
+  );
   if (!profile) return null;
   const today = new Date().toISOString().slice(0, 10);
   return {
@@ -43,20 +55,41 @@ async function fetchPublicProfile() {
         today,
       ),
     ),
-  } satisfies PUBLIC_PROFILE_QUERY_RESULT;
+  } as PUBLIC_PROFILE_QUERY_RESULT;
 }
 
-export function getPublicProfile() {
+export function getPublicProfile(
+  perspectiveCookie?: string,
+): Promise<PUBLIC_PROFILE_QUERY_RESULT | null> {
+  if (perspectiveCookie) return fetchPublicProfile(perspectiveCookie);
   publicProfilePromise ??= fetchPublicProfile();
   return publicProfilePromise;
 }
 
-export function getPageByTranslationGroup(translationGroupId: string, language: string) {
-  return sanityClient.fetch(PAGE_BY_TRANSLATION_GROUP_QUERY, { language, translationGroupId });
+export function getPageByTranslationGroup(
+  translationGroupId: string,
+  language: string,
+  perspectiveCookie?: string,
+): Promise<PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT | null> {
+  return fetchSanity<PAGE_BY_TRANSLATION_GROUP_QUERY_RESULT>(
+    PAGE_BY_TRANSLATION_GROUP_QUERY,
+    { language, translationGroupId },
+    perspectiveCookie,
+  );
 }
 
-export async function getEligibleKnowledge(language: string, now: string) {
-  const candidates = await sanityClient.fetch(ELIGIBLE_KNOWLEDGE_QUERY, { language });
+export async function getEligibleKnowledge(
+  language: string,
+  now: string,
+  perspectiveCookie?: string,
+): Promise<ELIGIBLE_KNOWLEDGE_QUERY_RESULT> {
+  const candidates = await fetchSanity<ELIGIBLE_KNOWLEDGE_QUERY_RESULT>(
+    ELIGIBLE_KNOWLEDGE_QUERY,
+    {
+      language,
+    },
+    perspectiveCookie,
+  );
   return candidates.filter((article) =>
     isDiscoveryEligible(
       {

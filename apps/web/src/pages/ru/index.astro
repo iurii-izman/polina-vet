@@ -9,8 +9,10 @@ import SeasonalPanel from '../../components/SeasonalPanel.astro';
 import { homepageContent } from '../../data/homepage';
 import { route } from '../../lib/i18n';
 import { getPublicProfile } from '../../lib/sanity/content';
+import { getDraftModeProps } from '../../lib/sanity/draft-mode';
 
-const profile = await getPublicProfile();
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const profile = await getPublicProfile(perspectiveCookie);
 ---
 
 <BaseLayout title="Практическая ветеринарная информация" locale="ru">

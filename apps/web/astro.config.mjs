@@ -1,6 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sanity from '@sanity/astro';
+import react from '@astrojs/react';
+import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 
 import { SANITY_API_VERSION } from '../../sanity.shared.ts';
@@ -17,6 +19,18 @@ if (!projectId || !dataset) {
 
 export default defineConfig({
   output: 'static',
+  vite: {
+    resolve: {
+      alias: {
+        'polina-vet-preview/visual-editing': fileURLToPath(
+          new URL('./src/components/NoopPreviewIsland.tsx', import.meta.url),
+        ),
+        'polina-vet-preview/disable-draft-mode': fileURLToPath(
+          new URL('./src/components/NoopPreviewIsland.tsx', import.meta.url),
+        ),
+      },
+    },
+  },
   integrations: [
     sanity({
       projectId,
@@ -24,6 +38,7 @@ export default defineConfig({
       apiVersion: SANITY_API_VERSION,
       useCdn: false,
     }),
+    react(),
   ],
   trailingSlash: 'always',
   i18n: {

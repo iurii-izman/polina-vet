@@ -1,43 +1,47 @@
 ---
-import { localeNames, publishedLocales, type Locale } from '../lib/i18n';
+import { contextualAlternates, localeNames, ui, type Locale } from '../lib/i18n';
 
 interface Props {
   locale: Locale;
   mobile?: boolean;
+  alternates?: Partial<Record<Locale, string | null>>;
 }
 
-const { locale, mobile = false } = Astro.props;
+const { locale, mobile = false, alternates } = Astro.props;
 const languages = ['ru', 'ro', 'uk'] as const;
+const strings = ui[locale];
+const available = contextualAlternates({ pathname: Astro.url.pathname, locale, alternates });
+const labelFor = (candidate: Locale) => candidate === locale ? localeNames[candidate] : `${localeNames[candidate]} — ${strings.unavailable}`;
 ---
 
 {mobile ? (
   <div class="mobile-nav__languages">
-    <p class="mobile-nav__label">Язык</p>
+    <p class="mobile-nav__label">{strings.language}</p>
     <ul class="language-list">
       {languages.map((candidate) =>
-        publishedLocales.includes(candidate) ? (
+        available[candidate] ? (
           <li aria-current={candidate === locale ? 'true' : undefined}>
-            {localeNames[candidate]}
+            {candidate === locale ? localeNames[candidate] : <a href={available[candidate]!}>{localeNames[candidate]}</a>}
           </li>
         ) : (
-          <li aria-disabled="true">{localeNames[candidate]} — нет опубликованной версии</li>
+          <li aria-disabled="true">{labelFor(candidate)}</li>
         ),
       )}
     </ul>
   </div>
 ) : (
   <details class="language-menu" data-language-menu>
-    <summary aria-label="Выбрать язык" aria-expanded="false">
+    <summary aria-label={strings.chooseLanguage} aria-expanded="false">
       {locale.toUpperCase()} <span aria-hidden="true">⌄</span>
     </summary>
-    <div class="language-popover" aria-label="Доступные языки">
-      <p>Язык</p>
+    <div class="language-popover" aria-label={locale === 'ro' ? 'Limbi disponibile' : locale === 'uk' ? 'Доступні мови' : 'Доступные языки'}>
+      <p>{strings.language}</p>
       <ul class="language-list">
         {languages.map((candidate) =>
-          publishedLocales.includes(candidate) ? (
-            <li aria-current={candidate === locale ? 'true' : undefined}>{localeNames[candidate]}</li>
+          available[candidate] ? (
+            <li aria-current={candidate === locale ? 'true' : undefined}>{candidate === locale ? localeNames[candidate] : <a href={available[candidate]!}>{localeNames[candidate]}</a>}</li>
           ) : (
-            <li aria-disabled="true">{localeNames[candidate]} — нет опубликованной версии</li>
+            <li aria-disabled="true">{labelFor(candidate)}</li>
           ),
         )}
       </ul>

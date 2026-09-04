@@ -91,13 +91,27 @@ export function validateContent(documents, sources = []) {
     routes.set(route, document.id);
   }
   for (const document of documents) {
-    if (document.translatedFrom && !ids.has(document.translatedFrom))
+    if (document.translatedFrom && !ids.has(referenceId(document.translatedFrom)))
       errors.push(`${document.id}: translation source does not exist`);
     if (
       document.translatedFrom &&
-      ids.get(document.translatedFrom)?.translationGroupId !== document.translationGroupId
+      ids.get(referenceId(document.translatedFrom))?.translationGroupId !==
+        document.translationGroupId
     )
       errors.push(`${document.id}: translation family does not match its source`);
+    const translationSource = document.translatedFrom
+      ? ids.get(referenceId(document.translatedFrom))
+      : undefined;
+    if (document.translatedFrom && translationSource) {
+      if (translationSource.language !== 'ru')
+        errors.push(`${document.id}: translation source must be the RU source`);
+      if (translationSource.primaryDomain !== document.primaryDomain)
+        errors.push(`${document.id}: translation domain does not match its source`);
+      if (document.sourceMedicalRevision !== translationSource.medicalRevision)
+        errors.push(
+          `${document.id}: sourceMedicalRevision does not match the current source revision`,
+        );
+    }
     const replacementId = referenceId(document.replacement);
     const replacement = replacementId ? ids.get(replacementId) : undefined;
     if (replacementId && !replacement) errors.push(`${document.id}: replacement does not exist`);

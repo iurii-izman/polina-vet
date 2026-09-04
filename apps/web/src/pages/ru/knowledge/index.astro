@@ -4,8 +4,11 @@ import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import { getEligibleKnowledge } from '../../../lib/sanity/content';
 import { route } from '../../../lib/i18n';
 import { articleRoute, type ArticleDomain } from '../../../lib/articleRoute';
+import { getDraftModeProps } from '../../../lib/sanity/draft-mode';
+import { stegaClean } from '@sanity/client/stega';
 
-const articles = await getEligibleKnowledge('ru', new Date().toISOString().slice(0, 10));
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const articles = await getEligibleKnowledge('ru', new Date().toISOString().slice(0, 10), perspectiveCookie);
 ---
 
 <BaseLayout title="Знания" locale="ru">
@@ -13,6 +16,6 @@ const articles = await getEligibleKnowledge('ru', new Date().toISOString().slice
   <section class="page-intro container"><p class="eyebrow">Знания</p><h1>Ветеринарные материалы</h1><p class="lead">Практические материалы для владельцев домашних животных и хозяйств. Каждый медицинский материал имеет дату последнего пересмотра и список использованных источников.</p></section>
   <section class="container page-content section" aria-labelledby="knowledge-list-title">
     <div class="section-heading"><div><p class="eyebrow">Навигация</p><h2 id="knowledge-list-title">Материалы</h2></div><p>Сейчас отображаются только материалы, прошедшие структурную и медицинскую проверку.</p></div>
-    {articles.length ? <div class="card-grid">{articles.map((article) => <a class="knowledge-card" href={articleRoute({ language: article.language!, primaryDomain: article.primaryDomain as ArticleDomain, slug: article.slug! })}><p class="eyebrow">{article.primaryDomain === 'pet' ? 'Домашние животные' : article.primaryDomain === 'farm' ? 'Ферма' : 'Знания'}</p><h3>{article.title}</h3><p>{article.summary}</p><span class="action-card__link">Читать материал <span aria-hidden="true">→</span></span></a>)}</div> : <div class="empty-state"><h2>Материалы готовятся</h2><p>Публикация появится после медицинской проверки, указания источников и даты пересмотра. Поиск пока не подключён, поэтому на странице нет неработающего поля поиска.</p><div class="empty-state__actions"><a class="button" href={route.pets('ru')}>Домашние животные <span aria-hidden="true">→</span></a><a class="button button--secondary" href={route.farm('ru')}>Ферма <span aria-hidden="true">→</span></a></div></div>}
+    {articles.length ? <div class="card-grid">{articles.map((article) => <a class="knowledge-card" href={articleRoute({ language: article.language!, primaryDomain: article.primaryDomain as ArticleDomain, slug: article.slug! })}><p class="eyebrow">{stegaClean(article.primaryDomain ?? '') === 'pet' ? 'Домашние животные' : stegaClean(article.primaryDomain ?? '') === 'farm' ? 'Ферма' : 'Знания'}</p><h3>{article.title}</h3><p>{article.summary}</p><span class="action-card__link">Читать материал <span aria-hidden="true">→</span></span></a>)}</div> : <div class="empty-state"><h2>Материалы готовятся</h2><p>Публикация появится после медицинской проверки, указания источников и даты пересмотра. Поиск пока не подключён, поэтому на странице нет неработающего поля поиска.</p><div class="empty-state__actions"><a class="button" href={route.pets('ru')}>Домашние животные <span aria-hidden="true">→</span></a><a class="button button--secondary" href={route.farm('ru')}>Ферма <span aria-hidden="true">→</span></a></div></div>}
   </section>
 </BaseLayout>

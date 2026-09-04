@@ -3,13 +3,14 @@ import type { Locale } from '../lib/i18n';
 import { route } from '../lib/i18n';
 import { articleRoute, type ArticleDomain } from '../lib/articleRoute';
 import type { PUBLIC_PROFILE_QUERY_RESULT } from '../lib/sanity/sanity.types';
+import { stegaClean } from '@sanity/client/stega';
 
 type PublicProfile = NonNullable<PUBLIC_PROFILE_QUERY_RESULT>;
 interface Props { locale: Locale; items?: NonNullable<PublicProfile['featuredKnowledge']> }
 const { locale, items = [] } = Astro.props;
 const routedItems = items.filter(
   (article): article is (typeof items)[number] & { slug: string; primaryDomain: ArticleDomain } =>
-    Boolean(article.slug && article.primaryDomain && article.language === locale),
+    Boolean(article.slug && article.primaryDomain && stegaClean(article.language ?? '') === locale),
 );
 ---
 
@@ -18,7 +19,7 @@ const routedItems = items.filter(
   <h2 id="knowledge-title">Полезные материалы</h2>
   {routedItems.length ? <div class="card-grid">
     {routedItems.map((article) => <a class="knowledge-card" href={articleRoute({ language: locale, primaryDomain: article.primaryDomain, slug: article.slug })}>
-      <p class="eyebrow">{article.primaryDomain === 'farm' ? 'Ферма' : article.primaryDomain === 'pet' ? 'Домашние животные' : 'Знания'}</p>
+      <p class="eyebrow">{stegaClean(article.primaryDomain ?? '') === 'farm' ? 'Ферма' : stegaClean(article.primaryDomain ?? '') === 'pet' ? 'Домашние животные' : 'Знания'}</p>
       <h3>{article.title}</h3>
       <p>{article.summary}</p>
       <span class="action-card__link">Читать материал <span aria-hidden="true">→</span></span>

@@ -5,8 +5,10 @@ import PortableText from '../../../components/PortableText.astro';
 import { route } from '../../../lib/i18n';
 import { getPublicProfile } from '../../../lib/sanity/content';
 import { sanityImageUrl } from '../../../lib/sanity/image';
+import { getDraftModeProps } from '../../../lib/sanity/draft-mode';
 
-const profile = await getPublicProfile();
+const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
+const profile = await getPublicProfile(perspectiveCookie);
 const author = profile?.primaryAuthor;
 const portraitUrl = author?.portrait ? sanityImageUrl(author.portrait, 720) : undefined;
 ---

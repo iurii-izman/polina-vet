@@ -1,4 +1,3 @@
-<aside class="urgent-boundary" aria-label="Важная информация о срочном обращении">
-  <p><strong>Не ждите ответа в мессенджере,</strong> если состояние животного быстро ухудшается или кажется срочным.</p>
-  <p>POLINA VET не является круглосуточной экстренной службой.</p>
+<aside class="urgent-boundary" aria-label={Astro.props.locale === 'ro' ? 'Informații importante despre urgențe' : Astro.props.locale === 'uk' ? 'Важлива інформація про термінову допомогу' : 'Важная информация о срочном обращении'}>
+  {Astro.props.locale === 'ro' ? <><p><strong>Nu așteptați răspunsul într-un mesager,</strong> dacă starea animalului se agravează rapid sau pare urgentă.</p><p>POLINA VET nu este un serviciu veterinar de urgență disponibil 24/7.</p></> : Astro.props.locale === 'uk' ? <><p><strong>Не чекайте відповіді в месенджері,</strong> якщо стан тварини швидко погіршується або здається терміновим.</p><p>POLINA VET не є цілодобовою ветеринарною екстреною службою.</p></> : <><p><strong>Не ждите ответа в мессенджере,</strong> если состояние животного быстро ухудшается или кажется срочным.</p><p>POLINA VET не является круглосуточной экстренной службой.</p></>}
 </aside>

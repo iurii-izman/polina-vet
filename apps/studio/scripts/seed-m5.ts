@@ -59,26 +59,52 @@ async function upsert(
 }
 
 const species = [
-  { _id: 'species-dog', _type: 'species', name: 'Собака', labels: { ru: 'Собака' } },
-  { _id: 'species-cat', _type: 'species', name: 'Кошка', labels: { ru: 'Кошка' } },
+  {
+    _id: 'species-dog',
+    _type: 'species',
+    name: 'Собака',
+  },
+  {
+    _id: 'species-cat',
+    _type: 'species',
+    name: 'Кошка',
+  },
 ];
 const topics = [
   {
     _id: 'topic-gi-symptoms',
     _type: 'topic',
     name: 'Желудочно-кишечные симптомы',
-    labels: { ru: 'Желудочно-кишечные симптомы' },
   },
-  { _id: 'topic-vaccination', _type: 'topic', name: 'Вакцинация', labels: { ru: 'Вакцинация' } },
-  { _id: 'topic-parasites', _type: 'topic', name: 'Паразиты', labels: { ru: 'Паразиты' } },
-  { _id: 'topic-observation', _type: 'topic', name: 'Наблюдение', labels: { ru: 'Наблюдение' } },
-  { _id: 'topic-prevention', _type: 'topic', name: 'Профилактика', labels: { ru: 'Профилактика' } },
-  { _id: 'topic-farm', _type: 'topic', name: 'Хозяйство', labels: { ru: 'Хозяйство' } },
+  {
+    _id: 'topic-vaccination',
+    _type: 'topic',
+    name: 'Вакцинация',
+  },
+  {
+    _id: 'topic-parasites',
+    _type: 'topic',
+    name: 'Паразиты',
+  },
+  {
+    _id: 'topic-observation',
+    _type: 'topic',
+    name: 'Наблюдение',
+  },
+  {
+    _id: 'topic-prevention',
+    _type: 'topic',
+    name: 'Профилактика',
+  },
+  {
+    _id: 'topic-farm',
+    _type: 'topic',
+    name: 'Хозяйство',
+  },
   {
     _id: 'topic-clinical-analysis',
     _type: 'topic',
     name: 'Клинические разборы',
-    labels: { ru: 'Клинические разборы' },
   },
 ];
 
