@@ -3,8 +3,8 @@
 Status date: 2026-09-04  
 Base SHA: `18ac4357c7d1384fca4169707a24120fd47e9a3d`  
 Candidate branch: `feat/launch-candidate-m11`  
-Candidate SHA: pending implementation commit  
-M11 PR: not opened  
+Candidate SHA: `3440ee4`  
+M11 PR: [#10](https://github.com/iurii-izman/polina-vet/pull/10)  
 Final domain / canonical hostname: **not supplied — waiting**
 
 ## Verdict
