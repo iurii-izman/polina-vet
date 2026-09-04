@@ -8,3 +8,4 @@ BOOTSTRAP_MANIFEST.md
 CODEX_START_PROMPT.md
 pnpm-lock.yaml
 .playwright-cli/
+output/
