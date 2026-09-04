@@ -19,7 +19,8 @@ export function localeFromPath(pathname: string): Locale {
 }
 
 export function localeRoute(locale: Locale, path = ''): string {
-  const cleanPath = path.replace(/^\/+/, '').replace(/\/+$/, '');
+  let cleanPath = path.replace(/^\/+/, '');
+  while (cleanPath.endsWith('/')) cleanPath = cleanPath.slice(0, -1);
   const suffix = cleanPath ? `${cleanPath}/` : '';
   return `/${locale}/${suffix}`;
 }
