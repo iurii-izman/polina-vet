@@ -10,7 +10,7 @@ const configs = [
 ];
 for (const [file, name, hostname] of configs) {
   const text = await readFile(resolve(root, file), 'utf8');
-  const json = JSON.parse(text.replace(/\/\/.*$/gm, '').replace(/,\s*([}\]])/g, '$1'));
+  const json = JSON.parse(text.replace(/\/\/.*$/gm, '').replace(/,([\r\n\t ]*[}\]])/g, '$1'));
   if (json.name !== name || json.workers_dev !== false || json.preview_urls !== false) {
     throw new Error(`Invalid isolated Worker configuration: ${file}`);
   }
