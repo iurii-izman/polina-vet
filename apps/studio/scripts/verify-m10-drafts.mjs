@@ -32,7 +32,7 @@ for (const document of drafts) {
   if (document.archived || document.withdrawn)
     errors.push(`${document._id}: M10 draft must be active`);
   if (!document.sources?.length) errors.push(`${document._id}: missing sources`);
-  if (/[\[]PREVIEW QA\]|QA DRAFT|placeholder/i.test(`${document.title} ${document.summary}`))
+  if (/\[PREVIEW QA\]|QA DRAFT|placeholder/i.test(`${document.title} ${document.summary}`))
     errors.push(`${document._id}: QA marker leaked into editorial draft`);
   const group = `${document.translationGroupId}:${document.language}`;
   if (groups.has(group)) errors.push(`${document._id}: duplicate translation identity ${group}`);
@@ -46,11 +46,7 @@ for (const document of drafts) {
     if (!document.translatedFrom?._ref || !ids.has(document.translatedFrom._ref))
       errors.push(`${document._id}: translatedFrom does not point to an M10 RU draft`);
     const source = drafts.find((candidate) => candidate._id === document.translatedFrom?._ref);
-    if (
-      !source ||
-      source.language !== 'ru' ||
-      source.translationGroupId !== document.translationGroupId
-    )
+    if (source?.language !== 'ru' || source?.translationGroupId !== document.translationGroupId)
       errors.push(`${document._id}: translation family/source mismatch`);
     if (document.sourceMedicalRevision != null)
       errors.push(`${document._id}: translation is CURRENT before human review`);
@@ -58,11 +54,11 @@ for (const document of drafts) {
 }
 for (const source of sourceDrafts) {
   for (const language of ['ro', 'uk']) {
-    const translation = drafts.find(
+    const hasTranslation = drafts.some(
       (document) =>
         document.translationGroupId === source.translationGroupId && document.language === language,
     );
-    if (!translation) errors.push(`${source._id}: missing ${language} translation draft`);
+    if (!hasTranslation) errors.push(`${source._id}: missing ${language} translation draft`);
   }
 }
 if (sourceDrafts.length !== 14)
