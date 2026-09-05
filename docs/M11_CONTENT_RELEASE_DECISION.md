@@ -32,3 +32,5 @@ Clinical cases: **0**. The educational poisoning article remains an explicitly s
 - The selected M10 draft remains draft-only in remote Sanity and is absent from live Knowledge/Pets discovery, direct public content, and sitemap.
 
 No reviewer, independent sign-off, translation freshness, or medical revision state is fabricated by M11. Publication of any draft requires the existing editorial workflow and the applicable independent review, especially for HIGH-risk material.
+
+M11 is closed for the temporary public + noindex candidate. Final-domain activation is an independent release gate tracked in [R1 — Final Domain & Public Launch Activation](R1_FINAL_DOMAIN_ACTIVATION.md) and does not block M12–M18.

@@ -2,7 +2,7 @@
 
 Only known, intentionally deferred work is listed here:
 
-- Final-domain activation only: purchase/control `lina.vet`, configure the Cloudflare zone, move the production hostname, validate with indexability off, then enable indexability and complete Search Console/post-launch checks.
+- Final-domain activation is tracked separately in [R1 — Final Domain & Public Launch Activation](R1_FINAL_DOMAIN_ACTIVATION.md); it is a release gate, not post-launch backlog work.
 
 - Review and publish appropriate M10 medical drafts, including independent HIGH-risk review.
 - Review and publish RO/UK medical translations when their governance and freshness gates pass.

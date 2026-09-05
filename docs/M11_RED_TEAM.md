@@ -12,7 +12,7 @@ The following gate findings were open before the temporary candidate was deploye
 
 | Severity | Finding | Evidence / decision |
 |---|---|---|
-| BLOCKER (gate) | Final public domain is not supplied. | No domain was guessed or purchased. Production DNS, HTTPS, canonical, robots, sitemap, external draft-isolation, and Search Console cannot be accepted until the approved domain is provided. This is a business gate, not a product defect. |
+| RELEASE GATE | Final public domain is not supplied. | No domain was guessed or purchased. Final-domain activation, public indexability, Search Console, organic SEO launch, and `v1.0.0` are tracked in [R1 — Final Domain & Public Launch Activation](R1_FINAL_DOMAIN_ACTIVATION.md). This does not block M12–M18. |
 | MAJOR (unverified gate) | Candidate-origin draft isolation and protected-host smoke tests remain to be run on deployed infrastructure. | The repository has separate staging, preview, and Studio configurations and fail-closed indexability logic, but deployed-origin evidence is unavailable in this environment. Keep indexability off and complete these probes before launch. |
 | MINOR | Local Sanity TypeGen hangs after schema extraction. | Known M10 tooling limitation; `astro check`, content validation, unit tests, and release configuration validation pass. Do not weaken CI or treat this as launch approval. |
 
@@ -21,7 +21,7 @@ The following gate findings were open before the temporary candidate was deploye
 - BLOCKER: none for the temporary noindex candidate.
 - MAJOR: none after live deployment verification.
 - MINOR: Lighthouse CLI emits an intermittent Windows temporary-directory cleanup warning after successful reports; it does not affect scores or the deployed site.
-- BACKLOG: purchase/control of `lina.vet`, hostname switch, final-domain validation, indexability enablement, Search Console, and `v1.0.0` remain intentionally final-domain-only work.
+- R1: purchase/control of `lina.vet`, hostname switch, final-domain validation, indexability enablement, Search Console, and `v1.0.0` remain open release-gate work.
 
 The live candidate is public and noindex. The selected M10 draft is excluded from public discovery and direct content, protected hosts remain behind Access, and the final origin verifier passes.
 
@@ -35,4 +35,4 @@ The live candidate is public and noindex. The selected M10 draft is excluded fro
 
 ## Launch decision
 
-No application BLOCKER was found in the domain-independent repository review. The launch remains **NO-GO until the final-domain and deployed-origin gates are completed**.
+No application BLOCKER was found in the domain-independent repository review. M11 is **CLOSED** for the temporary public + noindex candidate. Public SEO launch remains pending R1.
