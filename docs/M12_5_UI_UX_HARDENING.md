@@ -78,8 +78,8 @@ Temporary after-state evidence is under `output/m12.5-audit/after/` and is inten
 
 ## PR and CI
 
-Final candidate HEAD: `37fa502e906bd9befd975b8c6ed5cb50dd4b3e97`.  
-PR: https://github.com/iurii-izman/polina-vet/pull/14  
+Final candidate HEAD: `419123a` (documentation-only release evidence update on top of the implementation commit).
+PR: https://github.com/iurii-izman/polina-vet/pull/14
 State: OPEN, non-draft, CLEAN, unmerged.
 
 - GitHub Actions `verify`: PASS (83 E2E and 46 accessibility checks included in the workflow).
