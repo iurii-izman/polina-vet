@@ -68,12 +68,10 @@ export function normalizeChannels(
     label?: string | null,
   ) => {
     if (!value || result.some((channel) => channel.type === type)) return;
-    const normalized =
-      type === 'phone'
-        ? safePhoneHref(value)
-        : type === 'telegram' && !value.includes('://')
-          ? safeTelegramHref(value)
-          : validExternalUrl(value, type);
+    let normalized: string | undefined;
+    if (type === 'phone') normalized = safePhoneHref(value);
+    else if (type === 'telegram' && !value.includes('://')) normalized = safeTelegramHref(value);
+    else normalized = validExternalUrl(value, type);
     if (normalized) result.push({ type, value: normalized, priority, label: label ?? undefined });
   };
   add('telegram', contacts?.telegramHandle, channelPriority.telegram);
