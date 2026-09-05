@@ -38,11 +38,39 @@ export function assertNoDraft(body, path) {
 }
 
 function attributes(tag) {
-  const matches = [
-    ...tag.matchAll(/([A-Za-z0-9_:-]+)\s*=\s*"([^"]*)"/g),
-    ...tag.matchAll(/([A-Za-z0-9_:-]+)\s*=\s*'([^']*)'/g),
-  ];
-  return Object.fromEntries(matches.map((match) => [match[1].toLowerCase(), match[2]]));
+  const result = {};
+  const isWhitespace = (character) =>
+    character === ' ' || character === '\t' || character === '\n' || character === '\r';
+  const isAttributeCharacter = (character) =>
+    (character >= 'A' && character <= 'Z') ||
+    (character >= 'a' && character <= 'z') ||
+    (character >= '0' && character <= '9') ||
+    character === '_' ||
+    character === ':' ||
+    character === '-';
+  let index = 1;
+  while (index < tag.length - 1) {
+    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
+    const nameStart = index;
+    while (index < tag.length - 1 && isAttributeCharacter(tag[index])) index += 1;
+    if (index === nameStart) {
+      index += 1;
+      continue;
+    }
+    const name = tag.slice(nameStart, index).toLowerCase();
+    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
+    if (tag[index] !== '=') continue;
+    index += 1;
+    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
+    const quote = tag[index];
+    if (quote !== '"' && quote !== "'") continue;
+    index += 1;
+    const valueStart = index;
+    while (index < tag.length - 1 && tag[index] !== quote) index += 1;
+    result[name] = tag.slice(valueStart, index);
+    index += 1;
+  }
+  return result;
 }
 
 export function inspectHtml(body, url, headers, indexable) {
