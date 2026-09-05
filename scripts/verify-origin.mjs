@@ -8,7 +8,7 @@ export const articlePath = '/ru/pets/vomiting-diarrhea-what-to-observe/';
 
 export function plainText(value) {
   return value
-    .replace(/<[^>]*>/g, ' ')
+    .replace(/<[^<>]*>/g, ' ')
     .replace(/&#(x[\da-f]+|\d+);/gi, (_, code) =>
       String.fromCodePoint(
         code[0].toLowerCase() === 'x' ? Number.parseInt(code.slice(1), 16) : Number(code),
@@ -39,9 +39,9 @@ export function assertNoDraft(body, path) {
 
 function attributes(tag) {
   return Object.fromEntries(
-    [...tag.matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map((match) => [
+    [...tag.matchAll(/([\w:-]+)\s*=\s*("[^"]*"|'[^']*')/g)].map((match) => [
       match[1].toLowerCase(),
-      match[2] ?? match[3],
+      match[2].slice(1, -1),
     ]),
   );
 }

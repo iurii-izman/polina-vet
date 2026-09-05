@@ -60,7 +60,9 @@ Current known-good version is `ca66a2ff-93be-4424-b9f0-f06f2b00f3c0`. Roll back 
 | Staging | `polina-vet-dev.aipipeline.cc`, protected and non-indexable |
 | Preview | `preview-polina-vet.aipipeline.cc`, protected draft perspective |
 | Studio | `studio-polina-vet.aipipeline.cc`, protected editorial UI |
-| Production | Final approved domain required; published perspective only; indexability fail-closed |
+| Production | `https://lina.aipipeline.cc` — temporary public launch candidate, published perspective only, PUBLIC + NOINDEX |
+
+Future final production hostname: `lina.vet` — not yet owned.
 
 ## Audit and verification
 
@@ -68,7 +70,7 @@ Current known-good version is `ca66a2ff-93be-4424-b9f0-f06f2b00f3c0`. Roll back 
 - Astro diagnostics: PASS (0 errors, warnings, hints).
 - Unit tests: PASS (25 tests).
 - Cloudflare configuration validation: PASS (4 isolated configs, including the prepared production Worker).
-- Local TypeGen/build: blocked by the known hang after schema extraction; CI evidence is required.
+- TypeGen had intermittent local hangs during earlier M10/M11 work, but the final M11.5 validation completed successfully locally and in CI.
 - Deployed candidate draft isolation, Lighthouse, external a11y/security headers, Cloudflare, and Sonar: PASS. Search Console remains intentionally pending until `lina.vet` is owned and indexability is enabled.
 
 ## SEO and release controls
