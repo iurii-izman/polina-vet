@@ -25,3 +25,15 @@ CI enforces deterministic geometry, responsive, behavior and accessibility invar
 ## Deferred
 
 No product, medical-content, translation, R1/R2, analytics or M13 scope is changed by this milestone.
+
+## Final convergence
+
+- Token entropy: 283 token references across the production CSS, with no material legacy or suspicious duplicate value requiring consolidation. Remaining raw values are semantic surface, safety, responsive-control, gradient, focus, or print rules.
+- Alignment: the wide/section/readable roles remain consistent across Home, Pets, Farm, Knowledge, About, Contact, Urgent, and Article at 1024/1280/1440. No unexplained deviation or overflow was found.
+- Rhythm: shared intro/card/footer spacing is consistent; larger Home, Contact, Urgent, breadcrumb, and article gaps are intentional composition, safety-boundary, or editorial breathing room.
+- Cross-browser: Chromium, Firefox, and WebKit passed the 30-state geometry/behavior smoke at 390px and 1440px. Firefox and WebKit binaries were installed at the existing Playwright version; no dependency was added.
+- Contrast/type: dark surfaces use the semantic dark text roles; measured solid-surface contrast remained at or above 5.55:1 for muted urgent text and above 6:1 for dark-surface labels/body text. RU long titles, responsive controls, and image geometry remained sane.
+- Stylelint was deliberately not added because the CSS is already disciplined and the remaining raw values are justified rather than recurring accidental entropy.
+- No production visual change was required by this pass. Human convergence screenshots remain untracked under `output/m12.6-convergence/final/`.
+
+**Final visual-freeze status: converged and frozen for M13.**
