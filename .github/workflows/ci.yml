@@ -36,6 +36,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - run: pnpm test:origin
       - run: pnpm release:validate
       - run: pnpm --filter @polina-vet/web preview:cloudflare:check
       - run: pnpm --filter @polina-vet/web exec playwright install --with-deps chromium

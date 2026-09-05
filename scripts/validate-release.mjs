@@ -6,6 +6,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const configs = [
   ['apps/web/wrangler.jsonc', 'polina-vet-staging', 'polina-vet-dev.aipipeline.cc'],
   ['apps/web/wrangler.preview.jsonc', 'polina-vet-preview', 'preview-polina-vet.aipipeline.cc'],
+  ['apps/web/wrangler.production.jsonc', 'polina-vet-production', 'lina.aipipeline.cc'],
   ['apps/studio/wrangler.jsonc', 'polina-vet-studio', 'studio-polina-vet.aipipeline.cc'],
 ];
 for (const [file, name, hostname] of configs) {
@@ -26,6 +27,22 @@ for (const [file, name, hostname] of configs) {
   if (json.name !== name || json.workers_dev !== false || json.preview_urls !== false) {
     throw new Error(`Invalid isolated Worker configuration: ${file}`);
   }
-  if (!text.includes(hostname)) throw new Error(`Missing exact custom hostname: ${file}`);
+  if (
+    json.routes?.length !== 1 ||
+    json.routes[0].pattern !== hostname ||
+    json.routes[0].custom_domain !== true
+  )
+    throw new Error(`Expected exactly one isolated custom hostname: ${file}`);
+  if (
+    name === 'polina-vet-production' &&
+    (json.main ||
+      json.vars ||
+      json.bindings ||
+      json.assets?.directory !== './dist' ||
+      json.assets?.html_handling !== 'force-trailing-slash')
+  )
+    throw new Error(
+      'Production must remain a static-assets-only Worker without runtime variables.',
+    );
 }
 console.log(`Validated ${configs.length} isolated Cloudflare Worker configurations.`);

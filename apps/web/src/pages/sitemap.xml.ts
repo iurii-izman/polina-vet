@@ -10,7 +10,9 @@ export const GET: APIRoute = async () => {
   for (const locale of ['ru', 'ro', 'uk']) {
     const articles = await getEligibleKnowledge(locale, new Date().toISOString().slice(0, 10));
     for (const article of articles) {
-      const domain = article.primaryDomain === 'pet' ? 'pets' : 'farm';
+      let domain = 'knowledge';
+      if (article.primaryDomain === 'pet') domain = 'pets';
+      if (article.primaryDomain === 'farm') domain = 'farm';
       if (article.slug) routes.add(`/${locale}/${domain}/${article.slug}/`);
     }
   }

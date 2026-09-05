@@ -25,5 +25,14 @@ for (const file of htmlFiles) {
 const robots = await readFile(join(dist, 'robots.txt'), 'utf8');
 if (!robots.includes('Disallow: /'))
   throw new Error('Static release must be non-indexable by default.');
-await readFile(join(dist, 'sitemap.xml'), 'utf8');
+const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
+const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]));
+if (!sitemapUrls.length) throw new Error('Empty sitemap.');
+for (const url of sitemapUrls) {
+  const page = await readFile(join(dist, url.pathname, 'index.html'), 'utf8');
+  if (!page.includes(`href="${url.href}"`))
+    throw new Error(`Sitemap target lacks self-canonical: ${url}`);
+  if (process.env.SITE_URL && url.origin !== new URL(process.env.SITE_URL).origin)
+    throw new Error(`Sitemap host differs from SITE_URL: ${url}`);
+}
 console.log(`Validated SEO metadata and runtime boundary across ${htmlFiles.length} HTML files.`);

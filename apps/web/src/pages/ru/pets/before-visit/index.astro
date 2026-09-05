@@ -19,7 +19,4 @@ const items = [
   <Breadcrumbs items={[{ label: 'Домашние животные', href: route.pets('ru') }, { label: 'Подготовка к визиту' }]} />
   <section class="page-intro container"><p class="eyebrow">Домашние животные · Подготовка</p><h1>Как подготовиться к визиту с собакой или кошкой</h1><p class="lead">Несколько простых вещей помогут быстрее получить полезную информацию во время осмотра и не тратить время на восстановление деталей по памяти.</p></section>
   <section class="container page-content" aria-labelledby="before-visit-list-title"><div class="section-heading"><div><p class="eyebrow">Памятка</p><h2 id="before-visit-list-title">Что подготовить</h2></div><p>Сохраните список или распечатайте его перед обращением.</p></div><Checklist items={items} /><div class="print-actions"><button class="button button--secondary no-print" type="button" data-print>Распечатать памятку</button></div></section>
-  <script>
-    document.querySelector<HTMLButtonElement>('[data-print]')?.addEventListener('click', () => window.print());
-  </script>
 </BaseLayout>

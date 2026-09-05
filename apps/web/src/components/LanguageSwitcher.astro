@@ -48,21 +48,3 @@ const labelFor = (candidate: Locale) => candidate === locale ? localeNames[candi
     </div>
   </details>
 )}
-
-{!mobile && (
-  <script>
-    document.querySelectorAll<HTMLElement>('[data-language-menu]').forEach((menu) => {
-      const details = menu as HTMLDetailsElement;
-      const summary = details.querySelector('summary');
-      const syncExpanded = () => summary?.setAttribute('aria-expanded', String(details.open));
-      details.addEventListener('toggle', syncExpanded);
-      syncExpanded();
-      details.addEventListener('keydown', (event) => {
-        if (event.key !== 'Escape' || !details.open) return;
-        event.preventDefault();
-        details.open = false;
-        summary?.focus();
-      });
-    });
-  </script>
-)}
