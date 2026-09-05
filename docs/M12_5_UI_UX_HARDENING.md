@@ -74,4 +74,17 @@ Post-deploy live checks passed for Home and Knowledge at 1440/390, Home trust at
 
 Lighthouse desktop reports for Home, Knowledge, About, and Article each scored Performance 100, Accessibility 100, and Best Practices 100 with CLS 0. Reported LCP was 343ms Home, 330ms Knowledge, 532ms About, and 341ms Article in this run. Lighthouse’s Windows Chrome launcher emitted an EPERM while cleaning its temporary directory on some runs after writing the report; the JSON reports were produced and scores were read successfully.
 
-Temporary after-state evidence is under `output/m12.5-audit/after/` and is intentionally untracked. The PR remains open and unmerged; CI status and PR URL are recorded after push.
+Temporary after-state evidence is under `output/m12.5-audit/after/` and is intentionally untracked.
+
+## PR and CI
+
+Final candidate HEAD: `37fa502e906bd9befd975b8c6ed5cb50dd4b3e97`.  
+PR: https://github.com/iurii-izman/polina-vet/pull/14  
+State: OPEN, non-draft, CLEAN, unmerged.
+
+- GitHub Actions `verify`: PASS (83 E2E and 46 accessibility checks included in the workflow).
+- Cloudflare Workers Builds `polina-vet-staging`: PASS.
+- SonarCloud Code Analysis: PASS; no unresolved issues were returned by the public issue query.
+- Security Hotspots: no reportable hotspot was surfaced by the PR check; no findings were introduced by this narrow CSS/test/documentation change.
+
+The PR remains open and unmerged.
