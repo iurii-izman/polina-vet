@@ -54,7 +54,7 @@ h3 {
 h1 {
   max-width: 920px;
   margin-bottom: var(--space-5);
-  font-size: clamp(2.5rem, 5vw, 4.375rem);
+  font-size: var(--font-size-page-title);
   letter-spacing: -0.04em;
 }
 h2 {
@@ -71,6 +71,12 @@ ol:last-child {
 .container {
   width: min(var(--content-width-wide), calc(100% - 2.5rem));
   margin-inline: auto;
+}
+.content-width-section {
+  max-width: var(--content-width-section);
+}
+.content-width-readable {
+  max-width: var(--content-width-readable);
 }
 .site-main {
   min-height: 50vh;
@@ -100,7 +106,7 @@ ol:last-child {
 }
 .lead {
   max-width: var(--content-width-readable);
-  color: #4f554f;
+  color: var(--text-muted);
   font-size: clamp(1.08rem, 2vw, var(--font-size-lead));
 }
 .caption,
@@ -162,7 +168,7 @@ small {
     width: min(100% - 2rem, var(--content-width-wide));
   }
   h1 {
-    font-size: 2.375rem;
+    font-size: clamp(2rem, 9vw, 2.25rem);
   }
 }
 @media (max-width: 340px) {
