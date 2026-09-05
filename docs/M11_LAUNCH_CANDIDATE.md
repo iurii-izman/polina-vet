@@ -69,11 +69,11 @@ Current known-good version is `ca66a2ff-93be-4424-b9f0-f06f2b00f3c0`. Roll back 
 - Unit tests: PASS (25 tests).
 - Cloudflare configuration validation: PASS (4 isolated configs, including the prepared production Worker).
 - Local TypeGen/build: blocked by the known hang after schema extraction; CI evidence is required.
-- Deployed candidate draft isolation, Lighthouse, external a11y/security headers, Cloudflare, Sonar, and Search Console: pending deployment/domain access.
+- Deployed candidate draft isolation, Lighthouse, external a11y/security headers, Cloudflare, and Sonar: PASS. Search Console remains intentionally pending until `lina.vet` is owned and indexability is enabled.
 
 ## SEO and release controls
 
-The repository preserves the rule that indexability requires both `SITE_INDEXABLE=true` and `DEPLOYMENT_TARGET=production`. Staging and preview remain non-indexable. Final-domain canonical, hreflang, robots, sitemap, OG URLs, HTTPS, and cache behavior must be verified after the domain is supplied and while indexability is still off.
+The repository preserves the rule that indexability requires both `SITE_INDEXABLE=true` and `DEPLOYMENT_TARGET=production`. Staging and preview remain non-indexable. The temporary candidate's canonical, hreflang, robots, sitemap, OG URLs, HTTPS, and cache behavior were verified while indexability remains off; repeat the same checks after the final hostname is supplied.
 
 ## Rollback and monitoring
 
