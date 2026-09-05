@@ -5,7 +5,10 @@ Base SHA: `18ac4357c7d1384fca4169707a24120fd47e9a3d`
 Candidate branch: `feat/launch-candidate-m11`  
 Candidate SHA: `3440ee4`  
 M11 PR: [#10](https://github.com/iurii-izman/polina-vet/pull/10)  
-Planned final domain / canonical hostname: `lina.md` (not purchased or verified)
+Temporary launch candidate: `https://lina.aipipeline.cc` (public + noindex)  
+Preferred future final domain: `lina.vet` — NOT YET OWNED  
+Final domain status: **WAITING**  
+The former provisional `lina.md` is abandoned; do not purchase or deploy it.
 
 ## Verdict
 
@@ -49,4 +52,4 @@ Use Cloudflare deployment history to roll back the POLINA VET production Worker 
 
 ## Required user action
 
-Purchase/control `lina.md`, confirm that the apex is the canonical hostname (or explicitly choose `www`), and provide access needed to verify the Cloudflare zone and Google Search Console property. No domain will be purchased or modified automatically.
+Future activation requires owner purchase/control of `lina.vet`. No domain purchase, indexing, Search Console submission, or v1.0.0 tag is authorized in M11.5. The temporary candidate does not depend on owning the final domain.
