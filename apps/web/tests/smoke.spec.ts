@@ -156,6 +156,54 @@ test('M5 featured knowledge is governed and the educational case is an article',
   await expect(page.locator('.featured-case')).toHaveCount(0);
 });
 
+test('M12.5 Knowledge titles use the available card measure', async ({ page }) => {
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: width < 500 ? 844 : 1000 });
+    await page.goto('/ru/knowledge/');
+    const card = page.locator('.knowledge-card').first();
+    const measurement = await card.evaluate((node) => {
+      const title = node.querySelector('h3');
+      const cardRect = node.getBoundingClientRect();
+      const titleRect = title?.getBoundingClientRect();
+      return {
+        cardWidth: cardRect.width,
+        titleWidth: titleRect?.width ?? 0,
+        titleRight: titleRect?.right ?? 0,
+        cardRight: cardRect.right,
+        overflow: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+
+    expect(measurement.titleWidth).toBeGreaterThan(208);
+    expect(measurement.titleRight).toBeLessThanOrEqual(measurement.cardRight + 1);
+    expect(measurement.overflow).toBeFalsy();
+  }
+});
+
+test('M12.5 Home trust portrait keeps bounded portrait geometry', async ({ page }) => {
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: width < 500 ? 844 : 1000 });
+    await page.goto('/ru/');
+    const portrait = page.locator('.trust-block__portrait');
+    const measurement = await portrait.evaluate((node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return {
+        width: rect.width,
+        height: rect.height,
+        ratio: rect.width / rect.height,
+        objectFit: style.objectFit,
+        overflow: document.documentElement.scrollWidth > window.innerWidth,
+      };
+    });
+
+    expect(measurement.ratio).toBeGreaterThan(0.65);
+    expect(measurement.ratio).toBeLessThan(0.95);
+    expect(measurement.objectFit).toBe('cover');
+    expect(measurement.overflow).toBeFalsy();
+  }
+});
+
 test('404 provides useful routes and keeps the urgent action in the global header', async ({
   page,
 }) => {

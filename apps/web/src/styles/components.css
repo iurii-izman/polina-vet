@@ -343,9 +343,15 @@
 }
 .task-card__title,
 .knowledge-card h3 {
-  max-width: 13rem;
   margin-bottom: var(--space-3);
   font-weight: 800;
+}
+.task-card__title {
+  max-width: 13rem;
+}
+.knowledge-card h3 {
+  max-width: none;
+  padding-right: 2.5rem;
 }
 .task-card__description,
 .action-card p,
@@ -415,8 +421,8 @@
 }
 .trust-block__portrait {
   display: block;
-  width: min(100%, 11rem);
-  aspect-ratio: 4 / 5;
+  width: min(100%, 18rem);
+  height: 22.5rem;
   object-fit: cover;
   object-position: center 20%;
   margin-bottom: var(--space-5);
@@ -912,6 +918,10 @@
     grid-template-columns: 1fr;
     margin-top: var(--space-16);
     padding: var(--space-6);
+  }
+  .trust-block__portrait {
+    width: min(100%, 15rem);
+    height: 18.75rem;
   }
   .trust-block__details {
     grid-template-columns: 1fr;
