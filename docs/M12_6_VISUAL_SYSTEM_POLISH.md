@@ -20,7 +20,7 @@ The visual system remains warm, practical and editorial. The refinement uses pro
 
 ## Validation model
 
-The local visual set covers RU Home, Pets, Farm, Knowledge, About, Contact, Urgent and a representative article at desktop and mobile, plus the open language menu. CI continues to enforce deterministic screenshot and geometry checks; `output/m12.6-audit/` holds untracked review evidence.
+CI enforces deterministic geometry, responsive, behavior and accessibility invariants, including the M12.5 K-001 and IMG-001 regression controls. The local/manual visual set is the 17 pixel screenshots covering RU Home, Pets, Farm, Knowledge, About, Contact, Urgent and a representative article at desktop and mobile, plus the open language menu. Pixel screenshot baselines are not a Linux CI gate; `output/m12.6-audit/` holds untracked review evidence.
 
 ## Deferred
 
