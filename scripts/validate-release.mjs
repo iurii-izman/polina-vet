@@ -8,6 +8,8 @@ const configs = [
   ['apps/web/wrangler.preview.jsonc', 'polina-vet-preview', 'preview-polina-vet.aipipeline.cc'],
   ['apps/web/wrangler.production.jsonc', 'polina-vet-production', 'lina.aipipeline.cc'],
   ['apps/studio/wrangler.jsonc', 'polina-vet-studio', 'studio-polina-vet.aipipeline.cc'],
+  ['apps/intake/wrangler.jsonc', 'polina-vet-intake', 'intake-polina-vet.aipipeline.cc'],
+  ['apps/office/wrangler.jsonc', 'polina-vet-office', 'office-polina-vet.aipipeline.cc'],
 ];
 for (const [file, name, hostname] of configs) {
   const text = await readFile(resolve(root, file), 'utf8');
@@ -44,5 +46,13 @@ for (const [file, name, hostname] of configs) {
     throw new Error(
       'Production must remain a static-assets-only Worker without runtime variables.',
     );
+}
+for (const file of ['apps/intake/wrangler.jsonc', 'apps/office/wrangler.jsonc']) {
+  const text = await readFile(resolve(root, file), 'utf8');
+  if (
+    /OFFICE_AUTH_BYPASS\s*"?\s*:\s*"?true/i.test(text) ||
+    /PUBLIC_INTAKE_ENABLED\s*"?\s*:\s*"?true/i.test(text)
+  )
+    throw new Error(`Activation gate must remain fail-closed in ${file}`);
 }
 console.log(`Validated ${configs.length} isolated Cloudflare Worker configurations.`);

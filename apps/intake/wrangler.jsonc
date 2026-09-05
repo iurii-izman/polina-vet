@@ -1,0 +1,85 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "polina-vet-intake",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-04",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "intake-polina-vet.aipipeline.cc", "custom_domain": true }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "polina-vet-operations",
+      "migrations_dir": "migrations",
+      "migrations_pattern": "migrations/*/migration.sql",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "INTAKE_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 5, "period": 60 },
+    },
+  ],
+  "vars": {
+    "ENVIRONMENT": "staging",
+    "PUBLIC_INTAKE_ENABLED": "false",
+    "PRIVACY_NOTICE_VERSION": "M13-DRAFT-1",
+    "ALLOWED_ORIGINS": "https://polina-vet-dev.aipipeline.cc",
+  },
+  "triggers": { "crons": ["17 * * * *"] },
+  "env": {
+    "staging": {
+      "name": "polina-vet-intake-staging",
+      "routes": [{ "pattern": "intake-polina-vet.aipipeline.cc", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "polina-vet-operations-staging",
+          "database_id": "35f5c979-af99-4a1c-8fc9-98ab3e8ba96f",
+          "migrations_dir": "migrations",
+          "migrations_pattern": "migrations/*/migration.sql",
+        },
+      ],
+      "ratelimits": [
+        {
+          "name": "INTAKE_RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 5, "period": 60 },
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "PUBLIC_INTAKE_ENABLED": "false",
+        "PRIVACY_NOTICE_VERSION": "M13-DRAFT-1",
+        "ALLOWED_ORIGINS": "https://polina-vet-dev.aipipeline.cc",
+      },
+    },
+    "production": {
+      "name": "polina-vet-intake-production",
+      "routes": [{ "pattern": "intake.lina.aipipeline.cc", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "polina-vet-operations-production",
+          "database_id": "cd40444f-879d-4c50-af6a-a031ea693f9a",
+          "migrations_dir": "migrations",
+          "migrations_pattern": "migrations/*/migration.sql",
+        },
+      ],
+      "ratelimits": [
+        {
+          "name": "INTAKE_RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 5, "period": 60 },
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "production",
+        "PUBLIC_INTAKE_ENABLED": "false",
+        "PRIVACY_NOTICE_VERSION": "M13-APPROVED-REQUIRED",
+        "ALLOWED_ORIGINS": "https://lina.aipipeline.cc",
+      },
+    },
+  },
+}

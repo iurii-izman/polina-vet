@@ -41,6 +41,7 @@ export const route = {
   animalSick: (locale: Locale) => localeRoute(locale, 'task/animal-sick'),
   prepare: (locale: Locale) => localeRoute(locale, 'task/prepare'),
   groupProblem: (locale: Locale) => localeRoute(locale, 'farm/group-problem'),
+  intake: (locale: Locale) => localeRoute(locale, 'contact/request'),
 };
 
 /** Static route families are explicit so the switcher never guesses by replacing a path prefix. */
@@ -60,6 +61,7 @@ const staticRouteFamilies = new Set([
   'task/animal-sick',
   'task/prepare',
   'farm/group-problem',
+  'contact/request',
 ]);
 
 export function routeFamily(pathname: string): string | null {
