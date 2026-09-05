@@ -10,4 +10,4 @@ Diagnostic: `outbound_social`.
 
 Vocabulary is deliberately eight events. Properties are controlled: `channel` (telegram, viber, phone, instagram, facebook, whatsapp), `domain` (pet, farm, shared), `locale` (ru, ro, uk), `surface` (home, contact, header, footer, article, urgent), `kind` (domain, urgent, knowledge, preparation, contact, map), and language `from`/`to`.
 
-The implementation is `apps/web/src/lib/analytics.ts` plus the passive browser adapter. Non-production is disabled, and no PII is accepted by the allowlist.
+The implementation is `apps/web/src/lib/analytics.ts` plus the passive browser adapter. Collection requires the independent explicit gate `PUBLIC_ANALYTICS_ENABLED=true`, `PUBLIC_PLAUSIBLE_DOMAIN`, and `DEPLOYMENT_TARGET=production`; `SITE_INDEXABLE` does not participate. Non-production is disabled, and no PII, full URL, query string, fragment, or referrer is accepted by the allowlist.

@@ -4,7 +4,7 @@ Status: accepted, provider-ready (no provider identifier is configured in this m
 
 ## Decision
 
-Use a small typed event adapter with a Plausible-compatible production provider. It is enabled only when `PUBLIC_PLAUSIBLE_DOMAIN` is present, `DEPLOYMENT_TARGET=production`, and `SITE_INDEXABLE=true`. Therefore the temporary public origin remains noindex and sends no production analytics. Development, preview, Studio, staging, and tests are no-op.
+Use a small typed event adapter with a Plausible-compatible production provider. It is enabled only when `PUBLIC_ANALYTICS_ENABLED=true`, `PUBLIC_PLAUSIBLE_DOMAIN` is present, and `DEPLOYMENT_TARGET=production`. `SITE_INDEXABLE` is deliberately independent: a noindex production candidate may keep analytics off, and an indexable future domain must opt in explicitly. Development, preview, Studio, staging, and tests are no-op by default.
 
 Plausible was selected because its current documentation describes a lightweight script, custom events, no cookies, no persistent identifiers, and no consent banner. It supports UTM attribution and custom properties. See [Plausible docs](https://plausible.io/docs) and [custom events](https://plausible.io/docs/custom-event-goals). Cloudflare Web Analytics is a useful free performance/RUM option, but does not provide the required stable custom business-event vocabulary; GA4 is paid-ready but adds cookie/consent and governance complexity. A custom analytics service is disproportionate for M12.
 

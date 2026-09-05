@@ -1,0 +1,17 @@
+---
+import { normalizeChannels, type ChannelType } from '../lib/profile';
+import type { Locale } from '../lib/i18n';
+
+interface Props { locale: Locale; contacts?: { primaryPhone?: string | null; telegramHandle?: string | null } | null; channels?: Array<{ type?: string | null; label?: string | null; url?: string | null; enabled?: boolean | null; priority?: number | null }> | null; surface?: 'contact' | 'header' | 'footer' | 'about' }
+const { locale, contacts, channels, surface = 'contact' } = Astro.props;
+const labels: Record<Locale, Record<ChannelType, string>> = {
+  ru: { telegram: 'Telegram', viber: 'Viber', phone: 'Телефон', instagram: 'Instagram', facebook: 'Facebook', whatsapp: 'WhatsApp', tiktok: 'TikTok', youtube: 'YouTube' },
+  ro: { telegram: 'Telegram', viber: 'Viber', phone: 'Telefon', instagram: 'Instagram', facebook: 'Facebook', whatsapp: 'WhatsApp', tiktok: 'TikTok', youtube: 'YouTube' },
+  uk: { telegram: 'Telegram', viber: 'Viber', phone: 'Телефон', instagram: 'Instagram', facebook: 'Facebook', whatsapp: 'WhatsApp', tiktok: 'TikTok', youtube: 'YouTube' },
+};
+const actions: Record<Locale, string> = { ru: 'Открыть', ro: 'Deschideți', uk: 'Відкрити' };
+const normalized = normalizeChannels(channels, contacts);
+---
+{normalized.length > 0 && <div class="channel-links" aria-label={locale === 'ro' ? 'Modalități de contact' : locale === 'uk' ? 'Способи зв’язку' : 'Способы связи'}>
+  {normalized.map((channel) => <a class="button" href={channel.value} target={channel.type === 'phone' ? undefined : '_blank'} rel={channel.type === 'phone' ? undefined : 'noopener noreferrer'} data-analytics-event="contact_click" data-analytics-channel={channel.type} data-analytics-locale={locale} data-analytics-surface={surface} aria-label={`${labels[locale][channel.type]}: ${actions[locale]}`}>{channel.label ?? labels[locale][channel.type]} <span aria-hidden="true">→</span></a>)}
+</div>}

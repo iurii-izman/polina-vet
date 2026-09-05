@@ -2,7 +2,7 @@
 
 Still needed from the owner before public channel activation:
 
-- final Telegram URL confirmation, if the existing canonical value changes;
+- Telegram/phone: CURRENT canonical verified values; reconfirm only if owner data changes;
 - Viber URL or phone;
 - Instagram, Facebook, WhatsApp, TikTok, and YouTube URLs if used;
 - Google Business Profile URL/ID only after verified ownership and eligibility.
