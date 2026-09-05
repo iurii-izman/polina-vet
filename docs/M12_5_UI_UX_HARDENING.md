@@ -73,13 +73,17 @@ Footer styling, unrelated spacing, Farm whitespace, header proportions, typograp
 
 ## Release status
 
-## Live candidate evidence
+M12.5 is closed. PR #14 was merged by squash from exact candidate head `7b05dd3b8234e7acc30feced1b89bf16c9154448` at `2026-09-05T18:27:53Z`, producing merge commit `eb7771972a63688cb42e5b1063c7297a9ea7e133`. `main` was fast-forwarded to that merge commit before deployment.
 
-Candidate deployed to `https://lina.aipipeline.cc` on Worker `polina-vet-production`, version `cea6bf28-166e-46ad-a2ec-867a2abf5901`.
+## Live production evidence
+
+Merged `main` deployed to `https://lina.aipipeline.cc` on Worker `polina-vet-production`, version `e6d17804-da25-418e-b717-a40e3228553b`. Production deployment used `SITE_INDEXABLE=false` and `PUBLIC_ANALYTICS_ENABLED=false`.
 
 `VERIFY_ORIGIN=https://lina.aipipeline.cc EXPECT_INDEXABLE=false pnpm verify:origin` passed: 51 routes, 48 sitemap routes, draft isolation PASS, static root redirect, and indexability false.
 
 Post-deploy live checks passed for Home and Knowledge at 1440/390, Home trust at 1440/390, and locale spot checks. RU/RO/UK mobile checks preserved urgent access and measured no overflow; `/ro/contact/` preserved the urgent limitation before contact methods; `/uk/urgent/` preserved the localized urgent action at 320px.
+
+Post-merge live smoke passed on the merged-main deployment: Home trust measured 288×360 at 1440px and 240×300 at 390px with `object-fit: cover`; Knowledge title measures were 718px and 316px with no title overflow; About remained within its independent portrait geometry; all checked viewports had no horizontal overflow. Robots remained noindex and no analytics script was present.
 
 Lighthouse desktop reports for Home, Knowledge, About, and Article each scored Performance 100, Accessibility 100, and Best Practices 100 with CLS 0. Reported LCP was 343ms Home, 330ms Knowledge, 532ms About, and 341ms Article in this run. Lighthouse’s Windows Chrome launcher emitted an EPERM while cleaning its temporary directory on some runs after writing the report; the JSON reports were produced and scores were read successfully.
 
@@ -88,11 +92,11 @@ Temporary after-state evidence is under `output/m12.5-audit/after/` and is inten
 ## PR and CI
 
 PR: https://github.com/iurii-izman/polina-vet/pull/14
-State: OPEN, non-draft, CLEAN, unmerged.
+State: MERGED, non-draft, squash merge.
 
 - GitHub Actions `verify`: PASS (83 E2E and 46 accessibility checks included in the workflow).
 - Cloudflare Workers Builds `polina-vet-staging`: PASS.
-- SonarCloud Code Analysis: PASS; no unresolved issues were returned by the public issue query.
+- SonarCloud Code Analysis: PASS. The two annotated issues are the documented, accepted out-of-scope recommendations in the byte-verified frozen prototype reference.
 - Security Hotspots: no reportable hotspot was surfaced by the PR check; no findings were introduced by this narrow CSS/test/documentation change.
 
-The PR remains open and unmerged.
+The exact-head checks passed before merge. The merge commit is `eb7771972a63688cb42e5b1063c7297a9ea7e133`; deployment and origin verification were performed from merged `main`.
