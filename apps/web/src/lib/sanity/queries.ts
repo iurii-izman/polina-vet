@@ -20,6 +20,7 @@ export const PUBLIC_PROFILE_QUERY = defineQuery(`
       portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }
     },
     contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },
+    channels[]{ type, label, url, enabled, priority },
     location{ label, mapUrl },
     serviceModes,
     availabilityNote,

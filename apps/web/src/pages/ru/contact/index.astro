@@ -2,14 +2,13 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import UrgentBoundary from '../../../components/UrgentBoundary.astro';
+import ChannelLinks from '../../../components/ChannelLinks.astro';
 import { getPublicProfile } from '../../../lib/sanity/content';
-import { safeMapHref, safePhoneHref, safeTelegramHref, serviceModeLabels } from '../../../lib/profile';
+import { safeMapHref, serviceModeLabels } from '../../../lib/profile';
 import { getDraftModeProps } from '../../../lib/sanity/draft-mode';
 const { perspectiveCookie } = import.meta.env.MODE === 'preview' ? await getDraftModeProps(Astro.cookies) : { perspectiveCookie: undefined };
 const profile = await getPublicProfile(perspectiveCookie);
 const contacts = profile?.contacts;
-const phoneHref = safePhoneHref(contacts?.primaryPhone);
-const telegramHref = safeTelegramHref(contacts?.telegramHandle);
 const mapHref = safeMapHref(profile?.location?.mapUrl);
 const serviceModes = (profile?.serviceModes ?? []).filter((mode) => serviceModeLabels[mode]);
 ---
@@ -20,10 +19,9 @@ const serviceModes = (profile?.serviceModes ?? []).filter((mode) => serviceModeL
     {profile?.availabilityNote && <div class="availability-note"><h2>Доступность и выезды</h2><p>{profile.availabilityNote}</p></div>}
     <h2 id="contact-methods-title">Способы связи</h2>
     <div class="contact-grid">
-      {contacts?.primaryPhone && <div class="state-card"><p class="eyebrow">Телефон</p><h3>{contacts.primaryPhone}</h3>{phoneHref && <a class="button" href={phoneHref}>Позвонить</a>}</div>}
-      {contacts?.telegramHandle && <div class="state-card"><p class="eyebrow">Telegram</p><h3>{contacts.telegramHandle}</h3>{telegramHref && <a class="button" href={telegramHref} target="_blank" rel="noopener noreferrer">Написать</a>}</div>}
+      <div class="state-card"><p class="eyebrow">Способы связи</p>{contacts?.primaryPhone && <h3>{contacts.primaryPhone}</h3>}{contacts?.telegramHandle && <h3>{contacts.telegramHandle}</h3>}<ChannelLinks locale="ru" contacts={contacts} channels={profile?.channels} /></div>
       {serviceModes.length > 0 && <div class="state-card"><p class="eyebrow">Форматы обращения</p><ul class="contact-list">{serviceModes.map((mode) => <li>{serviceModeLabels[mode]}</li>)}</ul></div>}
-      {(profile?.location?.label || mapHref) && <div class="state-card"><p class="eyebrow">Место</p>{profile?.location?.label && <h3>{profile.location.label}</h3>}{mapHref && <a class="button button--secondary" href={mapHref} target="_blank" rel="noopener noreferrer">Открыть на карте</a>}</div>}
+      {(profile?.location?.label || mapHref) && <div class="state-card"><p class="eyebrow">Место</p>{profile?.location?.label && <h3>{profile.location.label}</h3>}{mapHref && <a class="button button--secondary" data-analytics-event="map_open" data-analytics-locale="ru" data-analytics-surface="contact" href={mapHref} target="_blank" rel="noopener noreferrer">Открыть на карте</a>}</div>}
     </div>
   </section>
 </BaseLayout>

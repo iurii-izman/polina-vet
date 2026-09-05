@@ -141,6 +141,15 @@ export type SiteSettings = {
     whatsappPhone?: string;
     viberPhone?: string;
   };
+  channels?: Array<{
+    type?:
+      'telegram' | 'viber' | 'phone' | 'instagram' | 'facebook' | 'whatsapp' | 'tiktok' | 'youtube';
+    label?: string;
+    url?: string;
+    enabled?: boolean;
+    priority?: number;
+    _key: string;
+  }>;
   location?: {
     label?: string;
     mapUrl?: string;
@@ -539,7 +548,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: PUBLIC_PROFILE_QUERY
-// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    _id,    title,    defaultLanguage,    primaryAuthor->{      _id, name, role, "slug": slug.current, position, shortBio,      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },      education[]{ institution, field, qualification, note },      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }    },    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },    location{ label, mapUrl },    serviceModes,    availabilityNote,    "featuredKnowledge": featuredKnowledge[]->{      _id, title, summary, "slug": slug.current, language, primaryDomain,      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived    }  }
+// Query: *[_type == "siteSettings" && _id == "siteSettings"][0]{    _id,    title,    defaultLanguage,    primaryAuthor->{      _id, name, role, "slug": slug.current, position, shortBio,      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },      education[]{ institution, field, qualification, note },      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }    },    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },    channels[]{ type, label, url, enabled, priority },    location{ label, mapUrl },    serviceModes,    availabilityNote,    "featuredKnowledge": featuredKnowledge[]->{      _id, title, summary, "slug": slug.current, language, primaryDomain,      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived    }  }
 export type PUBLIC_PROFILE_QUERY_RESULT = {
   _id: 'siteSettings';
   title: string | null;
@@ -591,6 +600,22 @@ export type PUBLIC_PROFILE_QUERY_RESULT = {
     whatsappPhone: string | null;
     viberPhone: string | null;
   } | null;
+  channels: Array<{
+    type:
+      | 'facebook'
+      | 'instagram'
+      | 'phone'
+      | 'telegram'
+      | 'tiktok'
+      | 'viber'
+      | 'whatsapp'
+      | 'youtube'
+      | null;
+    label: string | null;
+    url: string | null;
+    enabled: boolean | null;
+    priority: number | null;
+  }> | null;
   location: {
     label: string | null;
     mapUrl: string | null;
@@ -846,7 +871,7 @@ import '@sanity/client';
 declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage\n  }\n': SITE_SETTINGS_QUERY_RESULT;
-    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage,\n    primaryAuthor->{\n      _id, name, role, "slug": slug.current, position, shortBio,\n      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n      education[]{ institution, field, qualification, note },\n      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }\n    },\n    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },\n    location{ label, mapUrl },\n    serviceModes,\n    availabilityNote,\n    "featuredKnowledge": featuredKnowledge[]->{\n      _id, title, summary, "slug": slug.current, language, primaryDomain,\n      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,\n      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived\n    }\n  }\n': PUBLIC_PROFILE_QUERY_RESULT;
+    '\n  *[_type == "siteSettings" && _id == "siteSettings"][0]{\n    _id,\n    title,\n    defaultLanguage,\n    primaryAuthor->{\n      _id, name, role, "slug": slug.current, position, shortBio,\n      bio[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n      education[]{ institution, field, qualification, note },\n      portrait{ asset, alt, crop, hotspot, "dimensions": asset->metadata.dimensions }\n    },\n    contacts{ primaryPhone, secondaryPhone, telegramHandle, whatsappPhone, viberPhone },\n    channels[]{ type, label, url, enabled, priority },\n    location{ label, mapUrl },\n    serviceModes,\n    availabilityNote,\n    "featuredKnowledge": featuredKnowledge[]->{\n      _id, title, summary, "slug": slug.current, language, primaryDomain,\n      riskLevel, medicalOwner, reviewedBy, medicalRevision, lastMedicalReview,\n      reviewIntervalMonths, "sourceStatuses": sources[]->status, withdrawn, archived\n    }\n  }\n': PUBLIC_PROFILE_QUERY_RESULT;
     '\n  *[_type == "article" && language in ["ru", "ro", "uk"] && defined(slug.current) && defined(primaryDomain) && !archived && defined(title)]\n  { "slug": slug.current, language, primaryDomain, withdrawn, translationGroupId, sourceMedicalRevision, "sourceCurrentMedicalRevision": translatedFrom->medicalRevision }\n': ARTICLE_PATHS_QUERY_RESULT;
     '\n  *[_type == "article" && translationGroupId == $translationGroupId && language in ["ru", "ro", "uk"] && defined(slug.current)]\n  {\n    "slug": slug.current,\n    language,\n    primaryDomain,\n    translationGroupId,\n    "translatedFromId": translatedFrom->_id,\n    "translatedFromLanguage": translatedFrom->language,\n    sourceMedicalRevision,\n    "sourceCurrentMedicalRevision": translatedFrom->medicalRevision,\n    archived,\n    withdrawn,\n    riskLevel,\n    medicalOwner,\n    reviewedBy,\n    lastMedicalReview,\n    reviewIntervalMonths,\n    "sourceStatuses": sources[]->status\n  }\n': ARTICLE_ALTERNATES_QUERY_RESULT;
     '\n  *[_type == "article" && language == $language && primaryDomain == $primaryDomain && slug.current == $slug][0]{\n    _id, title, summary, "slug": slug.current, language, translationGroupId, primaryDomain,\n    medicalOwner->{ _id, name, role }, reviewedBy->{ _id, name, role }, riskLevel,\n    medicalRevision, sourceMedicalRevision, lastMedicalReview, reviewIntervalMonths,\n    sources[]->{ _id, title, url, status, jurisdiction, identifier, supersededBy->{ _id, title, url } },\n    species[]->{ _id, name }, topics[]->{ _id, name }, body[]{ _key, _type, ..., children[]{ _key, _type, text, marks, markDefs } },\n    archived, withdrawn, replacement->{ _id, title, "slug": slug.current, primaryDomain, language },\n    translatedFrom->{ _id, language, medicalRevision }, previousSlugs, seoTitle, seoDescription\n  }\n': ARTICLE_DETAIL_QUERY_RESULT;
