@@ -55,6 +55,7 @@ if (!siteIndexable || draftMode) {
     {Object.entries(resolvedAlternates).map(([lang, href]) => href && <link rel="alternate" hreflang={lang} href={absoluteUrl(href)} />)}
     {siteIndexable && <link rel="alternate" hreflang="x-default" href={absoluteUrl(staticAlternates('/ru/')?.ru ?? '/ru/')} />}
     <meta name="color-scheme" content="light" />
+    <script src="/nav.js" defer></script>
     <title>{title} — {siteTitle}</title>
   </head>
   <body>

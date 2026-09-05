@@ -20,7 +20,4 @@ const items = [
   <Breadcrumbs items={[{ label: 'Ферма', href: route.farm('ru') }, { label: 'Подготовка к приезду ветеринара' }]} />
   <section class="page-intro container"><p class="eyebrow">Ферма · Подготовка</p><h1>Как подготовиться к приезду ветеринара</h1><p class="lead">Подготовленное животное, история болезни и безопасное рабочее место позволяют быстрее перейти к осмотру и снижают риск для животного и людей.</p></section>
   <section class="container page-content" aria-labelledby="before-vet-list-title"><div class="section-heading"><div><p class="eyebrow">Памятка для хозяйства</p><h2 id="before-vet-list-title">Что подготовить заранее</h2></div><p>Используйте чек-лист, чтобы собрать данные о животном, группе и условиях.</p></div><Checklist items={items} /><div class="print-actions"><button class="button button--secondary no-print" type="button" data-print>Распечатать чек-лист</button></div></section>
-  <script>
-    document.querySelector<HTMLButtonElement>('[data-print]')?.addEventListener('click', () => window.print());
-  </script>
 </BaseLayout>

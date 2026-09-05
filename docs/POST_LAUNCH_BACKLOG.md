@@ -2,6 +2,8 @@
 
 Only known, intentionally deferred work is listed here:
 
+- Final-domain activation only: purchase/control `lina.vet`, configure the Cloudflare zone, move the production hostname, validate with indexability off, then enable indexability and complete Search Console/post-launch checks.
+
 - Review and publish appropriate M10 medical drafts, including independent HIGH-risk review.
 - Review and publish RO/UK medical translations when their governance and freshness gates pass.
 - Local SEO/geographic expansion after the core launch is stable.

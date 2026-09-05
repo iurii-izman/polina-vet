@@ -1,9 +1,9 @@
 # POLINA VET M11 launch candidate
 
-Status date: 2026-09-04  
+Status date: 2026-09-05
 Base SHA: `18ac4357c7d1384fca4169707a24120fd47e9a3d`  
 Candidate branch: `feat/launch-candidate-m11`  
-Candidate SHA: `3440ee4`  
+Candidate source: final Git HEAD on `feat/launch-candidate-m11`
 M11 PR: [#10](https://github.com/iurii-izman/polina-vet/pull/10)  
 Temporary launch candidate: `https://lina.aipipeline.cc` (public + noindex)  
 Preferred future final domain: `lina.vet` — NOT YET OWNED  
@@ -12,9 +12,38 @@ The former provisional `lina.md` is abandoned; do not purchase or deploy it.
 
 ## Verdict
 
-**M11 LAUNCH CANDIDATE READY: YES, domain-independent work only**  
-**FINAL DOMAIN GATE: WAITING**  
-**Production launch: NO-GO until the approved domain and deployed-origin gates are complete.**
+**M11 TEMPORARY LAUNCH CANDIDATE READY: YES**
+**Temporary production:** public + noindex at `https://lina.aipipeline.cc`
+**FINAL DOMAIN GATE:** waiting for purchase/control of `lina.vet`
+**M12:** not started.
+
+## M11.5 deployed evidence
+
+- Worker: `polina-vet-production`.
+- Current version: `ca66a2ff-93be-4424-b9f0-f06f2b00f3c0`.
+- HTTPS/public access: PASS. Staging, Preview, and Studio remain Cloudflare Access protected.
+- Live origin verifier: PASS (`routes=51`, `sitemapRoutes=48`, `draftIsolation=PASS`, `indexable=false`).
+- Live headers: CSP, Referrer-Policy, X-Content-Type-Options, X-Robots-Tag, and Permissions-Policy present.
+- Live Lighthouse representative homes: Performance 100, Accessibility 100, Best Practices 100; LCP 1.2–1.3s; CLS 0. SEO remains intentionally reduced by noindex.
+- Production is static-assets-only and published-perspective-only; no Viewer token, preview secret, Visual Editing runtime, credentials, or private data is bundled.
+- M10 deferred draft isolation: **CLOSED / PASS**. The selected draft remains absent from Knowledge, Pets discovery, direct public route content, and sitemap; current remote state remains draft-only.
+- `lina.md` is abandoned and appears only in the historical note below.
+
+## Release path and rollback
+
+`feat/launch-candidate-m11` source → `pnpm release:validate` → production web build with `SITE_URL=https://lina.aipipeline.cc`, `SITE_INDEXABLE=false`, `DEPLOYMENT_TARGET=production` → `pnpm exec wrangler deploy --config apps/web/wrangler.production.jsonc`.
+
+Current known-good version is `ca66a2ff-93be-4424-b9f0-f06f2b00f3c0`. Roll back in Cloudflare Workers deployment history for `polina-vet-production` to the previous known-good version, then rerun HTTPS, headers, canonical/robots/sitemap, root/404, and draft-isolation verification.
+
+## Final-domain activation runbook
+
+1. Purchase `lina.vet` and configure its Cloudflare zone.
+2. Move the production custom domain from `lina.aipipeline.cc` to `lina.vet`.
+3. Rebuild with `SITE_URL=https://lina.vet`, `SITE_INDEXABLE=false`, `DEPLOYMENT_TARGET=production`.
+4. Deploy and run `verify:origin` against `lina.vet`; repeat draft isolation and smoke/Lighthouse checks.
+5. Set `SITE_INDEXABLE=true`, rebuild, and redeploy.
+6. Verify robots, X-Robots-Tag, canonical, hreflang, sitemap, cache, and post-launch routes.
+7. Configure Google Search Console, submit the sitemap, run post-launch smoke, and create the `v1.0.0` tag.
 
 ## Content and safety
 
