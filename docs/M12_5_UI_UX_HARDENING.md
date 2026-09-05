@@ -12,13 +12,22 @@ Approved decisions retained:
 - The real Polina photograph and forest trust-layer concept remain unchanged.
 - The sticky-header duplication in the old full-page focus capture is a capture artifact and was not fixed.
 
+## Sonar review
+
+The PR annotation reported two new issues, both in the byte-verified frozen prototype reference rather than production code:
+
+1. Rule/title: accessible name should be part of the visible label; issue key `AaByok0DwSzpTW4LP3W1`; `docs/reference/prototype-v1.2/POLINA_VET_High_Fidelity_Prototype_v1.2_FROZEN.html:31`; severity unspecified in the annotation. The frozen prototype language button uses visible `RU` plus an accessible label “Выбрать язык”. This is a valid generic accessibility recommendation for the standalone prototype, but it is not a production defect and changing it would invalidate the required reference SHA-256.
+2. Rule/title: use `<dialog>` instead of `role="dialog"`; issue key `AaByok0DwSzpTW4LP3W2`; `docs/reference/prototype-v1.2/POLINA_VET_High_Fidelity_Prototype_v1.2_FROZEN.html:39`; severity unspecified in the annotation. The prototype’s static demonstration sheet is not the production language component; changing the frozen artifact is prohibited and would invalidate its required SHA-256.
+
+Resolution: no code suppression and no source change. These are documented, narrow, accepted out-of-scope findings. Sonar’s final PR check reports Quality Gate PASS, 0 Security Hotspots, and no reportable unresolved production issues.
+
 ## K-001 — Knowledge title measure
 
 Before: representative cards were approximately 760px wide at 1440px and 358px wide at 390px, while `.knowledge-card h3` was capped at 208px by a selector shared with task-card titles.
 
 After: task-card titles retain the 13rem compact measure; Knowledge headings use the available card measure with 2.5rem of internal right clearance for the arrow affordance. The single-column list, card padding, summaries, order, and H3 typography remain unchanged. The expected representative title widths are approximately 718px at 1440px and 316px at 390px.
 
-Regression protection checks the relationship rather than a pixel-perfect value: title width must exceed 208px, remain inside the card, and produce no horizontal overflow at 1440, 390, and 320px.
+Regression protection checks the relationship rather than a pixel-perfect value: title width must exceed 208px, remain inside the card, and produce no horizontal overflow at 1440, 390, and 320px. These critical visual invariants are CI-enforced through the Playwright smoke suite.
 
 ## IMG-001 — Home trust portrait geometry
 
@@ -26,7 +35,7 @@ Before: the Home trust portrait rendered at approximately 176×1402px at 1440px,
 
 After: the trust-specific portrait uses a bounded responsive frame with `object-fit: cover`, `object-position: center 20%`, and an approximately 4:5 geometry: 288×360px on desktop and 240×300px on narrow mobile. The real image, crop direction, trust copy, mini-cards, and forest section remain unchanged.
 
-Regression protection checks portrait ratio bounds, `object-fit: cover`, and no horizontal overflow at 1440, 390, and 320px. About remains a regression control and is not modified.
+Regression protection checks portrait ratio bounds, `object-fit: cover`, and no horizontal overflow at 1440, 390, and 320px. These critical visual invariants are CI-enforced through the Playwright smoke suite. About remains a regression control and is not modified.
 
 ## Visual regression baseline
 
@@ -43,7 +52,7 @@ The small stable Playwright baseline contains 10 viewport snapshots:
 - Article 390
 - Language menu open 1440
 
-Snapshots use deterministic viewports, `prefers-reduced-motion: reduce`, loaded fonts, disabled animations, and viewport captures rather than stitched full-page captures. K-001 and IMG-001 also have bounding-box assertions.
+Snapshots use deterministic viewports, `prefers-reduced-motion: reduce`, loaded fonts, disabled animations, and viewport captures rather than stitched full-page captures. They are a local/manual visual reference, not a GitHub CI gate. CI enforces the critical visual invariants through smoke assertions; K-001 and IMG-001 also have bounding-box assertions.
 
 ## Validation
 
@@ -78,7 +87,6 @@ Temporary after-state evidence is under `output/m12.5-audit/after/` and is inten
 
 ## PR and CI
 
-Final candidate HEAD: `419123a` (documentation-only release evidence update on top of the implementation commit).
 PR: https://github.com/iurii-izman/polina-vet/pull/14
 State: OPEN, non-draft, CLEAN, unmerged.
 
