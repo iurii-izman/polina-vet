@@ -20,10 +20,10 @@ const serviceModes = (profile?.serviceModes ?? []).filter((mode) => serviceModeL
     {profile?.availabilityNote && <div class="availability-note"><h2>Доступность и выезды</h2><p>{profile.availabilityNote}</p></div>}
     <h2 id="contact-methods-title">Способы связи</h2>
     <div class="contact-grid">
-      {contacts?.primaryPhone && <div class="state-card"><p class="eyebrow">Телефон</p><h3>{contacts.primaryPhone}</h3>{phoneHref && <a class="button" href={phoneHref}>Позвонить</a>}</div>}
-      {contacts?.telegramHandle && <div class="state-card"><p class="eyebrow">Telegram</p><h3>{contacts.telegramHandle}</h3>{telegramHref && <a class="button" href={telegramHref} target="_blank" rel="noopener noreferrer">Написать</a>}</div>}
+      {contacts?.primaryPhone && <div class="state-card"><p class="eyebrow">Телефон</p><h3>{contacts.primaryPhone}</h3>{phoneHref && <a class="button" data-analytics-event="contact_click" data-analytics-channel="phone" data-analytics-locale="ru" data-analytics-surface="contact" href={phoneHref}>Позвонить</a>}</div>}
+      {contacts?.telegramHandle && <div class="state-card"><p class="eyebrow">Telegram</p><h3>{contacts.telegramHandle}</h3>{telegramHref && <a class="button" data-analytics-event="contact_click" data-analytics-channel="telegram" data-analytics-locale="ru" data-analytics-surface="contact" href={telegramHref} target="_blank" rel="noopener noreferrer">Написать</a>}</div>}
       {serviceModes.length > 0 && <div class="state-card"><p class="eyebrow">Форматы обращения</p><ul class="contact-list">{serviceModes.map((mode) => <li>{serviceModeLabels[mode]}</li>)}</ul></div>}
-      {(profile?.location?.label || mapHref) && <div class="state-card"><p class="eyebrow">Место</p>{profile?.location?.label && <h3>{profile.location.label}</h3>}{mapHref && <a class="button button--secondary" href={mapHref} target="_blank" rel="noopener noreferrer">Открыть на карте</a>}</div>}
+      {(profile?.location?.label || mapHref) && <div class="state-card"><p class="eyebrow">Место</p>{profile?.location?.label && <h3>{profile.location.label}</h3>}{mapHref && <a class="button button--secondary" data-analytics-event="map_open" data-analytics-locale="ru" data-analytics-surface="contact" href={mapHref} target="_blank" rel="noopener noreferrer">Открыть на карте</a>}</div>}
     </div>
   </section>
 </BaseLayout>

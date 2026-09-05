@@ -29,7 +29,9 @@
     "test:a11y": "pnpm --filter @polina-vet/web test:a11y",
     "preview:check": "pnpm --filter @polina-vet/web preview:check",
     "preview:cloudflare:check": "pnpm --filter @polina-vet/web preview:cloudflare:check",
-    "release:validate": "node scripts/validate-release.mjs && pnpm build && node scripts/validate-seo.mjs"
+    "release:validate": "node scripts/validate-release.mjs && pnpm build && node scripts/validate-seo.mjs",
+    "growth:link": "node scripts/growth-link.mjs",
+    "test:growth": "node --test scripts/growth-link.test.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.6"

@@ -35,6 +35,50 @@ export const siteSettings = defineType({
     }),
     defineField({ name: 'contacts', title: 'Контакты', type: 'object', fields: contactFields }),
     defineField({
+      name: 'channels',
+      title: 'Публичные каналы',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'type',
+              title: 'Тип',
+              type: 'string',
+              options: {
+                list: [
+                  'telegram',
+                  'viber',
+                  'phone',
+                  'instagram',
+                  'facebook',
+                  'whatsapp',
+                  'tiktok',
+                  'youtube',
+                ],
+              },
+            }),
+            defineField({ name: 'label', title: 'Название', type: 'string' }),
+            defineField({ name: 'url', title: 'URL или значение', type: 'string' }),
+            defineField({
+              name: 'enabled',
+              title: 'Показывать',
+              type: 'boolean',
+              initialValue: false,
+            }),
+            defineField({
+              name: 'priority',
+              title: 'Приоритет',
+              type: 'number',
+              validation: (Rule) => Rule.integer().min(1).max(99),
+            }),
+          ],
+        }),
+      ],
+      validation: (Rule) => Rule.unique(),
+    }),
+    defineField({
       name: 'location',
       title: 'Место работы',
       type: 'object',
