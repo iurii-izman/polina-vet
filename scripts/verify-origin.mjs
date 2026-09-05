@@ -38,12 +38,11 @@ export function assertNoDraft(body, path) {
 }
 
 function attributes(tag) {
-  return Object.fromEntries(
-    [...tag.matchAll(/([\w:-]+)\s*=\s*("[^"]*"|'[^']*')/g)].map((match) => [
-      match[1].toLowerCase(),
-      match[2].slice(1, -1),
-    ]),
-  );
+  const matches = [
+    ...tag.matchAll(/([A-Za-z0-9_:-]+)\s*=\s*"([^"]*)"/g),
+    ...tag.matchAll(/([A-Za-z0-9_:-]+)\s*=\s*'([^']*)'/g),
+  ];
+  return Object.fromEntries(matches.map((match) => [match[1].toLowerCase(), match[2]]));
 }
 
 export function inspectHtml(body, url, headers, indexable) {
