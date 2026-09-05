@@ -19,7 +19,7 @@ const serviceModes = (profile?.serviceModes ?? []).filter((mode) => serviceModeL
     {profile?.availabilityNote && <div class="availability-note"><h2>Доступность и выезды</h2><p>{profile.availabilityNote}</p></div>}
     <h2 id="contact-methods-title">Способы связи</h2>
     <div class="contact-grid">
-      <div class="state-card"><p class="eyebrow">Способы связи</p><ChannelLinks locale="ru" contacts={contacts} channels={profile?.channels} /></div>
+      <div class="state-card"><p class="eyebrow">Способы связи</p>{contacts?.primaryPhone && <h3>{contacts.primaryPhone}</h3>}{contacts?.telegramHandle && <h3>{contacts.telegramHandle}</h3>}<ChannelLinks locale="ru" contacts={contacts} channels={profile?.channels} /></div>
       {serviceModes.length > 0 && <div class="state-card"><p class="eyebrow">Форматы обращения</p><ul class="contact-list">{serviceModes.map((mode) => <li>{serviceModeLabels[mode]}</li>)}</ul></div>}
       {(profile?.location?.label || mapHref) && <div class="state-card"><p class="eyebrow">Место</p>{profile?.location?.label && <h3>{profile.location.label}</h3>}{mapHref && <a class="button button--secondary" data-analytics-event="map_open" data-analytics-locale="ru" data-analytics-surface="contact" href={mapHref} target="_blank" rel="noopener noreferrer">Открыть на карте</a>}</div>}
     </div>

@@ -1,10 +1,5 @@
 # M12 external inputs
 
-Still needed from the owner before public channel activation:
+External activation inputs moved to R2: [R2_EXTERNAL_CHANNELS_ACTIVATION.md](R2_EXTERNAL_CHANNELS_ACTIVATION.md) and [GitHub issue #12](https://github.com/iurii-izman/polina-vet/issues/12).
 
-- Telegram/phone: CURRENT canonical verified values; reconfirm only if owner data changes;
-- Viber URL or phone;
-- Instagram, Facebook, WhatsApp, TikTok, and YouTube URLs if used;
-- Google Business Profile URL/ID only after verified ownership and eligibility.
-
-Unset channels must remain absent from the UI. No placeholder URLs or handles are used.
+Telegram, phone, and map/location are CURRENT verified project values. Future channels, Google Business, and optional Plausible activation remain unconfigured and fail closed until owner-controlled values are supplied.

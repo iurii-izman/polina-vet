@@ -8,4 +8,8 @@
 - Geo/local SEO/GBP/content/dashboard: documented with audience/service distinction, no doorway pages, no account invention, and human medical approval.
 - R1: unchanged; temporary production remains PUBLIC + NOINDEX. M10 drafts remain isolated. M13 not started.
 - Channel renderer: shared normalized renderer for verified Telegram/phone plus enabled, valid registry channels in RU/RO/UK contact surfaces.
-- Validation and live checks: pending final implementation pass and candidate deployment.
+- Closure rule: M12 is complete with analytics OFF, future channels unconfigured, and GBP uncreated when implementation, fail-closed behavior, privacy/security, live candidate, and R2 tracking are complete.
+- R2: OPEN / WAITING FOR OWNER-CONTROLLED EXTERNAL ACCOUNTS; tracked in GitHub issue #12 and does not block M12.
+- Validation: content, M10, growth, full check, Sanity verification, preview, release validation, E2E `81/81`, and accessibility `46/46` PASS.
+- Live candidate: `https://lina.aipipeline.cc`, Worker `polina-vet-production`, version `116aee29-f32f-4516-9b82-7ad598a4aecc`; `verify:origin` PASS, `indexable=false`, draft isolation PASS, 51 routes/48 sitemap routes, no localhost leakage, analytics OFF, CSP and `X-Robots-Tag` present.
+- R2: OPEN / WAITING FOR OWNER-CONTROLLED EXTERNAL ACCOUNTS; tracked in GitHub issue #12 and does not block M12.
