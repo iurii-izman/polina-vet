@@ -13,12 +13,16 @@
   --surface-farm: var(--color-forest-soft);
   --surface-pet: var(--color-pet-soft);
   --surface-urgent: var(--color-terracotta-soft);
+  --surface-context: #edf0e8;
   --text-main: #252823;
   --text-muted: #646b63;
   --text-on-dark: #f4f5ef;
+  --text-on-dark-muted: #dbe4dc;
+  --text-on-dark-subtle: #bfd0c3;
+  --text-on-urgent: #fffaf7;
   --border-subtle: #d8d0c3;
   --border-strong: #b9ae9c;
-  --shadow-card: 0 14px 34px rgb(37 40 35 / 9%);
+  --shadow-card: 0 10px 24px rgb(37 40 35 / 7%);
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -30,11 +34,14 @@
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
+  --space-section: clamp(3.5rem, 7vw, 5.5rem);
+  --space-intro: clamp(3.25rem, 7vw, 6.25rem);
   --radius-sm: 0.75rem;
   --radius-md: 1.125rem;
   --radius-lg: 1.75rem;
   --radius-pill: 999px;
   --content-width-wide: 1220px;
+  --content-width-section: 1020px;
   --content-width-readable: 760px;
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: Georgia, Cambria, 'Times New Roman', serif;
@@ -42,4 +49,7 @@
   --font-size-lead: 1.25rem;
   --line-height-body: 1.55;
   --line-height-heading: 1.08;
+  --font-size-display: clamp(3.25rem, 5vw, 4rem);
+  --font-size-page-title: clamp(2.8rem, 4.4vw, 3.7rem);
+  --font-size-article-title: clamp(2.55rem, 4vw, 3.55rem);
 }

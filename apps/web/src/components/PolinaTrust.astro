@@ -20,7 +20,7 @@ const portraitImage = portrait
 ---
 
 <section class="container trust-block">
-  <div>
+  <div class="trust-block__identity">
     <p class="eyebrow">Кто готовит материалы</p>
     {portraitImage?.src && <img class="trust-block__portrait" src={portraitImage.src} alt={portraitImage.alt} width={portraitImage.width} height={portraitImage.height} loading="lazy" />}
     <h2>{author?.name ?? 'Полина'}</h2>
@@ -28,8 +28,8 @@ const portraitImage = portrait
     {author?.shortBio && <p>{author.shortBio}</p>}
     <a class="button button--light" href={route.about(locale)}>О Полине <span aria-hidden="true">→</span></a>
   </div>
-  <div>
-    <p>POLINA VET собирает практические материалы, которые помогают понять ситуацию, подготовиться к обращению и выбрать следующий шаг.</p>
+  <div class="trust-block__content">
+    <p class="trust-block__intro">POLINA VET собирает практические материалы, которые помогают понять ситуацию, подготовиться к обращению и выбрать следующий шаг.</p>
     <div class="trust-block__details">
       <div class="trust-detail"><b>Практический контекст</b><br /><small>Задачи владельцев животных и хозяйств.</small></div>
       <div class="trust-detail"><b>Проверяемые источники</b><br /><small>Источники для медицински значимых материалов.</small></div>

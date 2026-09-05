@@ -15,7 +15,7 @@ const serviceModes = (profile?.serviceModes ?? []).filter((mode) => serviceModeL
 <BaseLayout title="Контакты и доступность" locale="ru">
   <Breadcrumbs items={[{ label: 'Контакты и доступность' }]} />
   <section class="page-intro container"><p class="eyebrow">Контакты</p><h1>Контакты и доступность</h1><p class="lead">Актуальные способы связи и пояснение, по каким вопросам и в какое время ими можно пользоваться.</p><UrgentBoundary /></section>
-  <section class="container page-content section contact-page" aria-labelledby="contact-methods-title">
+  <section class="container content-width-section section contact-page" aria-labelledby="contact-methods-title">
     {profile?.availabilityNote && <div class="availability-note"><h2>Доступность и выезды</h2><p>{profile.availabilityNote}</p></div>}
     <h2 id="contact-methods-title">Способы связи</h2>
     <div class="contact-grid">
