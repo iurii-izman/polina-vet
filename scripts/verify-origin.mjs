@@ -37,38 +37,53 @@ export function assertNoDraft(body, path) {
   }
 }
 
+const isWhitespace = (character) =>
+  character === ' ' || character === '\t' || character === '\n' || character === '\r';
+const isAttributeCharacter = (character) =>
+  (character >= 'A' && character <= 'Z') ||
+  (character >= 'a' && character <= 'z') ||
+  (character >= '0' && character <= '9') ||
+  character === '_' ||
+  character === ':' ||
+  character === '-';
+
+function skipWhitespace(tag, index) {
+  while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
+  return index;
+}
+
+function readAttributeName(tag, index) {
+  const start = index;
+  while (index < tag.length - 1 && isAttributeCharacter(tag[index])) index += 1;
+  return { index, name: start === index ? null : tag.slice(start, index).toLowerCase() };
+}
+
+function readQuotedValue(tag, index) {
+  const quote = tag[index];
+  if (quote !== '"' && quote !== "'") return null;
+  const start = index + 1;
+  index = start;
+  while (index < tag.length - 1 && tag[index] !== quote) index += 1;
+  return { index: index + 1, value: tag.slice(start, index) };
+}
+
 function attributes(tag) {
   const result = {};
-  const isWhitespace = (character) =>
-    character === ' ' || character === '\t' || character === '\n' || character === '\r';
-  const isAttributeCharacter = (character) =>
-    (character >= 'A' && character <= 'Z') ||
-    (character >= 'a' && character <= 'z') ||
-    (character >= '0' && character <= '9') ||
-    character === '_' ||
-    character === ':' ||
-    character === '-';
   let index = 1;
   while (index < tag.length - 1) {
-    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
-    const nameStart = index;
-    while (index < tag.length - 1 && isAttributeCharacter(tag[index])) index += 1;
-    if (index === nameStart) {
+    index = skipWhitespace(tag, index);
+    const attribute = readAttributeName(tag, index);
+    index = attribute.index;
+    if (!attribute.name) {
       index += 1;
       continue;
     }
-    const name = tag.slice(nameStart, index).toLowerCase();
-    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
+    index = skipWhitespace(tag, index);
     if (tag[index] !== '=') continue;
-    index += 1;
-    while (index < tag.length - 1 && isWhitespace(tag[index])) index += 1;
-    const quote = tag[index];
-    if (quote !== '"' && quote !== "'") continue;
-    index += 1;
-    const valueStart = index;
-    while (index < tag.length - 1 && tag[index] !== quote) index += 1;
-    result[name] = tag.slice(valueStart, index);
-    index += 1;
+    const value = readQuotedValue(tag, skipWhitespace(tag, index + 1));
+    if (!value) continue;
+    result[attribute.name] = value.value;
+    index = value.index;
   }
   return result;
 }
