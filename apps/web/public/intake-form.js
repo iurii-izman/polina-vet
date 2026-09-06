@@ -16,7 +16,11 @@
 
   function createIdempotencyKey() {
     const randomUuid = globalThis.crypto?.randomUUID?.();
-    return `web-${randomUuid || `${Date.now()}-${Math.random().toString(36).slice(2)}`}`;
+    if (randomUuid) return `web-${randomUuid}`;
+    const bytes = new Uint8Array(16);
+    globalThis.crypto?.getRandomValues?.(bytes);
+    const fallback = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    return `web-${fallback}-${Date.now()}`;
   }
 
   function setSubmitting(value) {

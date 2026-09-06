@@ -5,7 +5,6 @@ import {
   json,
   listInquiries,
   markContacted,
-  parseAllowedOrigins,
   privateHeaders,
   purgeExpired,
   safeLog,
