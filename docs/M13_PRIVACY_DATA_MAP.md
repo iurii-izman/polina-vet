@@ -1,6 +1,6 @@
 # M13 Privacy Data Map
 
-This is an implementation map, not a legal conclusion. Final controller/notice wording requires owner approval.
+This is an implementation map, not a legal conclusion. The canonical public notice is version `1.0`; the remaining activation gate is the specific Article 22 operator-notification prerequisite documented in `M13_PMR_PRIVACY_CHECK.md`.
 
 | Data | Why | Store | Access | Retention/handling |
 |---|---|---|---|---|

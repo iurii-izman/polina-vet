@@ -1,6 +1,6 @@
 # ADR-M13: private intake and lightweight operations foundation
 
-Status: accepted for implementation; production activation gated
+Status: accepted for implementation; production activation gated by Article 22 notification
 
 ## Decision
 
@@ -13,7 +13,7 @@ Keep the public Astro site static-first and introduce two isolated Cloudflare Wo
 
 The D1 database is named `polina-vet-operations` conceptually and is isolated per local, staging, and production environment. Migrations are versioned under `apps/intake/migrations/0001_init/migration.sql`. Production migrations remain explicit operator actions.
 
-Public activation is fail-closed with `PUBLIC_INTAKE_ENABLED=false` until privacy approval, a real D1 binding, Access verification, Turnstile verification, native rate limiting, retention, notification fallback/reliability, and production smoke checks are complete.
+Public activation is fail-closed with `PUBLIC_INTAKE_ENABLED=false` until the approved privacy notice, Article 22 operator notification evidence, a real D1 binding, Access verification, Turnstile verification, native rate limiting, retention, notification fallback/reliability, and production smoke checks are complete.
 
 ## Important alternatives rejected
 

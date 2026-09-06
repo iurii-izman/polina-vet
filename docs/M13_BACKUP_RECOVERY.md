@@ -10,6 +10,6 @@ Before a production migration:
 4. verify schema, indexes, and a synthetic smoke record without using real PII;
 5. stop and investigate if verification fails.
 
-Inspect: `wrangler d1 info polina-vet-operations-production`. Retrieve a bookmark with `wrangler d1 time-travel info polina-vet-operations-production --timestamp=<RFC3339>`. Restore only after an incident decision and explicit operator confirmation; restore is destructive in place. For recovery beyond the Time Travel window, an owner-approved export strategy is required; M13 does not add a second backup platform.
+Inspect: `wrangler d1 info polina-vet-operations-production`. Retrieve a bookmark with `wrangler d1 time-travel info polina-vet-operations-production --timestamp=<RFC3339>`. Restore only after an incident decision and explicit operator confirmation; restore is destructive in place. For recovery beyond the Time Travel window, an owner-approved export strategy is required; M13 does not add a second backup platform. Retention deletion is separate from recovery and follows the manual request procedure plus the scheduled 365-day purge.
 
 Local and staging D1 are separate from production. Production data must never be copied into local, tests, or CI.

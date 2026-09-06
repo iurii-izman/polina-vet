@@ -24,7 +24,7 @@
   "vars": {
     "ENVIRONMENT": "staging",
     "PUBLIC_INTAKE_ENABLED": "false",
-    "PRIVACY_NOTICE_VERSION": "M13-DRAFT-1",
+    "PRIVACY_NOTICE_VERSION": "1.0",
     "ALLOWED_ORIGINS": "https://polina-vet-dev.aipipeline.cc",
   },
   "triggers": { "crons": ["17 * * * *"] },
@@ -51,7 +51,7 @@
       "vars": {
         "ENVIRONMENT": "staging",
         "PUBLIC_INTAKE_ENABLED": "false",
-        "PRIVACY_NOTICE_VERSION": "M13-DRAFT-1",
+        "PRIVACY_NOTICE_VERSION": "1.0",
         "ALLOWED_ORIGINS": "https://polina-vet-dev.aipipeline.cc",
         "OFFICE_URL": "https://office-polina-vet.aipipeline.cc",
       },
@@ -78,8 +78,9 @@
       "vars": {
         "ENVIRONMENT": "production",
         "PUBLIC_INTAKE_ENABLED": "false",
-        "PRIVACY_NOTICE_VERSION": "M13-APPROVED-REQUIRED",
+        "PRIVACY_NOTICE_VERSION": "1.0",
         "ALLOWED_ORIGINS": "https://lina.aipipeline.cc",
+        "OFFICE_URL": "https://office.lina.aipipeline.cc",
       },
     },
   },

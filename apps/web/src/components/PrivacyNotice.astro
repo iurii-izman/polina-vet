@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { route, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = {
+  ru: {
+    eyebrow: 'Конфиденциальность', title: 'Уведомление об обработке персональных данных', version: 'Версия 1.0 · утверждено 6 сентября 2026 года',
+    operator: 'Ответственное лицо', operatorText: 'Изман Полина Андреевна / POLINA VET. POLINA VET — профессиональный проект, а не отдельное юридическое лицо.',
+    contact: 'Контакт по вопросам приватности', contactText: 'Пишите на lina.vet@gmail.com по вопросам доступа, исправления, удаления или отзыва согласия.',
+    what: 'Какие сведения получает форма', whatText: 'Имя; выбранный способ и значение контакта; местность; необязательный адрес; контекст «домашнее животное» или «ферма»; вид животного; краткое описание ситуации; язык формы; операционные дата, время, статус и номер обращения; разрешённые поля кампании; а также технические сведения, необходимые для защиты и предотвращения повторной отправки.',
+    why: 'Для чего они нужны', whyText: 'Чтобы получить ветеринарное обращение, понять его общий контекст, связаться с человеком, согласовать следующий практический шаг и хранить минимальную операционную историю для последующей работы. Мы не используем эти сведения для маркетинга или профилирования.',
+    boundaries: 'Границы формы', boundariesText: 'Отправка формы не подтверждает запись, не является экстренным чатом и не гарантирует немедленный ответ. Если состояние животного быстро ухудшается или кажется срочным, используйте самый быстрый доступный путь ветеринарной помощи и не ждите ответа в мессенджере.',
+    access: 'Доступ и техническая инфраструктура', accessText: 'Доступ к обращению имеют только Полина и технический администратор, уполномоченные для операционной работы M13. Форма работает через Cloudflare Workers и D1. Операционные уведомления в Telegram содержат только публичный номер обращения, контекст, местность и защищённую ссылку на Office; в них нет имени, контакта, адреса, описания или медицинских подробностей.',
+    retention: 'Срок хранения', retentionText: 'Самостоятельные закрытые обращения хранятся до 12 месяцев с даты закрытия. Ранее удаление или исправление возможно по обоснованному запросу, если нет требования закона или разумной необходимости разрешить активный спор или запрос. Открытые обращения могут храниться, пока это необходимо для работы.',
+    rights: 'Запрос субъекта данных', rightsText: 'Для доступа к своим данным, исправления, удаления или отзыва согласия отправьте запрос на lina.vet@gmail.com. После проверки личности технический администратор или Полина вручную найдут обращение по безопасному идентификатору и выполнят действие, если нет основания продолжать обработку. Не отправляйте в форме лишние сведения о здоровье человека, пароли, платёжные или карточные данные, документы, удостоверяющие личность, и другие чувствительные данные.',
+    security: 'Минимизация и безопасность', securityText: 'Мы просим только сведения, необходимые для обращения, ограничиваем доступ, используем защитные меры и удаляем данные по сроку. Ни одна система не может обещать абсолютную безопасность, поэтому не включайте в свободное описание лишние чувствительные сведения.', formLink: 'Вернуться к форме обращения',
+  },
+  ro: {
+    eyebrow: 'Confidențialitate', title: 'Notificare privind prelucrarea datelor cu caracter personal', version: 'Versiunea 1.0 · aprobată la 6 septembrie 2026',
+    operator: 'Persoana responsabilă', operatorText: 'Izman Polina Andreevna / POLINA VET. POLINA VET este un proiect profesional, nu o entitate juridică separată.',
+    contact: 'Contact pentru confidențialitate', contactText: 'Scrieți la lina.vet@gmail.com pentru acces, corectare, ștergere sau retragerea consimțământului.',
+    what: 'Ce informații primește formularul', whatText: 'Numele; metoda și valoarea de contact preferate; localitatea; adresa opțională; contextul „animal de companie” sau „fermă”; specia; descrierea scurtă a situației; limba formularului; data, ora, starea și numărul operațional al solicitării; câmpuri de campanie permise; precum și datele tehnice strict necesare pentru securitate și prevenirea retrimiterilor.',
+    why: 'De ce sunt necesare', whyText: 'Pentru a primi o solicitare veterinară, a-i înțelege contextul de bază, a contacta persoana, a coordona următorul pas practic și a păstra un istoric operațional minim. Nu folosim aceste informații pentru marketing sau profilare.',
+    boundaries: 'Limitele formularului', boundariesText: 'Trimiterea formularului nu confirmă o programare, nu este un chat de urgență și nu garantează un răspuns imediat. Dacă starea animalului se agravează rapid sau pare urgentă, folosiți cea mai rapidă cale disponibilă de ajutor veterinar și nu așteptați răspunsul într-un mesager.',
+    access: 'Acces și infrastructură tehnică', accessText: 'Accesul la solicitare îl au doar Polina și administratorul tehnic, autorizați pentru activitatea operațională M13. Formularul folosește Cloudflare Workers și D1. Notificările operaționale Telegram conțin doar numărul public al solicitării, contextul, localitatea și un link protejat către Office; nu conțin numele, contactul, adresa, descrierea sau detalii medicale.',
+    retention: 'Păstrare', retentionText: 'Solicitările independente închise sunt păstrate până la 12 luni de la închidere. Ștergerea sau corectarea mai devreme este posibilă la o cerere justificată, dacă nu există o obligație legală sau o necesitate rezonabilă de a soluționa un litigiu ori o cerere activă. Solicitările deschise pot fi păstrate cât timp este necesar operațional.',
+    rights: 'Cererea persoanei vizate', rightsText: 'Pentru acces, corectare, ștergere sau retragerea consimțământului, trimiteți cererea la lina.vet@gmail.com. După verificarea identității, administratorul tehnic sau Polina va găsi manual solicitarea printr-un identificator sigur și va efectua acțiunea când nu există un temei pentru continuarea prelucrării. Nu introduceți informații umane sensibile inutile, parole, date de plată/card sau acte de identitate.',
+    security: 'Minimizare și securitate', securityText: 'Solicităm doar datele necesare, limităm accesul, aplicăm măsuri de protecție și ștergem datele la expirarea perioadei. Niciun sistem nu poate garanta securitate absolută; nu includeți în descriere date sensibile inutile.', formLink: 'Înapoi la formular',
+  },
+  uk: {
+    eyebrow: 'Конфіденційність', title: 'Повідомлення про обробку персональних даних', version: 'Версія 1.0 · затверджено 6 вересня 2026 року',
+    operator: 'Відповідальна особа', operatorText: 'Ізман Поліна Андріївна / POLINA VET. POLINA VET — професійний проєкт, а не окрема юридична особа.',
+    contact: 'Контакт щодо конфіденційності', contactText: 'Пишіть на lina.vet@gmail.com щодо доступу, виправлення, видалення або відкликання згоди.',
+    what: 'Які відомості отримує форма', whatText: 'Ім’я; обраний спосіб і значення контакту; місцевість; необов’язкова адреса; контекст «домашня тварина» або «ферма»; вид тварини; короткий опис ситуації; мова форми; операційні дата, час, статус і номер звернення; дозволені поля кампанії; а також технічні відомості, необхідні для захисту й запобігання повторному надсиланню.',
+    why: 'Для чого вони потрібні', whyText: 'Щоб отримати ветеринарне звернення, зрозуміти його основний контекст, зв’язатися з людиною, узгодити наступний практичний крок і зберігати мінімальну операційну історію для подальшої роботи. Ми не використовуємо ці відомості для маркетингу чи профілювання.',
+    boundaries: 'Межі форми', boundariesText: 'Надсилання форми не підтверджує запис, не є екстреним чатом і не гарантує негайної відповіді. Якщо стан тварини швидко погіршується або здається терміновим, скористайтеся найшвидшим доступним шляхом ветеринарної допомоги та не чекайте відповіді в месенджері.',
+    access: 'Доступ і технічна інфраструктура', accessText: 'Доступ до звернення мають лише Поліна та технічний адміністратор, уповноважені для операційної роботи M13. Форма працює через Cloudflare Workers і D1. Операційні сповіщення в Telegram містять лише публічний номер звернення, контекст, місцевість і захищене посилання на Office; у них немає імені, контакту, адреси, опису чи медичних подробиць.',
+    retention: 'Строк зберігання', retentionText: 'Окремі закриті звернення зберігаються до 12 місяців від дати закриття. Раніше видалення або виправлення можливе за обґрунтованим запитом, якщо немає вимоги закону або розумної необхідності вирішити активний спір чи запит. Відкриті звернення можуть зберігатися, доки це необхідно для роботи.',
+    rights: 'Запит суб’єкта даних', rightsText: 'Для доступу до своїх даних, виправлення, видалення або відкликання згоди надішліть запит на lina.vet@gmail.com. Після перевірки особи технічний адміністратор або Поліна вручну знайдуть звернення за безпечним ідентифікатором і виконають дію, якщо немає підстав продовжувати обробку. Не надсилайте через форму зайві чутливі відомості про здоров’я людини, паролі, платіжні чи карткові дані, документи, що посвідчують особу.',
+    security: 'Мінімізація та безпека', securityText: 'Ми просимо лише необхідні для звернення відомості, обмежуємо доступ, застосовуємо захисні заходи й видаляємо дані після завершення строку. Жодна система не може гарантувати абсолютну безпеку, тому не додавайте до опису зайві чутливі відомості.', formLink: 'Повернутися до форми звернення',
+  },
+} as const;
+const t = copy[locale];
+---
+
+<BaseLayout title={t.title} locale={locale}>
+  <section class="page-intro container content-width-section">
+    <p class="eyebrow">{t.eyebrow}</p>
+    <h1>{t.title}</h1>
+    <p class="caption">{t.version}</p>
+  </section>
+  <article class="container content-width-readable privacy-notice">
+    <section><h2>{t.operator}</h2><p>{t.operatorText}</p></section>
+    <section><h2>{t.contact}</h2><p>{t.contactText}</p></section>
+    <section><h2>{t.what}</h2><p>{t.whatText}</p></section>
+    <section><h2>{t.why}</h2><p>{t.whyText}</p></section>
+    <section><h2>{t.boundaries}</h2><p>{t.boundariesText}</p></section>
+    <section><h2>{t.access}</h2><p>{t.accessText}</p></section>
+    <section><h2>{t.retention}</h2><p>{t.retentionText}</p></section>
+    <section><h2>{t.rights}</h2><p>{t.rightsText}</p></section>
+    <section><h2>{t.security}</h2><p>{t.securityText}</p></section>
+    <p><a class="button" href={route.intake(locale)}>{t.formLink} <span aria-hidden="true">→</span></a></p>
+  </article>
+</BaseLayout>

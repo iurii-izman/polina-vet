@@ -7,6 +7,7 @@ import type {
   InquiryOutcome,
 } from './domain.js';
 import { canTransition } from './domain.js';
+import { retentionUntil } from './retentionPolicy.js';
 
 export type D1Result<T = unknown> = { results?: T[]; success?: boolean; meta?: unknown };
 export type D1Statement = {
@@ -21,9 +22,6 @@ export type OperationsDb = {
 };
 
 const iso = (date = new Date()) => date.toISOString();
-const retention = (date: Date) =>
-  new Date(date.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
-
 function event(
   db: OperationsDb,
   inquiryId: string,
@@ -210,12 +208,12 @@ export async function updateStatus(
     return { ok: false as const, error: 'invalid_transition' };
   if (status === 'CLOSED' && !outcome) return { ok: false as const, error: 'outcome_required' };
   const closedAt = status === 'CLOSED' ? iso() : null;
-  const retentionUntil = status === 'CLOSED' ? retention(new Date()) : null;
+  const retentionDate = status === 'CLOSED' ? retentionUntil(new Date()) : null;
   await db
     .prepare(
       'UPDATE inquiries SET status = ?, outcome = ?, closed_at = ?, retention_until = ?, updated_at = ? WHERE id = ?',
     )
-    .bind(status, outcome, closedAt, retentionUntil, iso(), current.id)
+    .bind(status, outcome, closedAt, retentionDate, iso(), current.id)
     .run();
   await event(
     db,

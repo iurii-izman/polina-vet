@@ -18,6 +18,7 @@ for (const path of [
   '/ru/contact/',
   '/ru/contact/request/',
   '/ru/editorial-policy/',
+  '/ru/privacy/v1.0/',
   '/404.html',
 ]) {
   test(`has no automatic accessibility violations: ${path}`, async ({ page }) => {
@@ -42,6 +43,7 @@ for (const locale of ['ro', 'uk'] as const) {
     'farm/before-vet-arrives',
     'knowledge',
     'editorial-policy',
+    'privacy/v1.0',
     'task/animal-sick',
     'task/prepare',
     'farm/group-problem',

@@ -17,3 +17,5 @@ Controlled event type, inquiry id, actor, small controlled metadata object, time
 Channel, delivery status, error category, timestamp, inquiry id. The Telegram adapter contains only reference/domain/locality and an Office link.
 
 Indexes cover created time, status, follow-up, domain, assignment, source, notes, and events. There are deliberately no client/animal/farm/visit/medical/billing/calendar tables.
+
+Closed standalone inquiries have a 365-day `retention_until` from closure. Earlier deletion/correction is handled through the protected manual process in [M13 privacy operations](M13_PRIVACY_OPERATIONS.md), unless continued storage is required by applicable law or is reasonably necessary to resolve an active dispute/request.

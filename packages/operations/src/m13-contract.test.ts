@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createPublicReference } from './ids.ts';
 import { notifyNewInquiry } from './notifications.ts';
+import { retentionUntil } from './retentionPolicy.ts';
 
 test('D1 migration remains inquiry-centred and privacy constrained', async () => {
   const migration = await readFile(
@@ -23,6 +24,11 @@ test('public references have the non-sequential PV shape', () => {
   const second = createPublicReference();
   assert.match(first, /^PV-[A-Z2-9]{8}$/);
   assert.notEqual(first, second);
+});
+
+test('closed inquiries retain data for exactly 365 days', () => {
+  const closedAt = new Date('2026-09-06T00:00:00.000Z');
+  assert.equal(retentionUntil(closedAt), '2027-09-06T00:00:00.000Z');
 });
 
 test('Telegram adapter excludes inquiry PII', async () => {

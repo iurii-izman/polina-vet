@@ -16,6 +16,7 @@ export const coreRouteFamilies = [
   'task/animal-sick',
   'task/prepare',
   'farm/group-problem',
+  'privacy/v1.0',
 ] as const;
 
 export function coreRoutes(locale: Locale): string[] {

@@ -56,7 +56,7 @@ for (const locale of locales) {
       contactValue: '@synthetic_m13',
       species: 'dog',
       reason: 'follow_up',
-      privacyNoticeVersion: 'M13-DRAFT-1',
+      privacyNoticeVersion: '1.0',
       privacyAcknowledged: true,
       turnstileToken: 'synthetic-turnstile-token',
     });

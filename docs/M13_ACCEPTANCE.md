@@ -14,16 +14,16 @@
 | Idempotency, validation, payload limits | Implemented and unit-tested |
 | Telegram adapter | Implemented; staging secrets configured and real delivery verified with a PII-safe message; production inactive |
 | Retention/Cron/dry-run | Implemented; production schedule and activation remain gated |
-| Privacy map and notice | Map implemented; approved notice and legal wording remain required |
+| Privacy map and notice | PASS; version 1.0 approved 2026-09-06 and published in RU/RO/UK |
 | PII logging/cache/analytics boundary | Implemented and verified in code/tests |
 | Responsive/mobile/accessibility | Office and form are mobile-first; E2E visual and accessibility suites pass |
 | Localized routes/noindex | Implemented and verified for RU/RO/UK |
 | Staging D1, Access, synthetic QA cleanup | PASS; real browser → Turnstile → Intake → staging D1 → Telegram → Office → cleanup verified |
-| Production activation | OFF; not performed |
+| Production activation | OFF; Article 22 prior-notification evidence is the single external blocker |
 | R1/R2 | Unchanged |
 | M13 implementation | COMPLETE |
 | M13 staging acceptance | PASS |
-| M13 privacy/legal activation gate | OPEN |
+| M13 privacy/legal activation gate | FAIL — precise external prerequisite: Article 22 operator notification before processing |
 | M14 | Not started |
 
 ## Resolved staging acceptance
@@ -38,20 +38,14 @@
 
 ## Still open / intentional
 
-### OWNER/LEGAL
+### PRIVACY / LEGAL
 
-- final approved/versioned privacy notice;
-- controller/operator identity wording;
-- legal basis and rights wording where legally required;
-- approved privacy contact route;
-- final retention wording and exception wording if not already approved.
+- The owner-approved notice is version `1.0`, dated `2026-09-06`, with the approved identity, contact, purposes, rights route, and retention.
+- The narrow current PMR check found one precise external prerequisite: submit the Article 22 operator notification before real Intake processing. See [M13 PMR Privacy Check](M13_PMR_PRIVACY_CHECK.md).
 
 ### OPTIONAL PRODUCTION ACTIVATION
 
-- production Intake activation;
-- production Turnstile configuration;
-- production Office activation;
-- production Telegram configuration;
-- final production origins and hostnames.
+- production Intake activation after the Article 22 notification evidence;
+- production Turnstile, Office, Telegram, and exact-origin configuration where not already provisioned.
 
-M13 may merge while the privacy/legal gate is open because production Intake remains disabled. This document does not declare public Intake live or legal approval complete.
+M13 implementation and staging acceptance are complete, but public Intake remains disabled because the single external notification prerequisite is open. This document does not declare public Intake live.
