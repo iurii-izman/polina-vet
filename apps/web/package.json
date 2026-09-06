@@ -12,7 +12,7 @@
     "preview:cloudflare:check": "astro build --config astro.hosted-preview.config.mjs --mode preview",
     "check": "astro check",
     "test:unit": "node --test --experimental-strip-types src/lib/sanity/translation-state.test.ts src/lib/medical.test.ts src/lib/articleAlternates.test.ts src/lib/articlePresentation.test.ts src/lib/profile.test.ts src/lib/routeContract.test.ts src/lib/analytics.test.ts",
-    "test:e2e": "playwright test tests/smoke.spec.ts tests/visual-system.spec.ts",
+    "test:e2e": "playwright test tests/smoke.spec.ts tests/intake.spec.ts tests/visual-system.spec.ts",
     "test:a11y": "playwright test tests/a11y.spec.ts"
   },
   "dependencies": {
