@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
 const locales = ['ru', 'ro', 'uk'] as const;
+
+test('hosted security headers allow the real intake API transport', () => {
+  const headers = readFileSync(new URL('../public/_headers', import.meta.url), 'utf8');
+  expect(headers).toContain('connect-src');
+  expect(headers).toContain('https://intake-polina-vet.aipipeline.cc');
+});
 
 for (const locale of locales) {
   test(`intake ${locale} submits one JSON POST without URL leakage`, async ({ page }) => {
@@ -49,9 +56,11 @@ for (const locale of locales) {
       contactValue: '@synthetic_m13',
       species: 'dog',
       reason: 'follow_up',
+      privacyNoticeVersion: 'M13-DRAFT-1',
       privacyAcknowledged: true,
       turnstileToken: 'synthetic-turnstile-token',
     });
+    expect(body).not.toHaveProperty('cf-turnstile-response');
     expect(page.url()).toBe(beforeSubmitUrl);
     await expect(page.locator('#intake-status')).toContainText('PV-TEST-0001');
   });

@@ -35,10 +35,12 @@
     const data = Object.fromEntries(new FormData(form).entries());
     const turnstile = form.querySelector('[name="cf-turnstile-response"]');
     data.locale = form.dataset.locale || 'ru';
+    data.privacyNoticeVersion = form.dataset.privacyNoticeVersion || '';
     data.privacyAcknowledged = data.privacyAcknowledged === 'on';
     if (data.affectedCount) data.affectedCount = Number(data.affectedCount);
     else delete data.affectedCount;
     data.turnstileToken = turnstile instanceof HTMLInputElement ? turnstile.value : '';
+    delete data['cf-turnstile-response'];
     delete data.website;
 
     try {
