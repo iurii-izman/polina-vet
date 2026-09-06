@@ -26,7 +26,7 @@ Public activation is fail-closed with `PUBLIC_INTAKE_ENABLED=false` until privac
 
 ## Current activation status
 
-Implementation is PR-ready as a gated foundation. No production database, Access identities, Turnstile production secret, Telegram credentials, or approved privacy wording are assumed or embedded.
+Implementation is PR-ready as a gated foundation. Production storage may be provisioned, but production Intake remains disabled and no production data, Access identities, Turnstile production secret, Telegram credentials, or approved privacy wording are embedded in the repository.
 
 ## Official references
 

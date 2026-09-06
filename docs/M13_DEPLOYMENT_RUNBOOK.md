@@ -6,7 +6,7 @@ Use synthetic data only. Copy no `.dev.vars` into git. Run the intake and Office
 
 ## Staging
 
-Create separate staging D1 binding/database, apply migrations explicitly, deploy `polina-vet-intake --env staging` and `polina-vet-office --env staging`, and place the Office custom hostname behind Cloudflare Access. Confirm no workers.dev or preview origin is enabled. Verify no-store headers, Access JWT validation, form write, Office read/update, Telegram disabled behavior, and retention dry-run with synthetic records. Remove QA records at the end.
+The M13 staging deployment and acceptance path is complete: separate staging D1 bindings are applied, `polina-vet-intake --env staging` and `polina-vet-office --env staging` are deployed, and the Office custom hostname is behind Cloudflare Access. No workers.dev or preview origin is enabled. The real browser path verified no-store headers, Access JWT validation, Turnstile, form write, Office read/update, the Telegram adapter, operational status/outcome handling, audit events, and synthetic cleanup. Restore `PUBLIC_INTAKE_ENABLED=false` after any controlled smoke.
 
 ## Production preparation
 

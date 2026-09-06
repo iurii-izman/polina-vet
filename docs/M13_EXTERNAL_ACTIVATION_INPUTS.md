@@ -11,18 +11,19 @@ The implementation intentionally does not invent or print owner-controlled value
   - `polina-vet-office-staging` with its configured custom-domain route.
 - Intake native Rate Limiting is configured as `INTAKE_RATE_LIMITER`, 5 requests per 60 seconds, namespace `1001`, for base, staging, and production configurations.
 - Staging Turnstile widget `polina-vet-intake-staging` exists for `polina-vet-dev.aipipeline.cc`; sitekey `0x4AAAAAAEpk3wwLuo-XJBLf`; its secret is not stored in Git.
+- The staging Office custom hostname is protected by Cloudflare Access; authorized access, Access JWT validation, and the Office workflow were verified.
+- Staging Telegram secrets are configured outside Git; the real adapter delivered a staging notification with the allowed reference, context, locality, and protected Office link.
+- A real browser intake smoke using Turnstile reached staging D1 and was cleaned up; staging was restored to `PUBLIC_INTAKE_ENABLED=false`.
 
 ## Owner input still required
 
-- Cloudflare Access team domain and Office application audience; Wrangler does not provide an Access application/policy command, and the authenticated token has no Access-management scope.
-- Attach the two owner-supplied Access identities to that protected Office application. Their email values are intentionally not stored in this repository.
 - Approved, versioned privacy notice replacing `M13_PRIVACY_NOTICE_DRAFT.md`.
+- Final controller/operator identity, legal-basis, rights, privacy-contact, and retention wording where legally required.
 - Production Turnstile widget/sitekey/secret and final hostname allowlist.
-- Verification of the staging Office DNS/custom-domain route, which did not resolve during this checkpoint; the Worker deployment itself succeeded.
-- Verified final staging/production hostnames and allowlisted origins.
+- Verified final production hostnames and allowlisted origins.
 
 ## Optional
 
-- Telegram notifications: configure only if desired. The adapter remains disabled until its secrets exist.
+- Production Telegram notifications remain optional and activation-gated; staging Telegram delivery is already verified.
 
 Do not paste secrets into GitHub, this repository, or the PR body.
