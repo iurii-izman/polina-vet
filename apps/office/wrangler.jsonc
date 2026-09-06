@@ -1,0 +1,67 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "polina-vet-office",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-04",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "office-polina-vet.aipipeline.cc", "custom_domain": true }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "polina-vet-operations",
+      "migrations_dir": "../intake/migrations",
+      "migrations_pattern": "../intake/migrations/*/migration.sql",
+    },
+  ],
+  "vars": {
+    "ENVIRONMENT": "staging",
+    "OFFICE_AUTH_BYPASS": "false",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUDIENCE": "",
+    "OFFICE_IDENTITIES": "",
+  },
+  "triggers": { "crons": ["23 5 * * *"] },
+  "env": {
+    "staging": {
+      "name": "polina-vet-office-staging",
+      "routes": [{ "pattern": "office-polina-vet.aipipeline.cc", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "polina-vet-operations-staging",
+          "database_id": "35f5c979-af99-4a1c-8fc9-98ab3e8ba96f",
+          "migrations_dir": "../intake/migrations",
+          "migrations_pattern": "../intake/migrations/*/migration.sql",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "OFFICE_AUTH_BYPASS": "false",
+        "ACCESS_TEAM_DOMAIN": "",
+        "ACCESS_AUDIENCE": "",
+        "OFFICE_IDENTITIES": "",
+      },
+    },
+    "production": {
+      "name": "polina-vet-office-production",
+      "routes": [{ "pattern": "office.lina.aipipeline.cc", "custom_domain": true }],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "polina-vet-operations-production",
+          "database_id": "cd40444f-879d-4c50-af6a-a031ea693f9a",
+          "migrations_dir": "../intake/migrations",
+          "migrations_pattern": "../intake/migrations/*/migration.sql",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "production",
+        "OFFICE_AUTH_BYPASS": "false",
+        "ACCESS_TEAM_DOMAIN": "",
+        "ACCESS_AUDIENCE": "",
+        "OFFICE_IDENTITIES": "",
+      },
+    },
+  },
+}

@@ -16,6 +16,7 @@ for (const path of [
   '/ru/knowledge/',
   '/ru/about/',
   '/ru/contact/',
+  '/ru/contact/request/',
   '/ru/editorial-policy/',
   '/404.html',
 ]) {
@@ -36,6 +37,7 @@ for (const locale of ['ro', 'uk'] as const) {
     'farm/urgent',
     'about',
     'contact',
+    'contact/request',
     'pets/before-visit',
     'farm/before-vet-arrives',
     'knowledge',

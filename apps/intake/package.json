@@ -1,0 +1,22 @@
+{
+  "name": "@polina-vet/intake",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "dev": "wrangler dev",
+    "deploy:staging": "wrangler deploy --env staging",
+    "migrate:local": "wrangler d1 migrations apply polina-vet-operations --local",
+    "migrate:staging": "wrangler d1 migrations apply polina-vet-operations --remote --env staging",
+    "migrate:production": "wrangler d1 migrations apply polina-vet-operations --remote --env production"
+  },
+  "dependencies": {
+    "@polina-vet/operations": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260831.1",
+    "typescript": "^6.0.3",
+    "wrangler": "^4.128.0"
+  }
+}
