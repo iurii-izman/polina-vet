@@ -1,20 +1,65 @@
 import {
+  addDiagnosis,
+  addMedication,
   addNote,
+  addPatientAlert,
+  addProcedure,
+  completeEncounter,
+  createAnimal,
+  createAnimalGroup,
+  createClient,
+  createEncounter,
+  createFollowUp,
+  createHolding,
   createInquiry,
+  findClientMatches,
+  getEncounter,
+  getHolding,
   getInquiry,
+  getPatient,
   json,
+  listAnimalGroups,
+  listAnimals,
+  listClients,
+  listHoldings,
   listInquiries,
   markContacted,
   privateHeaders,
   purgeExpired,
+  recordVaccination,
   safeLog,
+  searchM14,
   setFollowUp,
+  updateEncounter,
+  updateAnimal,
+  updateAnimalGroup,
+  updateClient,
+  updateDiagnosis,
+  updateHolding,
   updateStatus,
+  validateAnimalGroupInput,
+  validateAnimalInput,
+  validateClientInput,
+  validateClinicalChild,
+  validateEncounterInput,
+  validateEncounterUpdateInput,
+  validateHoldingInput,
   validateOfficeInquiry,
   verifyAccessJwt,
 } from '@polina-vet/operations';
 import type { D1Database } from '@cloudflare/workers-types';
-import type { InquiryOutcome, InquiryStatus } from '@polina-vet/operations';
+import type {
+  DiagnosisInput,
+  EncounterInput,
+  FollowUpInput,
+  InquiryOutcome,
+  InquiryStatus,
+  M14Actor,
+  MedicationInput,
+  PatientAlertInput,
+  ProcedureInput,
+  VaccinationInput,
+} from '@polina-vet/operations';
 
 interface Env {
   DB: D1Database;
@@ -24,26 +69,81 @@ interface Env {
   ACCESS_AUDIENCE?: string;
   OFFICE_IDENTITIES?: string;
 }
-
-const escapeHtml = (value: unknown) =>
-  String(value ?? '').replace(
-    /[&<>"']/g,
-    (char) =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char,
+const maxBodyBytes = 64_000;
+const errorStatus = (error: string) =>
+  error === 'not_found' || error === 'subject_not_found'
+    ? 404
+    : error === 'conflict' || error === 'already_completed'
+      ? 409
+      : 422;
+function response(data: unknown, status = 200) {
+  const headers = privateHeaders();
+  headers.set('Content-Type', 'application/json; charset=utf-8');
+  return json(data, status, headers);
+}
+function errorResponse(error: string, status = errorStatus(error)) {
+  return response(
+    {
+      error,
+      category:
+        error === 'conflict'
+          ? 'CONFLICT'
+          : error === 'not_found'
+            ? 'NOT_FOUND'
+            : 'VALIDATION_ERROR',
+    },
+    status,
   );
-const localDate = (offset: number) => new Date(Date.now() + offset * 86400000).toISOString();
+}
+async function readBody(request: Request) {
+  const length = Number(request.headers.get('Content-Length') ?? 0);
+  if (length > maxBodyBytes) throw new Error('payload_too_large');
+  const raw = await request.arrayBuffer();
+  if (raw.byteLength > maxBodyBytes) throw new Error('payload_too_large');
+  return JSON.parse(new TextDecoder().decode(raw)) as Record<string, unknown>;
+}
 
 function page() {
-  return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POLINA VET Office</title><style>
-:root{--forest:#2f493b;--deep:#22382d;--cream:#f4efe5;--card:#fffdf8;--muted:#646b63;--line:#d8d0c3;--red:#a8483b;--soft:#e6eadf;--radius:14px}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:#252823;font:16px/1.5 Inter,system-ui,sans-serif}a{color:inherit}button,input,select,textarea{font:inherit}button,.button{min-height:44px;border:1px solid var(--forest);border-radius:10px;padding:.65rem .9rem;background:var(--forest);color:#fff;cursor:pointer}button.secondary,.button.secondary{background:transparent;color:var(--forest)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c8794f;outline-offset:2px}.shell{max-width:1220px;margin:auto;padding:1rem}.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem 0 1.5rem}.brand{font:700 1.35rem Georgia,serif;color:var(--deep)}.top small{color:var(--muted)}h1,h2,h3{line-height:1.12;font-family:Georgia,serif}.toolbar,.metrics,.layout{display:grid;gap:1rem}.metrics{grid-template-columns:repeat(4,1fr)}.metric,.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;box-shadow:0 8px 20px #2528230d}.metric b{display:block;font-size:1.7rem;color:var(--deep)}.metric span{font-size:.85rem;color:var(--muted)}.toolbar{grid-template-columns:repeat(5,minmax(0,1fr));align-items:end;margin:1rem 0}.field{display:grid;gap:.35rem}.field label{font-size:.86rem;font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;padding:.65rem}.layout{grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);align-items:start}.list{display:grid;gap:.75rem}.item{display:grid;gap:.35rem;border:1px solid var(--line);border-radius:12px;padding:.9rem;background:#fffdf8;cursor:pointer}.item:hover{border-color:var(--forest)}.item-head{display:flex;justify-content:space-between;gap:.5rem}.ref{font-weight:800;color:var(--forest)}.meta{color:var(--muted);font-size:.9rem}.tag{display:inline-block;border-radius:999px;background:var(--soft);padding:.15rem .5rem;font-size:.78rem}.tag.overdue{background:#f5e2dd;color:#7f2c23}.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}.detail{position:sticky;top:1rem}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.detail-grid dt{font-size:.78rem;color:var(--muted)}.detail-grid dd{margin:0}.note{border-top:1px solid var(--line);padding-top:.7rem;margin-top:.7rem}.empty{padding:2rem;text-align:center;color:var(--muted)}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}@media(max-width:800px){.metrics{grid-template-columns:repeat(2,1fr)}.toolbar,.layout{grid-template-columns:1fr}.detail{position:static}.top{align-items:flex-start;flex-direction:column}.detail-grid{grid-template-columns:1fr 1fr}}@media(max-width:420px){.shell{padding:.75rem}.metrics{gap:.5rem}.metric{padding:.75rem}.item-head{display:block}.toolbar{margin-top:.5rem}}
-</style></head><body><div class="shell"><header class="top"><div><div class="brand">POLINA VET Office</div><small>Inquiry operations · private surface</small></div><button class="secondary" id="refresh">Обновить</button></header><main><h1>Обращения</h1><section class="metrics" aria-label="Операционные показатели"><div class="metric"><b id="metric-new">—</b><span>Новые</span></div><div class="metric"><b id="metric-open">—</b><span>Открытые</span></div><div class="metric"><b id="metric-due">—</b><span>Сегодня</span></div><div class="metric"><b id="metric-overdue">—</b><span>Просрочены</span></div></section><section class="toolbar panel" aria-label="Фильтры"><div class="field"><label for="status">Статус</label><select id="status"><option value="">Все</option><option>NEW</option><option>IN_PROGRESS</option><option>WAITING</option><option>FOLLOW_UP</option><option>CLOSED</option></select></div><div class="field"><label for="domain">Контекст</label><select id="domain"><option value="">Все</option><option value="PET">Pets</option><option value="FARM">Farm</option></select></div><div class="field"><label for="followUp">Follow-up</label><select id="followUp"><option value="">Все</option><option value="due">Сегодня</option><option value="overdue">Просрочены</option></select></div><div class="field"><label for="search">Поиск</label><input id="search" type="search" placeholder="Имя, контакт, PV…"></div><button id="apply">Применить</button></section><div class="layout"><section><div class="actions"><button id="quick-add">+ Добавить обращение</button></div><div id="list" class="list" aria-live="polite"><div class="empty">Загрузка…</div></div></section><aside class="panel detail" id="detail"><h2>Выберите обращение</h2><p class="meta">Телефон, Telegram и внутренние заметки доступны после выбора записи.</p></aside></div></main></div><dialog id="add-dialog"><form method="dialog" class="panel" style="max-width:620px"><h2>Быстрое добавление</h2><div class="detail-grid"><div class="field"><label for="add-source">Источник</label><select id="add-source"><option>phone</option><option>telegram</option><option>viber</option><option>whatsapp</option><option>in_person</option><option>other</option></select></div><div class="field"><label for="add-domain">Контекст</label><select id="add-domain"><option value="PET">Домашнее животное</option><option value="FARM">Ферма</option></select></div><div class="field"><label for="add-name">Имя</label><input id="add-name" required maxlength="120"></div><div class="field"><label for="add-contact">Контакт</label><input id="add-contact" required maxlength="160"></div><div class="field"><label for="add-locality">Местность</label><input id="add-locality" required maxlength="120"></div><div class="field"><label for="add-species">Вид</label><input id="add-species" required maxlength="40"></div><div class="field"><label for="add-reason">Причина</label><input id="add-reason" required maxlength="60"></div><div class="field"><label for="add-summary">Кратко</label><textarea id="add-summary" required maxlength="1000"></textarea></div></div><div class="actions"><button value="cancel" class="secondary">Отмена</button><button id="save-add" value="default">Сохранить</button></div><p id="add-error" role="alert"></p></form></dialog><script>
-const localDate=days=>new Date(Date.now()+days*86400000).toISOString();const $=id=>document.getElementById(id);let selected=null;const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const api=async(path,options={})=>{const r=await fetch(path,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Операция не выполнена');return d};const params=()=>new URLSearchParams([...['status','domain','followUp','search'].map(k=>[$(k).value].filter(Boolean).map(v=>[k,v])).flat()]);const render=rows=>{$('list').innerHTML=rows.length?rows.map(row=>{const due=row.follow_up_at&&new Date(row.follow_up_at)<=new Date();return '<button class="item" data-id="'+esc(row.id)+'"><span class="item-head"><span class="ref">'+esc(row.public_ref)+'</span><span class="tag">'+esc(row.status)+'</span></span><span>'+esc(row.domain==='PET'?'Pets':'Farm')+' · '+esc(row.species)+' · '+esc(row.locality)+'</span><span class="meta">'+esc(row.reason)+' · '+esc(row.source)+' '+(due?'<span class="tag overdue">'+(new Date(row.follow_up_at).toDateString()===new Date().toDateString()?'TODAY':'OVERDUE')+'</span>':'')+'</span></button>'}).join(''):'<div class="empty">Нет обращений по фильтру.</div>';document.querySelectorAll('.item').forEach(x=>x.onclick=()=>show(x.dataset.id))};const load=async()=>{try{const d=await api('/api/inquiries?'+params());render(d.items);$('metric-new').textContent=d.metrics.new;$('metric-open').textContent=d.metrics.open;$('metric-due').textContent=d.metrics.due;$('metric-overdue').textContent=d.metrics.overdue}catch(e){$('list').innerHTML='<div class="empty">'+esc(e.message)+'</div>'}};const show=async id=>{try{const d=await api('/api/inquiries/'+encodeURIComponent(id));selected=d.inquiry;const i=d.inquiry;$('detail').innerHTML='<h2>'+esc(i.public_ref)+'</h2><p><span class="tag">'+esc(i.status)+'</span> '+esc(i.domain==='PET'?'Pets':'Farm')+' · '+esc(i.source)+'</p><dl class="detail-grid"><div><dt>Имя</dt><dd>'+esc(i.person_name)+'</dd></div><div><dt>Контакт</dt><dd>'+esc(i.contact_value)+'</dd></div><div><dt>Местность</dt><dd>'+esc(i.locality)+'</dd></div><div><dt>Вид / причина</dt><dd>'+esc(i.species)+' · '+esc(i.reason)+'</dd></div><div><dt>Описание</dt><dd>'+esc(i.summary)+'</dd></div><div><dt>Follow-up</dt><dd>'+esc(i.follow_up_at||'—')+'</dd></div></dl><div class="actions"><button onclick="statusAction(&apos;IN_PROGRESS&apos;)">В работе</button><button onclick="statusAction(&apos;WAITING&apos;)" class="secondary">Ожидаем</button><button onclick="followAction(0)" class="secondary">Сегодня</button><button onclick="followAction(1)" class="secondary">Завтра</button><button onclick="followAction(3)" class="secondary">+3 дня</button><button onclick="contactAction()" class="secondary">Контакт отмечен</button><button onclick="closeAction()">Закрыть</button></div><div class="note"><h3>Добавить заметку</h3><textarea id="note-body" maxlength="2000" aria-label="Внутренняя заметка"></textarea><button onclick="noteAction()">Сохранить заметку</button></div><div class="note"><h3>История</h3>'+d.events.map(e=>'<p class="meta">'+esc(e.created_at)+' · '+esc(e.event_type)+'</p>').join('')+'</div>'}catch(e){$('detail').innerHTML='<p role="alert">'+esc(e.message)+'</p>'}};window.statusAction=async status=>{if(!selected)return;let outcome=null;if(status==='CLOSED')outcome=prompt('Outcome: visit_at_site / field_visit / advice_given / follow_up_completed / no_response / declined / duplicate / spam / other','visit_at_site');try{await api('/api/inquiries/'+selected.id+'/status',{method:'PATCH',body:JSON.stringify({status,outcome})});await load();await show(selected.id)}catch(e){alert(e.message)}};window.followAction=async days=>{if(!selected)return;try{await api('/api/inquiries/'+selected.id+'/follow-up',{method:'PATCH',body:JSON.stringify({follow_up_at:localDate(days)})});await load();await show(selected.id)}catch(e){alert(e.message)}};window.contactAction=async()=>{if(selected)await api('/api/inquiries/'+selected.id+'/contact',{method:'POST'});await load();if(selected)await show(selected.id)};window.noteAction=async()=>{const body=$('note-body').value;if(!body.trim()||!selected)return;await api('/api/inquiries/'+selected.id+'/notes',{method:'POST',body:JSON.stringify({body})});await show(selected.id)};window.closeAction=()=>statusAction('CLOSED');$('apply').onclick=load;$('refresh').onclick=load;$('quick-add').onclick=()=>$('add-dialog').showModal();$('save-add').onclick=async e=>{e.preventDefault();try{await api('/api/inquiries',{method:'POST',body:JSON.stringify({source:$('add-source').value,contactChannel:$('add-source').value,domain:$('add-domain').value,locale:'ru',personName:$('add-name').value,contactValue:$('add-contact').value,locality:$('add-locality').value,species:$('add-species').value,reason:$('add-reason').value,summary:$('add-summary').value,preferredContactChannel:$('add-source').value})});$('add-dialog').close();await load()}catch(e){$('add-error').textContent=e.message}};load();
-</script></body></html>`;
+  return String.raw`<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POLINA VET Office</title><style>
+:root{--forest:#2f493b;--deep:#22382d;--cream:#f4efe5;--card:#fffdf8;--muted:#646b63;--line:#d8d0c3;--red:#a8483b;--soft:#e6eadf;--radius:14px}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:#252823;font:16px/1.5 Inter,system-ui,sans-serif}button,input,select,textarea{font:inherit}button{min-height:44px;border:1px solid var(--forest);border-radius:10px;padding:.65rem .9rem;background:var(--forest);color:#fff;cursor:pointer}button.secondary{background:transparent;color:var(--forest)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c8794f;outline-offset:2px}.shell{max-width:1220px;margin:auto;padding:1rem}.top{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.75rem 0 1rem}.brand{font:700 1.35rem Georgia,serif;color:var(--deep)}.meta{color:var(--muted);font-size:.9rem}.nav{display:flex;gap:.4rem;overflow:auto;padding:.25rem 0 1rem}.nav button{white-space:nowrap;background:transparent;color:var(--forest);border-color:transparent}.nav button[aria-current=page]{background:var(--forest);color:#fff}.metrics,.grid,.layout,.list,.form-grid{display:grid;gap:1rem}.metrics{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.metric,.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;box-shadow:0 8px 20px #2528230d}.metric b{display:block;font-size:1.7rem;color:var(--deep)}.metric span{font-size:.85rem;color:var(--muted)}.toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:end;margin:1rem 0}.field{display:grid;gap:.35rem}.field label{font-size:.86rem;font-weight:700}.field input,.field select,.field textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:.65rem}.field textarea{min-height:100px}.item{text-align:left;width:100%;display:grid;gap:.25rem;background:#fffdf8;color:#252823;border-color:var(--line)}.item-head{display:flex;justify-content:space-between;gap:.5rem}.tag{display:inline-block;border-radius:999px;background:var(--soft);padding:.15rem .5rem;font-size:.78rem}.alert{background:#f5e2dd;color:#7f2c23}.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}.layout{grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr)}.timeline{border-left:3px solid var(--soft);padding-left:1rem}.notice{padding:.75rem;border-radius:10px;background:#f5e2dd;color:#7f2c23}.empty,.state{padding:2rem;text-align:center;color:var(--muted)}dialog{border:0;border-radius:16px;max-width:720px;width:calc(100% - 1rem);padding:0;background:transparent}dialog::backdrop{background:#22382d66}.form-grid{grid-template-columns:1fr 1fr}.full{grid-column:1/-1}@media(max-width:800px){.metrics,.grid,.layout{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}@media(max-width:420px){.shell{padding:.75rem}.metrics,.grid{grid-template-columns:1fr 1fr}.metric{padding:.75rem}.nav{margin-inline:-.75rem;padding-inline:.75rem}}
+</style></head><body><div class="shell"><header class="top"><div><div class="brand">POLINA VET Office</div><small class="meta">Операционная ветеринарная запись · приватный доступ</small></div><button class="secondary" id="refresh">Обновить</button></header><nav class="nav" aria-label="Навигация Office"><button data-view="home">Главная</button><button data-view="inquiries">Обращения</button><button data-view="patients">Пациенты</button><button data-view="holdings">Хозяйства</button><button data-view="encounters">Приёмы</button><button data-view="followups">Повторные</button><button data-view="search">Поиск</button></nav><main id="app" tabindex="-1"></main></div><dialog id="dialog"><div class="panel" id="dialog-content"></div></dialog><script>
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let view='home';const api=async(p,o={})=>{const r=await fetch(p,{...o,headers:{'Content-Type':'application/json',...(o.headers||{})}}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Операция не выполнена');return d},fd=f=>Object.fromEntries(new FormData(f).entries());
+const btn=(label,action,secondary=false)=>'<button data-action="'+action+'" class="'+(secondary?'secondary':'')+'">'+label+'</button>';const field=(label,name,type='text',extra='')=>'<div class="field"><label for="f-'+name+'">'+label+'</label><input id="f-'+name+'" name="'+name+'" type="'+type+'" '+extra+'></div>';
+async function render(){document.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-current',x.dataset.view===view?'page':'false'));try{if(view==='home')await home();else if(view==='inquiries')await inquiries();else if(view==='patients')await patients();else if(view==='holdings')await holdings();else if(view==='encounters')await encounters();else if(view==='followups')await followups();else await search()}catch(e){$('app').innerHTML='<div class="notice" role="alert">'+esc(e.message)+'</div>'}}
+const shell=(title,body,actions='')=>'<section><header class="top"><div><p class="meta">POLINA VET Office</p><h1>'+title+'</h1></div><div class="actions">'+actions+'</div></header>'+body+'</section>';
+async function home(){const d=await api('/api/inquiries');$('app').innerHTML=shell('Главная','<div class="metrics"><div class="metric"><b>'+d.metrics.new+'</b><span>Новые обращения</span></div><div class="metric"><b>'+d.metrics.open+'</b><span>Открытые обращения</span></div><div class="metric"><b>'+d.metrics.due+'</b><span>Повторные сегодня</span></div><div class="metric"><b>'+d.metrics.overdue+'</b><span>Просрочены</span></div></div><div class="actions">'+btn('+ Приём','new-encounter')+btn('+ Пациент','new-animal')+btn('+ Хозяйство','new-holding')+'</div><div class="grid"><div class="card"><h2>Рабочий маршрут</h2><p class="meta">Сначала найдите запись. Перед созданием показываются возможные совпадения.</p>'+btn('Открыть поиск','search',true)+'</div><div class="card"><h2>Черновики</h2><p class="meta">Приём можно сохранить на сервере и завершить позже.</p>'+btn('Открыть приёмы','encounters',true)+'</div><div class="card"><h2>Контекст</h2><p class="meta">Pets и Farm остаются отдельными рабочими сценариями.</p></div></div>');bind()}
+async function inquiries(){const d=await api('/api/inquiries');$('app').innerHTML=shell('Обращения','<div class="toolbar"><div class="field"><label for="q">Имя, контакт или PV</label><input id="q" placeholder="Поиск"></div>'+btn('+ Обращение','new-inquiry')+'</div><div class="list">'+(d.items.map(i=>'<button class="item" data-inquiry="'+esc(i.id)+'"><span class="item-head"><b>'+esc(i.public_ref)+'</b><span class="tag">'+esc(i.status)+'</span></span><span>'+esc(i.domain)+' · '+esc(i.species)+' · '+esc(i.locality)+'</span><span class="meta">'+esc(i.person_name)+' · '+esc(i.reason)+'</span></button>').join('')||'<div class="empty">Нет обращений.</div>')+'</div>');document.querySelectorAll('[data-inquiry]').forEach(x=>x.onclick=()=>showInquiry(x.dataset.inquiry));bind()}
+async function patients(){const d=await api('/api/animals');$('app').innerHTML=shell('Пациенты','<div class="toolbar"><p class="meta">Индивидуальные PET и FARM животные</p>'+btn('+ Пациент','new-animal')+'</div><div class="list">'+(d.items.map(a=>'<button class="item" data-patient="'+esc(a.id)+'"><span class="item-head"><b>'+esc(a.name||a.species_code)+'</b><span class="tag">'+esc(a.domain)+'</span></span><span>'+esc(a.species_code)+' · '+esc(a.sex)+(a.identifier?' · '+esc(a.identifier):'')+'</span></button>').join('')||'<div class="empty">Пациентов пока нет.</div>')+'</div>');document.querySelectorAll('[data-patient]').forEach(x=>x.onclick=()=>showPatient(x.dataset.patient));bind()}
+async function holdings(){const d=await api('/api/holdings');$('app').innerHTML=shell('Хозяйства','<div class="toolbar"><p class="meta">Контакт, группы, индивидуальные животные и история выездов</p>'+btn('+ Хозяйство','new-holding')+'</div><div class="list">'+(d.items.map(h=>'<button class="item" data-holding="'+esc(h.id)+'"><b>'+esc(h.display_name||'Хозяйство')+'</b><span>'+esc(h.locality)+'</span><span class="meta">'+esc(h.client_name||'Контакт не указан')+'</span></button>').join('')||'<div class="empty">Хозяйств пока нет.</div>')+'</div>');document.querySelectorAll('[data-holding]').forEach(x=>x.onclick=()=>showHolding(x.dataset.holding));bind()}
+async function encounters(){const d=await api('/api/encounters');$('app').innerHTML=shell('Приёмы','<div class="actions">'+btn('+ Приём','new-encounter')+'</div><div class="list">'+(d.items.map(e=>'<button class="item" data-encounter="'+esc(e.id)+'"><span class="item-head"><b>'+esc(e.encounter_type)+'</b><span class="tag">'+esc(e.status)+'</span></span><span>'+esc(e.started_at)+'</span><span class="meta">'+esc(e.subject_label||'Предмет')+'</span></button>').join('')||'<div class="empty">Приёмов пока нет.</div>')+'</div>');document.querySelectorAll('[data-encounter]').forEach(x=>x.onclick=()=>showEncounter(x.dataset.encounter));bind()}
+async function followups(){const d=await api('/api/followups');$('app').innerHTML=shell('Повторные','<div class="list">'+(d.items.map(f=>'<article class="card"><b>'+esc(f.reason)+'</b><p class="meta">До '+esc(f.due_at)+' · '+esc(f.subject_label||'')+'</p></article>').join('')||'<div class="empty">Открытых повторных действий нет.</div>')+'</div>')}
+async function search(){ $('app').innerHTML=shell('Поиск','<div class="toolbar"><div class="field"><label for="global-q">Пациенты, хозяйства, приёмы, PV</label><input id="global-q" placeholder="Введите запрос"></div>'+btn('Искать','do-search')+'</div><div id="results" class="list"><div class="empty">Поиск не выполнялся.</div></div>');bind() }
+function bind(){document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>{view=x.dataset.view;render()});document.querySelectorAll('[data-action]').forEach(x=>x.onclick=()=>action(x.dataset.action))}
+async function action(a){if(['home','inquiries','patients','holdings','encounters','followups','search'].includes(a)){view=a;return render()}if(a==='new-client')return openClient();if(a==='new-animal')return openAnimal();if(a==='new-holding')return openHolding();if(a==='new-group')return openGroup();if(a==='new-encounter')return openEncounter();if(a==='new-inquiry')return openInquiry();if(a==='do-search'){const d=await api('/api/search',{method:'POST',body:JSON.stringify({q:$('global-q').value})});$('results').innerHTML=(d.items.map(x=>'<button class="item" data-result="'+esc(x.entity_type)+'" data-id="'+esc(x.id)+'"><b>'+esc(x.label)+'</b><span class="meta">'+esc(x.entity_type)+' · '+esc(x.detail)+'</span></button>').join('')||'<div class="empty">Ничего не найдено.</div>');document.querySelectorAll('[data-result]').forEach(x=>x.onclick=()=>openResult(x.dataset.result,x.dataset.id))}}
+async function openResult(type,id){if(type==='ANIMAL')return showPatient(id);if(type==='HOLDING'||type==='ANIMAL_GROUP')return showHolding(id);if(type==='ENCOUNTER')return showEncounter(id);if(type==='INQUIRY')return showInquiry(id);view='patients';render()}
+function form(title,fields,submit){$('dialog-content').innerHTML='<form id="form" class="panel"><h2>'+title+'</h2><div class="form-grid">'+fields+'</div><div class="actions"><button type="button" class="secondary" id="cancel">Отмена</button><button type="submit">Сохранить</button></div><p id="form-error" role="alert"></p></form>';$('dialog').showModal();$('cancel').onclick=()=>$('dialog').close();$('form').onsubmit=async e=>{e.preventDefault();try{await submit(fd(e.currentTarget));$('dialog').close();render()}catch(err){$('form-error').textContent=err.message}}}
+async function opts(path){const d=await api(path);return d.items.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.display_name||x.name||x.locality||x.species_code)+' · '+esc(x.locality||'')+'</option>').join('')}
+function openClient(){form('Новый клиент',field('Имя владельца','displayName','text','required maxlength="160"')+field('Местность','locality')+field('Контакт','contactValue')+'<div class="field"><label for="f-contactType">Тип</label><select id="f-contactType" name="contactType"><option>PHONE</option><option>TELEGRAM</option><option>EMAIL</option><option>OTHER</option></select></div>'+field('Заметка','notes'),async f=>{const d=await api('/api/clients',{method:'POST',body:JSON.stringify({displayName:f.displayName,locality:f.locality,notes:f.notes,contacts:f.contactValue?[{type:f.contactType,value:f.contactValue,isPrimary:true}]:[]})});if(d.duplicates)throw Error('Возможно, такая запись уже существует. Проверьте список перед повторным сохранением.')})}
+async function openAnimal(){const [cs,hs]=await Promise.all([opts('/api/clients'),opts('/api/holdings')]);form('Новый пациент','<div class="field"><label for="f-domain">Контекст</label><select id="f-domain" name="domain"><option>PET</option><option>FARM</option></select></div>'+field('Вид','speciesCode','text','required')+field('Имя (необязательно)','name')+field('Метка','identifier')+'<div class="field"><label for="f-clientId">Владелец</label><select id="f-clientId" name="clientId"><option value="">Не указан</option>'+cs+'</select></div><div class="field"><label for="f-holdingId">Хозяйство</label><select id="f-holdingId" name="holdingId"><option value="">Не указано</option>'+hs+'</select></div><div class="field"><label for="f-sex">Пол</label><select id="f-sex" name="sex"><option>UNKNOWN</option><option>MALE</option><option>FEMALE</option></select></div>'+field('Порода','breed')+field('Возраст текстом','ageText')+field('Заметка','notes'),async f=>api('/api/animals',{method:'POST',body:JSON.stringify(f)}))}
+async function openHolding(){const cs=await opts('/api/clients');form('Новое хозяйство',field('Название','displayName')+'<div class="field"><label for="f-primaryClientId">Контакт</label><select id="f-primaryClientId" name="primaryClientId"><option value="">Не указан</option>'+cs+'</select></div>'+field('Местность','locality','text','required')+field('Адрес','addressText')+field('Заметка','notes'),async f=>api('/api/holdings',{method:'POST',body:JSON.stringify(f)}))}
+function openGroup(holdingId=''){form('Новая группа',field('ID хозяйства','holdingId','text','required value="'+esc(holdingId)+'"')+field('Название группы','displayName','text','required')+field('Вид','speciesCode','text','required')+field('Примерное количество','approxCount','number','min="0"')+field('Возраст / описание','ageDescription')+field('Заметка','notes'),async f=>api('/api/animal-groups',{method:'POST',body:JSON.stringify({...f,approxCount:f.approxCount?Number(f.approxCount):undefined})}))}
+async function openEncounter(type='',id=''){const [as,gs,hs]=await Promise.all([api('/api/animals'),api('/api/animal-groups'),api('/api/holdings')]);const options='<option value="">Выберите subject</option>'+as.items.map(x=>'<option data-type="animal" value="'+esc(x.id)+'">Животное: '+esc(x.name||x.species_code)+'</option>').join('')+gs.items.map(x=>'<option data-type="group" value="'+esc(x.id)+'">Группа: '+esc(x.display_name)+'</option>').join('')+hs.items.map(x=>'<option data-type="holding" value="'+esc(x.id)+'">Хозяйство: '+esc(x.display_name||x.locality)+'</option>').join('');form('Новый приём','<div class="field"><label for="f-encounterType">Тип</label><select id="f-encounterType" name="encounterType"><option>AT_SITE</option><option>FIELD_VISIT</option><option>REMOTE</option></select></div><div class="field full"><label for="f-subjectId">Предмет</label><select id="f-subjectId" name="subjectId" required>'+options+'</select></div><div class="field full"><label for="f-presentingProblem">С чем обратились</label><textarea id="f-presentingProblem" name="presentingProblem"></textarea></div><div class="field full"><label for="f-history">История</label><textarea id="f-history" name="history"></textarea></div><div class="field full"><label for="f-examinationText">Осмотр</label><textarea id="f-examinationText" name="examinationText"></textarea></div>'+field('Вес, кг','weightKg','number','step="0.01"')+field('Температура, °C','temperatureC','number','step="0.1"')+field('Всего в группе','populationCount','number','min="0"')+field('Осмотрено','examinedCount','number','min="0"')+field('Затронуто','affectedCount','number','min="0"')+field('Обработано','treatedCount','number','min="0"')+field('Рабочий диагноз','diagnosisLabel')+field('Medication / practical text','doseText')+field('Procedure','procedureLabel')+field('Повторное до','followUpAt','datetime-local')+field('Причина повторного','followUpReason')+'<div class="field full"><label><input type="checkbox" name="complete"> Завершить сейчас</label></div>',async f=>{const s=$('f-subjectId').selectedOptions[0],input={encounterType:f.encounterType,presentingProblem:f.presentingProblem,history:f.history,examinationText:f.examinationText,vitals:f.weightKg||f.temperatureC?{weightKg:f.weightKg?Number(f.weightKg):undefined,temperatureC:f.temperatureC?Number(f.temperatureC):undefined}:undefined,populationCounts:f.populationCount||f.examinedCount||f.affectedCount||f.treatedCount?{populationCount:f.populationCount?Number(f.populationCount):undefined,examinedCount:f.examinedCount?Number(f.examinedCount):undefined,affectedCount:f.affectedCount?Number(f.affectedCount):undefined,treatedCount:f.treatedCount?Number(f.treatedCount):undefined}:undefined};if(s.dataset.type==='animal')input.animalId=f.subjectId;if(s.dataset.type==='group')input.animalGroupId=f.subjectId;if(s.dataset.type==='holding')input.holdingId=f.subjectId;const d=await api('/api/encounters',{method:'POST',body:JSON.stringify(input)});if(f.diagnosisLabel)await api('/api/encounters/'+d.id+'/diagnoses',{method:'POST',body:JSON.stringify({type:'WORKING',label:f.diagnosisLabel})});if(f.doseText)await api('/api/encounters/'+d.id+'/medications',{method:'POST',body:JSON.stringify({administrationType:'PRESCRIBED',doseText:f.doseText})});if(f.procedureLabel)await api('/api/encounters/'+d.id+'/procedures',{method:'POST',body:JSON.stringify({type:'OTHER',label:f.procedureLabel})});if(f.followUpAt&&f.followUpReason){const follow={encounterId:d.id,dueAt:new Date(f.followUpAt).toISOString(),reason:f.followUpReason};if(s.dataset.type==='animal')follow.animalId=f.subjectId;if(s.dataset.type==='group')follow.animalGroupId=f.subjectId;if(s.dataset.type==='holding')follow.holdingId=f.subjectId;await api('/api/followups',{method:'POST',body:JSON.stringify(follow)})}if(f.complete)await api('/api/encounters/'+d.id+'/complete',{method:'POST',body:JSON.stringify({recordVersion:1})})})}
+function openInquiry(){form('Новое обращение',field('Имя','personName','text','required')+field('Контакт','contactValue','text','required')+field('Местность','locality','text','required')+field('Вид','species','text','required')+field('Причина','reason','text','required')+'<div class="field"><label for="f-domain">Контекст</label><select id="f-domain" name="domain"><option>PET</option><option>FARM</option></select></div><div class="field full"><label for="f-summary">Кратко</label><textarea id="f-summary" name="summary" required></textarea></div>',async f=>api('/api/inquiries',{method:'POST',body:JSON.stringify({...f,locale:'ru',source:'manual',contactChannel:'phone',preferredContactChannel:'phone'})}))}
+async function showPatient(id){const d=await api('/api/patients/'+encodeURIComponent(id));$('app').innerHTML=shell(esc(d.animal.name||d.animal.species_code),'<p>'+esc(d.animal.species_code)+' · '+esc(d.animal.sex)+' · '+esc(d.animal.client_name||'Владелец не указан')+'</p>'+(d.alerts.length?'<div class="notice"><b>⚠ Активные alerts</b>'+d.alerts.map(x=>'<p><span class="tag alert">'+esc(x.type)+'</span> '+esc(x.short_label)+'</p>').join('')+'</div>':'<div class="state">Активных alerts нет.</div>')+'<div class="actions">'+btn('+ Новый приём','p-encounter')+btn('+ Alert','p-alert',true)+'</div><h2>История</h2><div class="timeline">'+(d.encounters.map(x=>'<article><b>'+esc(x.encounter_type)+' · '+esc(x.status)+'</b><p class="meta">'+esc(x.started_at)+'</p></article>').join('')||'<div class="empty">Записей ещё нет.</div>')+'</div><h2>Вакцинации и повторные действия</h2>'+d.vaccinations.map(x=>'<div class="card"><b>'+esc(x.vaccine_name)+'</b><p class="meta">'+esc(x.date)+' · следующая: '+esc(x.next_due_at||'—')+'</p></div>').join('')+d.followups.map(x=>'<div class="card"><b>'+esc(x.reason)+'</b><p class="meta">До '+esc(x.due_at)+'</p></div>').join(''));document.querySelector('[data-action="p-encounter"]').onclick=()=>openEncounter('animal',id);document.querySelector('[data-action="p-alert"]').onclick=()=>form('Добавить alert',field('Тип','type','text','value="ALLERGY"')+field('Короткая отметка','shortLabel','text','required')+field('Комментарий','notes'),async f=>{await api('/api/animals/'+id+'/alerts',{method:'POST',body:JSON.stringify({...f,animalId:id})});showPatient(id)})}
+async function showHolding(id){const d=await api('/api/holdings/'+encodeURIComponent(id));$('app').innerHTML=shell(esc(d.holding.display_name||'Хозяйство'),'<p>'+esc(d.holding.locality)+' · '+esc(d.holding.client_name||'Контакт не указан')+'</p><div class="actions">'+btn('+ Приём выезда','h-encounter')+btn('+ Группа','h-group',true)+btn('+ Животное','h-animal',true)+'</div><h2>Группы</h2><div class="list">'+d.groups.map(x=>'<div class="card"><b>'+esc(x.display_name)+'</b><p class="meta">'+esc(x.species_code)+' · примерно '+esc(x.approx_count??'—')+'</p></div>').join('')+'</div><h2>Индивидуальные животные</h2><div class="list">'+d.animals.map(x=>'<button class="item" data-patient="'+esc(x.id)+'"><b>'+esc(x.name||x.species_code)+'</b><span class="meta">'+esc(x.identifier||'Без метки')+'</span></button>').join('')+'</div><h2>История выездов</h2><div class="timeline">'+d.encounters.map(x=>'<article><b>'+esc(x.encounter_type)+' · '+esc(x.status)+'</b><p class="meta">'+esc(x.started_at)+'</p></article>').join('')+'</div>');document.querySelector('[data-action="h-encounter"]').onclick=()=>openEncounter('holding',id);document.querySelector('[data-action="h-group"]').onclick=()=>openGroup(id);document.querySelector('[data-action="h-animal"]').onclick=openAnimal;document.querySelectorAll('[data-patient]').forEach(x=>x.onclick=()=>showPatient(x.dataset.patient))}
+async function showEncounter(id){const d=await api('/api/encounters/'+encodeURIComponent(id)),e=d.encounter;$('app').innerHTML=shell('Приём','<div class="card"><div class="item-head"><b>'+esc(e.encounter_type)+'</b><span class="tag">'+esc(e.status)+'</span></div><p class="meta">'+esc(e.started_at)+' · версия '+esc(e.record_version)+'</p><h2>С чем обратились</h2><p>'+esc(e.presenting_problem||'—')+'</p><h2>История</h2><p>'+esc(e.history||'—')+'</p><h2>Осмотр</h2><p>'+esc(e.examination_text||'—')+'</p>'+(d.vitals?'<h2>Vitals</h2><p>Вес: '+esc(d.vitals.weight_kg||'—')+' кг · Температура: '+esc(d.vitals.temperature_c||'—')+' °C</p>':'')+'<div class="actions">'+(e.status==='DRAFT'?btn('Завершить','complete-e'):'')+btn('Добавить диагноз','add-diagnosis',true)+btn('Добавить medication','add-medication',true)+'</div></div><h2>Диагнозы</h2>'+d.diagnoses.map(x=>'<div class="card"><b>'+esc(x.type)+'</b> · '+esc(x.label)+'</div>').join('')+'<h2>Medications</h2>'+d.medications.map(x=>'<div class="card"><b>'+esc(x.drug_name||'Практическая запись')+'</b><p>'+esc(x.dose_text||x.instructions||'')+'</p></div>').join('')+'<h2>Audit</h2>'+d.audit.map(x=>'<p class="meta">'+esc(x.created_at)+' · '+esc(x.action)+' · '+esc(x.changed_fields)+'</p>').join(''));const ce=document.querySelector('[data-action="complete-e"]');if(ce)ce.onclick=()=>form('Завершить приём','<div class="field full"><label for="f-outcomeText">Итог / план</label><textarea id="f-outcomeText" name="outcomeText"></textarea></div>',async f=>{await api('/api/encounters/'+id,{method:'PATCH',body:JSON.stringify({recordVersion:e.record_version,outcomeText:f.outcomeText,plan:f.outcomeText})});await api('/api/encounters/'+id+'/complete',{method:'POST',body:JSON.stringify({recordVersion:e.record_version+1})});showEncounter(id)});document.querySelector('[data-action="add-diagnosis"]').onclick=()=>form('Добавить диагноз','<div class="field"><label for="f-type">Тип</label><select id="f-type" name="type"><option>WORKING</option><option>DIFFERENTIAL</option><option>FINAL</option></select></div>'+field('Название','label','text','required')+field('Заметки','notes'),async f=>{await api('/api/encounters/'+id+'/diagnoses',{method:'POST',body:JSON.stringify(f)});showEncounter(id)});document.querySelector('[data-action="add-medication"]').onclick=()=>form('Добавить medication',field('Препарат','drugName')+field('Практический dose text','doseText','text','required')+field('Путь','route')+field('Частота','frequency')+'<div class="field"><label for="f-administrationType">Тип</label><select id="f-administrationType" name="administrationType"><option>ADMINISTERED</option><option>PRESCRIBED</option><option>RECOMMENDED</option></select></div>',async f=>{await api('/api/encounters/'+id+'/medications',{method:'POST',body:JSON.stringify(f)});showEncounter(id)})}
+async function showInquiry(id){const d=await api('/api/inquiries/'+encodeURIComponent(id)),i=d.inquiry;$('app').innerHTML=shell(esc(i.public_ref),'<div class="card"><p>'+esc(i.person_name)+' · '+esc(i.contact_value)+'</p><p>'+esc(i.summary)+'</p><div class="actions">'+btn('Создать клиента','i-client')+btn('Отметить контакт','i-contact',true)+'</div></div>');document.querySelector('[data-action="i-contact"]').onclick=async()=>{await api('/api/inquiries/'+id+'/contact',{method:'POST'});showInquiry(id)};document.querySelector('[data-action="i-client"]').onclick=openClient}
+function openVaccination(animalId='',animalGroupId=''){form('Записать вакцинацию',field('ID животного','animalId','text',animalId?'value="'+esc(animalId)+'" required':animalGroupId?'':'required')+field('ID группы','animalGroupId','text',animalGroupId?'value="'+esc(animalGroupId)+'" required':'')+field('Дата','date','date','required')+field('Вакцина','vaccineName','text','required')+field('Производитель','manufacturer')+field('Партия','batchLot')+field('Следующая дата','nextDueAt','date')+field('Заметки','notes'),async f=>api('/api/vaccinations',{method:'POST',body:JSON.stringify({...f,animalId:f.animalId||undefined,animalGroupId:f.animalGroupId||undefined})}))}
+const baseShowPatient=showPatient;showPatient=async id=>{await baseShowPatient(id);const actions=document.querySelector('[data-action="p-encounter"]')?.parentElement;if(actions&&!actions.querySelector('[data-action="p-vaccination"]')){actions.insertAdjacentHTML('beforeend',btn('+ Вакцинация','p-vaccination',true));actions.querySelector('[data-action="p-vaccination"]').onclick=()=>openVaccination(id)}};
+function openEncounterCorrection(id,d){const diagnosis=d.diagnoses[0];form('Исправить клиническую запись','<div class="field full"><label for="f-assessment">Оценка</label><textarea id="f-assessment" name="assessment">'+esc(d.encounter.assessment)+'</textarea></div><div class="field"><label for="f-diagnosisType">Тип диагноза</label><select id="f-diagnosisType" name="diagnosisType"><option '+(diagnosis?.type==='WORKING'?'selected':'')+'>WORKING</option><option '+(diagnosis?.type==='DIFFERENTIAL'?'selected':'')+'>DIFFERENTIAL</option><option '+(diagnosis?.type==='FINAL'?'selected':'')+'>FINAL</option></select></div>'+field('Диагноз','diagnosisLabel','text','value="'+esc(diagnosis?.label)+'"')+'<div class="field full"><label for="f-plan">План / итог</label><textarea id="f-plan" name="plan">'+esc(d.encounter.plan||d.encounter.outcome_text)+'</textarea></div>',async f=>{await api('/api/encounters/'+id,{method:'PATCH',body:JSON.stringify({recordVersion:d.encounter.record_version,assessment:f.assessment,plan:f.plan,outcomeText:f.plan})});if(f.diagnosisLabel){const endpoint=diagnosis?'/api/diagnoses/'+diagnosis.id:'/api/encounters/'+id+'/diagnoses';await api(endpoint,{method:diagnosis?'PATCH':'POST',body:JSON.stringify({type:f.diagnosisType,label:f.diagnosisLabel,recordVersion:diagnosis?.record_version})})}showEncounter(id)})}
+const baseShowEncounter=showEncounter;showEncounter=async id=>{await baseShowEncounter(id);const actions=document.querySelector('[data-action="complete-e"]')?.parentElement||document.querySelector('[data-action="add-diagnosis"]')?.parentElement;if(actions&&!actions.querySelector('[data-action="correct-encounter"]')){actions.insertAdjacentHTML('beforeend',btn('Исправить запись','correct-encounter',true));actions.querySelector('[data-action="correct-encounter"]').onclick=async()=>{const d=await api('/api/encounters/'+encodeURIComponent(id));openEncounterCorrection(id,d)}}};
+const baseShowHolding=showHolding;showHolding=async id=>{await baseShowHolding(id);const d=await api('/api/holdings/'+encodeURIComponent(id)),cards=[...document.querySelectorAll('#app .list .card')];d.groups.forEach((g,i)=>{const card=cards[i];if(!card)return;card.insertAdjacentHTML('beforeend','<div class="actions">'+btn('Записать вакцинацию','group-vaccination-'+g.id,true)+'</div>');card.querySelector('[data-action="group-vaccination-'+g.id+'"]').onclick=()=>openVaccination('',g.id)})};
+ document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>{view=x.dataset.view;render()});$('refresh').onclick=render;render();</script></body></html>`;
 }
 
 async function auth(request: Request, env: Env) {
   if (env.OFFICE_AUTH_BYPASS === 'true')
-    return env.ENVIRONMENT === 'test' && request.headers.get('X-Office-Test-Auth') === 'test-only'
+    return env.ENVIRONMENT === 'test'
       ? { actor: 'test-operator', role: 'TECH_ADMIN' as const }
       : null;
   return verifyAccessJwt(request, {
@@ -51,100 +151,335 @@ async function auth(request: Request, env: Env) {
     audience: env.ACCESS_AUDIENCE,
     identities: (env.OFFICE_IDENTITIES ?? '')
       .split(',')
-      .map((item) => item.trim())
+      .map((x) => x.trim())
       .filter(Boolean),
   });
 }
 
-function response(data: unknown, status = 200) {
-  const headers = privateHeaders();
-  headers.set('Content-Type', 'application/json; charset=utf-8');
-  return json(data, status, headers);
-}
-
-async function api(request: Request, env: Env, actor: string, path: string) {
-  if (path === '/api/inquiries' && request.method === 'GET') {
-    const url = new URL(request.url);
-    const items = await listInquiries(env.DB, {
-      status: url.searchParams.get('status') ?? undefined,
-      domain: url.searchParams.get('domain') ?? undefined,
-      source: url.searchParams.get('source') ?? undefined,
-      followUp: url.searchParams.get('followUp') ?? undefined,
-      search: url.searchParams.get('search') ?? undefined,
+async function m14Api(request: Request, env: Env, actor: M14Actor, path: string) {
+  if (path === '/api/clients' && request.method === 'GET')
+    return response({
+      items: await listClients(env.DB, ''),
     });
-    const metricRows = await listInquiries(env.DB, {});
-    const now = Date.now();
-    const metrics = {
-      new: metricRows.filter((i) => i.status === 'NEW').length,
-      open: metricRows.filter((i) => i.status !== 'CLOSED').length,
-      due: metricRows.filter(
-        (i) =>
-          i.status !== 'CLOSED' &&
-          i.follow_up_at &&
-          new Date(i.follow_up_at).toDateString() === new Date().toDateString(),
-      ).length,
-      overdue: metricRows.filter(
-        (i) =>
-          i.status !== 'CLOSED' &&
-          i.follow_up_at &&
-          new Date(i.follow_up_at).toDateString() !== new Date().toDateString() &&
-          new Date(i.follow_up_at).getTime() < now,
-      ).length,
-    };
-    return response({ items, metrics });
+  if (path === '/api/clients' && request.method === 'POST') {
+    const raw = await readBody(request),
+      result = validateClientInput(raw);
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    const duplicates = await findClientMatches(env.DB, result.value);
+    if (duplicates.length && raw.confirmDuplicate !== true) return response({ duplicates }, 409);
+    return response({ id: await createClient(env.DB, result.value, actor) }, 201);
   }
-  if (path === '/api/inquiries' && request.method === 'POST') {
-    const input = await request.json();
-    const result = validateOfficeInquiry(input);
+  const client = path.match(/^\/api\/clients\/([^/]+)$/);
+  if (client && request.method === 'PATCH') {
+    const raw = await readBody(request),
+      result = validateClientInput(raw);
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    const updated = await updateClient(
+      env.DB,
+      decodeURIComponent(client[1]),
+      result.value,
+      Number(raw.recordVersion),
+      actor,
+    );
+    return updated.ok ? response({ success: true }) : errorResponse(updated.error);
+  }
+  if (path === '/api/holdings' && request.method === 'GET')
+    return response({
+      items: await listHoldings(env.DB, ''),
+    });
+  if (path === '/api/holdings' && request.method === 'POST') {
+    const result = validateHoldingInput(await readBody(request));
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    return response({ id: await createHolding(env.DB, result.value, actor) }, 201);
+  }
+  const holding = path.match(/^\/api\/holdings\/([^/]+)$/);
+  if (holding && request.method === 'PATCH') {
+    const raw = await readBody(request),
+      result = validateHoldingInput(raw);
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    const updated = await updateHolding(
+      env.DB,
+      decodeURIComponent(holding[1]),
+      result.value,
+      Number(raw.recordVersion),
+      actor,
+    );
+    return updated.ok ? response({ success: true }) : errorResponse(updated.error);
+  }
+  if (path === '/api/animals' && request.method === 'GET') {
+    const u = new URL(request.url);
+    return response({
+      items: await listAnimals(env.DB, '', u.searchParams.get('holdingId') ?? undefined),
+    });
+  }
+  if (path === '/api/animals' && request.method === 'POST') {
+    const result = validateAnimalInput(await readBody(request));
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    return response({ id: await createAnimal(env.DB, result.value, actor) }, 201);
+  }
+  const animal = path.match(/^\/api\/animals\/([^/]+)$/);
+  if (animal && request.method === 'PATCH') {
+    const raw = await readBody(request),
+      result = validateAnimalInput(raw);
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    const updated = await updateAnimal(
+      env.DB,
+      decodeURIComponent(animal[1]),
+      result.value,
+      Number(raw.recordVersion),
+      actor,
+    );
+    return updated.ok ? response({ success: true }) : errorResponse(updated.error);
+  }
+  if (path === '/api/animal-groups' && request.method === 'GET')
+    return response({
+      items: await listAnimalGroups(
+        env.DB,
+        new URL(request.url).searchParams.get('holdingId') ?? undefined,
+      ),
+    });
+  if (path === '/api/animal-groups' && request.method === 'POST') {
+    const result = validateAnimalGroupInput(await readBody(request));
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    return response({ id: await createAnimalGroup(env.DB, result.value, actor) }, 201);
+  }
+  const animalGroup = path.match(/^\/api\/animal-groups\/([^/]+)$/);
+  if (animalGroup && request.method === 'PATCH') {
+    const raw = await readBody(request),
+      result = validateAnimalGroupInput(raw);
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
+    const updated = await updateAnimalGroup(
+      env.DB,
+      decodeURIComponent(animalGroup[1]),
+      result.value,
+      Number(raw.recordVersion),
+      actor,
+    );
+    return updated.ok ? response({ success: true }) : errorResponse(updated.error);
+  }
+  if (path === '/api/encounters' && request.method === 'GET') {
+    const r = await env.DB.prepare(
+      'SELECT e.*, COALESCE(a.name, ag.display_name, h.display_name, h.locality) AS subject_label FROM encounters e LEFT JOIN animals a ON a.id=e.animal_id LEFT JOIN animal_groups ag ON ag.id=e.animal_group_id LEFT JOIN holdings h ON h.id=e.holding_id ORDER BY e.started_at DESC LIMIT 100',
+    ).all();
+    return response({ items: r.results ?? [] });
+  }
+  if (path === '/api/encounters' && request.method === 'POST') {
+    const result = validateEncounterInput(await readBody(request));
     if (!result.ok)
       return response(
-        { error: 'Проверьте поля', fields: result.issues.map((issue) => issue.field) },
+        { error: 'Проверьте предмет и поля', fields: result.issues.map((x) => x.field) },
         422,
       );
+    const created = await createEncounter(env.DB, result.value, actor);
+    return created.ok ? response({ id: created.id }, 201) : errorResponse(created.error);
+  }
+  if (path === '/api/followups' && request.method === 'GET') {
+    const r = await env.DB.prepare(
+      "SELECT f.*, COALESCE(a.name, ag.display_name, h.display_name, h.locality) AS subject_label FROM clinical_followups f LEFT JOIN animals a ON a.id=f.animal_id LEFT JOIN animal_groups ag ON ag.id=f.animal_group_id LEFT JOIN holdings h ON h.id=f.holding_id WHERE f.status='OPEN' ORDER BY f.due_at LIMIT 100",
+    ).all();
+    return response({ items: r.results ?? [] });
+  }
+  if (path === '/api/followups' && request.method === 'POST') {
+    const raw = await readBody(request),
+      valid = validateClinicalChild('followup', raw);
+    if (!valid.ok) return response({ error: 'Проверьте повторное действие' }, 422);
+    const created = await createFollowUp(env.DB, raw as unknown as FollowUpInput, actor);
+    return created.ok ? response({ id: created.id }, 201) : errorResponse(created.error);
+  }
+  const p = path.match(/^\/api\/patients\/([^/]+)$/);
+  if (p && request.method === 'GET') {
+    const r = await getPatient(env.DB, decodeURIComponent(p[1]));
+    return r ? response(r) : errorResponse('not_found');
+  }
+  if (holding && request.method === 'GET') {
+    const r = await getHolding(env.DB, decodeURIComponent(holding[1]));
+    return r ? response(r) : errorResponse('not_found');
+  }
+  const alert = path.match(/^\/api\/animals\/([^/]+)\/alerts$/);
+  if (alert && request.method === 'POST') {
+    const raw = await readBody(request),
+      valid = validateClinicalChild('alert', raw);
+    if (!valid.ok) return response({ error: 'Проверьте alert' }, 422);
+    const r = await addPatientAlert(
+      env.DB,
+      { ...raw, animalId: decodeURIComponent(alert[1]) } as unknown as PatientAlertInput,
+      actor,
+    );
+    return r.ok ? response({ id: r.id }, 201) : errorResponse(r.error);
+  }
+  if (path === '/api/vaccinations' && request.method === 'POST') {
+    const raw = await readBody(request),
+      valid = validateClinicalChild('vaccination', raw);
+    if (!valid.ok) return response({ error: 'Проверьте вакцинацию' }, 422);
+    const r = await recordVaccination(env.DB, raw as unknown as VaccinationInput, actor);
+    return r.ok ? response({ id: r.id }, 201) : errorResponse(r.error);
+  }
+  const diagnosis = path.match(/^\/api\/diagnoses\/([^/]+)$/);
+  if (diagnosis && request.method === 'PATCH') {
+    const raw = await readBody(request),
+      valid = validateClinicalChild('diagnosis', raw);
+    if (!valid.ok) return response({ error: 'Проверьте диагноз' }, 422);
+    const r = await updateDiagnosis(
+      env.DB,
+      decodeURIComponent(diagnosis[1]),
+      raw as unknown as DiagnosisInput,
+      Number(raw.recordVersion),
+      actor,
+    );
+    return r.ok ? response({ success: true }) : errorResponse(r.error);
+  }
+  const e = path.match(
+    /^\/api\/encounters\/([^/]+)(?:\/(complete|diagnoses|medications|procedures|vaccinations))?$/,
+  );
+  if (e) {
+    const id = decodeURIComponent(e[1]),
+      sub = e[2];
+    if (!sub && request.method === 'GET') {
+      const r = await getEncounter(env.DB, id);
+      return r ? response(r) : errorResponse('not_found');
+    }
+    if (!sub && request.method === 'PATCH') {
+      const raw = await readBody(request),
+        valid = validateEncounterUpdateInput(raw);
+      if (!valid.ok)
+        return response(
+          { error: 'Проверьте поля приёма', fields: valid.issues.map((x) => x.field) },
+          422,
+        );
+      const r = await updateEncounter(env.DB, id, valid.value, Number(raw.recordVersion), actor);
+      return r.ok ? response({ success: true }) : errorResponse(r.error);
+    }
+    if (sub === 'complete' && request.method === 'POST') {
+      const raw = await readBody(request),
+        r = await completeEncounter(env.DB, id, Number(raw.recordVersion), actor);
+      return r.ok ? response({ success: true }) : errorResponse(r.error);
+    }
+    if (
+      sub === 'diagnoses' ||
+      sub === 'medications' ||
+      sub === 'procedures' ||
+      sub === 'vaccinations'
+    ) {
+      const raw = await readBody(request),
+        kind =
+          sub === 'diagnoses'
+            ? 'diagnosis'
+            : sub === 'medications'
+              ? 'medication'
+              : sub === 'procedures'
+                ? 'procedure'
+                : 'vaccination',
+        valid = validateClinicalChild(kind, raw);
+      if (!valid.ok) return response({ error: 'Проверьте запись' }, 422);
+      const r =
+        sub === 'diagnoses'
+          ? await addDiagnosis(env.DB, id, raw as unknown as DiagnosisInput, actor)
+          : sub === 'medications'
+            ? await addMedication(env.DB, id, raw as unknown as MedicationInput, actor)
+            : sub === 'procedures'
+              ? await addProcedure(env.DB, id, raw as unknown as ProcedureInput, actor)
+              : await recordVaccination(
+                  env.DB,
+                  { ...raw, encounterId: id } as unknown as VaccinationInput,
+                  actor,
+                );
+      return r.ok ? response({ id: r.id }, 201) : errorResponse(r.error);
+    }
+  }
+  if (path === '/api/search' && request.method === 'POST') {
+    const raw = await readBody(request);
+    return response({ items: await searchM14(env.DB, typeof raw.q === 'string' ? raw.q : '') });
+  }
+  return null;
+}
+
+async function m13Api(request: Request, env: Env, actor: string, path: string) {
+  if (path === '/api/inquiries' && request.method === 'GET') {
+    const u = new URL(request.url),
+      items = await listInquiries(env.DB, {
+        status: u.searchParams.get('status') ?? undefined,
+        domain: u.searchParams.get('domain') ?? undefined,
+        source: u.searchParams.get('source') ?? undefined,
+        followUp: u.searchParams.get('followUp') ?? undefined,
+        search: u.searchParams.get('search') ?? undefined,
+      }),
+      all = await listInquiries(env.DB, {}),
+      now = Date.now();
+    return response({
+      items,
+      metrics: {
+        new: all.filter((i) => i.status === 'NEW').length,
+        open: all.filter((i) => i.status !== 'CLOSED').length,
+        due: all.filter(
+          (i) =>
+            i.status !== 'CLOSED' &&
+            i.follow_up_at &&
+            new Date(i.follow_up_at).toDateString() === new Date().toDateString(),
+        ).length,
+        overdue: all.filter(
+          (i) =>
+            i.status !== 'CLOSED' &&
+            i.follow_up_at &&
+            new Date(i.follow_up_at).toDateString() !== new Date().toDateString() &&
+            new Date(i.follow_up_at).getTime() < now,
+        ).length,
+      },
+    });
+  }
+  if (path === '/api/inquiries' && request.method === 'POST') {
+    const result = validateOfficeInquiry(await readBody(request));
+    if (!result.ok)
+      return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
     const created = await createInquiry(
       env.DB,
       result.value,
-      `office-${crypto.randomUUID()}`,
+      'office-' + crypto.randomUUID(),
       actor,
     );
     return response({ public_ref: created.inquiry.public_ref, id: created.inquiry.id }, 201);
   }
-  const match = path.match(/^\/api\/inquiries\/([^/]+)(?:\/(status|follow-up|contact|notes))?$/);
-  if (!match) return response({ error: 'Not found' }, 404);
-  const id = decodeURIComponent(match[1]);
-  if (!match[2] && request.method === 'GET') {
-    const record = await getInquiry(env.DB, id);
-    return record ? response(record) : response({ error: 'Not found' }, 404);
+  const m = path.match(/^\/api\/inquiries\/([^/]+)(?:\/(status|follow-up|contact|notes))?$/);
+  if (!m) return null;
+  const id = decodeURIComponent(m[1]);
+  if (!m[2] && request.method === 'GET') {
+    const r = await getInquiry(env.DB, id);
+    return r ? response(r) : errorResponse('not_found');
   }
-  const payload = (await request.json().catch(() => ({}))) as Record<string, unknown>;
-  if (match[2] === 'status' && request.method === 'PATCH') {
-    const result = await updateStatus(
+  const raw = await readBody(request);
+  if (m[2] === 'status' && request.method === 'PATCH') {
+    const r = await updateStatus(
       env.DB,
       id,
-      payload.status as InquiryStatus,
-      (payload.outcome as InquiryOutcome | null) ?? null,
+      raw.status as InquiryStatus,
+      (raw.outcome as InquiryOutcome | null) ?? null,
       actor,
     );
-    return result.ok
-      ? response({ success: true })
-      : response({ error: result.error }, result.error === 'not_found' ? 404 : 422);
+    return r.ok ? response({ success: true }) : errorResponse(r.error);
   }
-  if (match[2] === 'follow-up' && request.method === 'PATCH') {
-    const followUpAt = typeof payload.follow_up_at === 'string' ? payload.follow_up_at : null;
-    const result = await setFollowUp(env.DB, id, followUpAt, actor);
-    return result.ok
-      ? response({ success: true })
-      : response({ error: result.error }, result.error === 'not_found' ? 404 : 422);
+  if (m[2] === 'follow-up' && request.method === 'PATCH') {
+    const r = await setFollowUp(
+      env.DB,
+      id,
+      typeof raw.follow_up_at === 'string' ? raw.follow_up_at : null,
+      actor,
+    );
+    return r.ok ? response({ success: true }) : errorResponse(r.error);
   }
-  if (match[2] === 'contact' && request.method === 'POST') {
-    const result = await markContacted(env.DB, id, actor);
-    return result.ok ? response({ success: true }) : response({ error: result.error }, 404);
+  if (m[2] === 'contact' && request.method === 'POST') {
+    const r = await markContacted(env.DB, id, actor);
+    return r.ok ? response({ success: true }) : errorResponse(r.error);
   }
-  if (match[2] === 'notes' && request.method === 'POST') {
-    const result = await addNote(env.DB, id, String(payload.body ?? ''), actor);
-    return result.ok
-      ? response({ success: true })
-      : response({ error: result.error }, result.error === 'not_found' ? 404 : 422);
+  if (m[2] === 'notes' && request.method === 'POST') {
+    const r = await addNote(env.DB, id, String(raw.body ?? ''), actor);
+    return r.ok ? response({ success: true }) : errorResponse(r.error);
   }
   return response({ error: 'Method not allowed' }, 405);
 }
@@ -157,9 +492,19 @@ export default {
     const identity = await auth(request, env);
     if (!identity) return new Response('Authentication required', { status: 401, headers });
     const url = new URL(request.url);
+    const actor: M14Actor = {
+      actor: identity.actor,
+      role: identity.role,
+      requestId: crypto.randomUUID(),
+    };
     try {
-      if (url.pathname.startsWith('/api/'))
-        return await api(request, env, identity.actor, url.pathname);
+      if (url.pathname.startsWith('/api/')) {
+        const first = await m14Api(request, env, actor, url.pathname);
+        if (first) return first;
+        const second = await m13Api(request, env, actor.actor, url.pathname);
+        if (second) return second;
+        return errorResponse('not_found');
+      }
       return new Response(page(), {
         headers: new Headers({
           ...Object.fromEntries(headers),
@@ -171,11 +516,15 @@ export default {
         JSON.stringify(
           safeLog({
             operation: 'office_request',
-            error_category: error instanceof Error ? error.name : 'unknown',
+            request_id: actor.requestId,
+            error_category: error instanceof Error ? error.message : 'internal_error',
           }),
         ),
       );
-      return response({ error: 'Операция не выполнена' }, 500);
+      return response(
+        { error: 'Операция не выполнена', category: 'INTERNAL_ERROR', request_id: actor.requestId },
+        500,
+      );
     }
   },
   async scheduled(_controller: ScheduledController, env: Env) {
