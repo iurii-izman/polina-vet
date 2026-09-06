@@ -6,8 +6,8 @@ Users are Polina and a technical administrator/assistant. Both roles have full i
 
 Statuses: `NEW`, `IN_PROGRESS`, `WAITING`, `FOLLOW_UP`, `CLOSED`. Closing requires a separate outcome, with `visit_at_site` first in the Office UI. Closed inquiries can be reopened.
 
-Public intake is a short Pets/Farm flow at `/ru/contact/request/`, `/ro/contact/request/`, and `/uk/contact/request/`. Address is optional. The route is always noindex. It is disabled by default with `PUBLIC_INTAKE_ENABLED=false`.
+Public intake is a short Pets/Farm flow at `/ru/contact/request/`, `/ro/contact/request/`, and `/uk/contact/request/`. Address is optional. The route is always noindex. It is disabled by default with `PUBLIC_INTAKE_ENABLED=false` until the Article 22 external notification prerequisite is evidenced.
 
 Required operational capabilities: list, detail, Quick Add, status, follow-up presets (today/tomorrow/+3 days/custom API), last contact, notes, audit events, filters/search, retention, and a narrow Telegram notification adapter that excludes PII.
 
-Retention is 12 months after closure for standalone M13 inquiries. Uploads are off. M14 has not started.
+Retention is up to 365 days after closure for standalone M13 inquiries, with earlier deletion/correction through the protected manual privacy procedure. Uploads are off. M14 has not started.

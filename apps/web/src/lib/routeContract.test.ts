@@ -4,8 +4,8 @@ import { staticAlternates } from './i18n.ts';
 import { coreRoutes, requiredLocalizedCoreRoutes } from './routeContract.ts';
 
 test('all core route families have all three locale variants', () => {
-  assert.equal(coreRoutes('ru').length, 15);
-  assert.equal(requiredLocalizedCoreRoutes.length, 45);
+  assert.equal(coreRoutes('ru').length, 16);
+  assert.equal(requiredLocalizedCoreRoutes.length, 48);
   assert.ok(requiredLocalizedCoreRoutes.includes('/ro/farm/group-problem/'));
   assert.ok(requiredLocalizedCoreRoutes.includes('/uk/pets/before-visit/'));
 });
