@@ -53,6 +53,7 @@
         "PUBLIC_INTAKE_ENABLED": "false",
         "PRIVACY_NOTICE_VERSION": "M13-DRAFT-1",
         "ALLOWED_ORIGINS": "https://polina-vet-dev.aipipeline.cc",
+        "OFFICE_URL": "https://office-polina-vet.aipipeline.cc",
       },
     },
     "production": {
