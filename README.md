@@ -2,6 +2,10 @@
 
 Static-first multilingual veterinary guidance and routing hub.
 
+## Current state
+
+The M1–M14.5 launch baseline is closed and development is paused for real-world observation. Read [the current status](docs/PROJECT_STATUS.md) and [the pause/restart contract](docs/PAUSE_AND_RESTART.md) before making changes. R1, R2, and R3 remain open external follow-ups; no M15/M16 work is authorized by this repository state.
+
 ## Commands
 
 - `pnpm dev` — run the Astro public site.
@@ -13,6 +17,8 @@ Static-first multilingual veterinary guidance and routing hub.
 - `pnpm sanity:typegen` — extract the local Studio schema and generate frontend query types.
 - `pnpm sanity:seed:safe` — idempotently publish only the safe singleton settings and RU editorial-policy page.
 - `pnpm sanity:verify` — read and validate published Sanity content without changing it.
+
+Production operations runbook: [docs/OPERATIONS_RUNBOOK.md](docs/OPERATIONS_RUNBOOK.md).
 
 ## Local configuration
 

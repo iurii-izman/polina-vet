@@ -1,5 +1,7 @@
 # M14.5 Acceptance
 
+This file records the M14.5 implementation evidence and its final closure state. Historical PR evidence remains useful, while current production facts are maintained in `PROJECT_STATUS.md` and `OPERATIONS_RUNBOOK.md`.
+
 ## Local gates
 
 - `pnpm test:m14-5`
@@ -23,8 +25,17 @@
 - Staging and production Analytics Engine datasets are physically separate.
 - Canary leakage count is zero across accessible logs, telemetry, client events, and traces.
 
-## Release boundary
+## Final release boundary
 
-`PUBLIC_INTAKE_ENABLED=false`; public analytics remains off; temporary public site remains noindex; production M14 migration is not applied; production clinical real-data processing is not activated; R1/R2/R3 remain open; observation period is NOT STARTED.
+`PUBLIC_INTAKE_ENABLED=false`; public analytics remains off; the temporary public site is indexable only after the explicit production SEO verification; production M14 migration is applied with zero operational rows; production clinical real-data processing is not activated; R1/R2/R3 remain open; observation is `READY / REAL OBSERVATION NOT YET STARTED` until the first genuine `REAL` telemetry event after Office activation.
 
-Trace status must be recorded truthfully as `CONFIGURED`, `VERIFIED`, or `CONFIGURED BUT EXTERNAL VIEW NOT AVAILABLE`.
+Trace status must be recorded truthfully as `CONFIGURED`, `VERIFIED`, `CONFIGURED BUT EXTERNAL VIEW NOT AVAILABLE`, or `NOT STARTED`. No synthetic event may be used to start observation.
+
+## Current evidence snapshot — 2026-09-07
+
+- Production database `polina-vet-operations-production` has migrations `0001` and `0002_m14_core` applied, zero inquiry/clinical/audit rows, and a clean foreign-key check.
+- Production Turnstile is provisioned for the temporary public origin and its Worker secret is present by name. The sitekey is kept in the deployment runbook, not in this acceptance record.
+- Production Cloudflare Access has no application configured. Approved Office identities and production Telegram credentials were not supplied; Office stays fail-closed and Intake stays disabled.
+- The current production deployments are recorded in `OPERATIONS_RUNBOOK.md`; the web origin verifier passed after the final public deployment.
+- The corrected public build has absolute temporary-origin canonical, Open Graph, sitemap, and alternate links. Public Plausible remains disabled.
+- The PMR Article 22 notification prerequisite remains unresolved. The owner override accepts launch with notification evidence deferred; this is not a legal-compliance claim.

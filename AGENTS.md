@@ -6,18 +6,22 @@ Implement POLINA VET as the frozen Veterinary Guidance & Routing Hub defined by 
 
 Codex is an implementation engineer here. Do not redesign the product, reopen the information architecture, or invent missing facts.
 
+The M1–M14.5 implementation and launch baseline is now closed. Development is paused for real-world observation. Read `docs/PROJECT_STATUS.md` and `docs/PAUSE_AND_RESTART.md` before changing the repository. Do not start M15, M16, or any later milestone without an explicit new owner request.
+
 ## Canonical sources of truth
 
 Read these before meaningful implementation work, in this order:
 
-1. `docs/Product Blueprint v1.1.md`
-2. `docs/Content & UX Freeze v1.0.md`
-3. `docs/POLINA_VET_High_Fidelity_Prototype_v1.2_FROZEN.html`
-4. `docs/POLINA_VET_Prototype_v1.2_Decision_Log.md`
-5. `docs/POLINA_VET_Prototype_Handoff_v1.2_CODEX_READY.md`
-6. `docs/ARCHITECTURE.md`
-7. `docs/MEDICAL_SAFETY.md`
-8. relevant ADRs in `docs/ADR/`
+1. `docs/PROJECT_STATUS.md`
+2. `docs/PAUSE_AND_RESTART.md`
+3. `docs/Product Blueprint v1.1.md`
+4. `docs/Content & UX Freeze v1.0.md`
+5. `docs/POLINA_VET_High_Fidelity_Prototype_v1.2_FROZEN.html`
+6. `docs/POLINA_VET_Prototype_v1.2_Decision_Log.md`
+7. `docs/POLINA_VET_Prototype_Handoff_v1.2_CODEX_READY.md`
+8. `docs/ARCHITECTURE.md`
+9. `docs/MEDICAL_SAFETY.md`
+10. relevant ADRs in `docs/ADR/`
 
 If two documents appear to conflict, do not guess. Prefer the later frozen decision document, record the conflict, and ask before changing product behavior.
 
@@ -99,7 +103,7 @@ For browser/UI verification:
 - Never `git push --force`.
 - Never `git reset --hard` on user work.
 - Never delete a Sanity dataset.
-- Never deploy production or change repository visibility without explicit approval.
+- Never deploy production or change repository visibility without explicit approval. The final M1–M14.5 closure brief is that approval for the recorded launch actions; later production changes still require explicit approval.
 - After the bootstrap baseline, use feature branches and PRs rather than direct changes to `main`.
 - Keep commits small and descriptive.
 

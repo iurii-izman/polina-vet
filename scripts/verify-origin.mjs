@@ -240,10 +240,12 @@ export async function verifyOrigin({ origin, indexable, fetcher = fetch }) {
     const { response, body } = await get(path);
     assert.equal(response.status, 404, `Expected safe 404: ${path}`);
     assertNoDraft(body, path);
-    assert(
-      /\bnoindex\b/.test(response.headers.get('x-robots-tag') ?? ''),
-      `404 HTTP noindex: ${path}`,
-    );
+    assert(/<meta\s+name="robots"[^>]*\bnoindex\b/i.test(body), `404 HTML noindex: ${path}`);
+    if (!indexable)
+      assert(
+        /\bnoindex\b/.test(response.headers.get('x-robots-tag') ?? ''),
+        `404 HTTP noindex: ${path}`,
+      );
     assert(/<main\b/.test(body), `Unusable 404: ${path}`);
   }
   const summary = {

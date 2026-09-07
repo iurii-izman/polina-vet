@@ -1,6 +1,6 @@
 # M13 narrow PMR personal-data check
 
-**Checked:** 2026-09-06
+**Checked:** 2026-09-07 (narrow recheck)
 **Scope:** the small public Pets/Farm Intake flow, its Cloudflare Workers/D1 operations store, protected Office, and PII-free Telegram notifications. This is a focused product gate, not a broad legal opinion.
 
 ## Official sources checked
@@ -43,5 +43,9 @@ This is the single activation blocker. It is not a request for generic lawyer ap
 ## Gate result
 
 **LEGAL PRODUCT GATE: FAIL / EXTERNAL PREREQUISITE OPEN**
+
+## M14.5 recheck
+
+The current consolidated text and the official publication material were rechecked on 2026-09-07. The Article 22(1) prior-notification conclusion remains unchanged. The specific official route/form needed for an owner submission was not located in the checked material, so the project records `OWNER INPUT REQUIRED` and does not claim filing, registration, or compliance. The owner-approved launch override allows the public static site to launch while real Intake remains disabled.
 
 The M13 implementation and privacy documentation can be closed, and production infrastructure can be provisioned fail-closed, but real public Intake activation must wait for the Article 22 notification evidence.

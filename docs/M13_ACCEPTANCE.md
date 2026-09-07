@@ -1,5 +1,7 @@
 # M13 Acceptance
 
+This is the historical M13 staging/implementation acceptance. The current production closure state, including the later empty D1 migration, is recorded in `PROJECT_STATUS.md`.
+
 ## Implementation status
 
 | Area | State |
@@ -46,6 +48,7 @@
 ### OPTIONAL PRODUCTION ACTIVATION
 
 - production Intake activation after the Article 22 notification evidence;
-- production Turnstile, Office, Telegram, and exact-origin configuration where not already provisioned.
+- production Access identities and Telegram configuration;
+- the controlled production synthetic smoke and clean-up sequence before any flag change.
 
 M13 implementation and staging acceptance are complete, but public Intake remains disabled because the single external notification prerequisite is open. This document does not declare public Intake live.

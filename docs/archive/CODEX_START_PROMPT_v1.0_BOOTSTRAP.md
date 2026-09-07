@@ -1,12 +1,4 @@
-# POLINA VET — Codex Restart Prompt (post-M14.5 pause)
-
-This duplicate is kept consistent with the active root prompt. The bootstrap prompt is archived at `docs/archive/CODEX_START_PROMPT_v1.0_BOOTSTRAP.md`.
-
-Read `docs/PROJECT_STATUS.md` and `docs/PAUSE_AND_RESTART.md` before any work. M1–M14.5 is closed; development is paused; M15/M16 are not started. New work requires an explicit milestone request, the `milestone-start` skill, a feature branch from current `main`, the frozen product/medical/privacy boundaries, and applicable `preflight` checks.
-
-Do not enable Intake, Access bypass, public analytics, or production notifications without owner-controlled inputs and evidence. Do not invent Polina facts, medical/legal claims, availability, cases, or contact details. Do not add AI diagnosis, owner dosing, booking, commerce, testimonials, or private data to Sanity/public analytics. Keep `output/` untracked and never commit `.env` or secrets.
-
-For the full historical bootstrap instructions, see `docs/archive/CODEX_START_PROMPT_v1.0_BOOTSTRAP.md`.
+# POLINA VET — Codex Start Prompt v1.0
 
 You are the senior implementation engineer responsible for bootstrapping and beginning production development of POLINA VET.
 
