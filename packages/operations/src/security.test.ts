@@ -79,8 +79,8 @@ test('safe logs exclude PII-shaped fields', () => {
 });
 
 test('safe logs omit error code for successful events without an error', () => {
-  assert.deepEqual(
-    safeLog({ operation: 'request', result: 'SUCCESS', error_code: undefined }),
-    { operation: 'request', result: 'SUCCESS' },
-  );
+  assert.deepEqual(safeLog({ operation: 'request', result: 'SUCCESS', error_code: undefined }), {
+    operation: 'request',
+    result: 'SUCCESS',
+  });
 });
