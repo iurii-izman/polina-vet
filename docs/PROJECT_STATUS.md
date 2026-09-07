@@ -1,7 +1,7 @@
 # POLINA VET — Current Project Status
 
-**As of:** 2026-09-07  
-**Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation  
+**As of:** 2026-09-07
+**Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation
 **Current branch:** `chore/finalize-m14-5-pause-baseline` until closure merge
 
 ## Launch decision

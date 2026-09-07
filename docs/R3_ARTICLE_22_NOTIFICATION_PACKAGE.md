@@ -1,7 +1,7 @@
 # Internal Article 22 Notification Package Checklist
 
-**Purpose:** owner-input checklist for an operator notification under the current PMR personal-data review.  
-**Status:** NOT FILED / OWNER INPUT REQUIRED  
+**Purpose:** owner-input checklist for an operator notification under the current PMR personal-data review.
+**Status:** NOT FILED / OWNER INPUT REQUIRED
 **Not legal advice:** this document is not a filing, submission, registration, or compliance certificate.
 
 ## Current review basis

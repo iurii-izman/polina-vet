@@ -1,6 +1,6 @@
 # R3 — Complete production compliance and deferred Intake obligations
 
-**Status:** OPEN / TECHNICAL AND EXTERNAL PREREQUISITES DEFERRED  
+**Status:** OPEN / TECHNICAL AND EXTERNAL PREREQUISITES DEFERRED
 **Tracking issue:** [#18](https://github.com/iurii-izman/polina-vet/issues/18)
 
 R3 is the remaining production-operations gate. The owner accepted public launch with notification evidence deferred. This is an operational override, not a legal-compliance conclusion.

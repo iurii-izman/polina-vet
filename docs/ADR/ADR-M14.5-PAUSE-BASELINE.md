@@ -1,6 +1,6 @@
 # ADR-M14.5 — Public launch and development pause baseline
 
-**Date:** 2026-09-07  
+**Date:** 2026-09-07
 **Status:** Accepted for the M1–M14.5 closure baseline
 
 ## Decision
