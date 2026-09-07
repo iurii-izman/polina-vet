@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/prepare-headers.mjs",
     "preview": "astro preview",
     "preview:server": "astro dev --config astro.preview.config.mjs --mode preview",
     "preview:check": "astro build --config astro.preview.config.mjs --mode preview",
