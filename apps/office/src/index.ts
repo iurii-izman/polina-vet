@@ -29,6 +29,13 @@ import {
   recordVaccination,
   safeLog,
   searchM14,
+  collectDailySnapshot,
+  officeMutationOriginAllowed,
+  recordClientFrictionEvent,
+  recordDailySnapshot,
+  recordWorkflowEvent,
+  routeClassForPath,
+  toErrorCode,
   setFollowUp,
   updateEncounter,
   updateAnimal,
@@ -47,7 +54,7 @@ import {
   validateOfficeInquiry,
   verifyAccessJwt,
 } from '@polina-vet/operations';
-import type { D1Database } from '@cloudflare/workers-types';
+import type { AnalyticsEngineDataset, D1Database } from '@cloudflare/workers-types';
 import type {
   DiagnosisInput,
   EncounterInput,
@@ -68,31 +75,68 @@ interface Env {
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUDIENCE?: string;
   OFFICE_IDENTITIES?: string;
+  OFFICE_ORIGIN?: string;
+  LEARNING?: AnalyticsEngineDataset;
+  VERSION_METADATA?: { id: string; tag: string; timestamp: string };
+  RELEASE?: string;
 }
 const maxBodyBytes = 64_000;
 const errorStatus = (error: string) =>
-  error === 'not_found' || error === 'subject_not_found'
-    ? 404
-    : error === 'conflict' || error === 'already_completed'
-      ? 409
-      : 422;
+  toErrorCode(error) === 'NOT_FOUND' ? 404 : toErrorCode(error) === 'CONFLICT' ? 409 : 422;
 function response(data: unknown, status = 200) {
   const headers = privateHeaders();
   headers.set('Content-Type', 'application/json; charset=utf-8');
   return json(data, status, headers);
 }
 function errorResponse(error: string, status = errorStatus(error)) {
+  const errorCode = toErrorCode(error);
   return response(
     {
       error,
-      category:
-        error === 'conflict'
-          ? 'CONFLICT'
-          : error === 'not_found'
-            ? 'NOT_FOUND'
-            : 'VALIDATION_ERROR',
+      category: errorCode,
     },
     status,
+  );
+}
+
+function telemetryContext(env: Env) {
+  return {
+    environment: env.ENVIRONMENT ?? 'unknown',
+    service: 'office' as const,
+    release:
+      env.RELEASE?.trim() || env.VERSION_METADATA?.id || env.VERSION_METADATA?.tag || 'unversioned',
+    dataOrigin: env.ENVIRONMENT === 'production' ? ('REAL' as const) : ('SYNTHETIC' as const),
+  };
+}
+
+function emitWorkflow(env: Env, event: Parameters<typeof recordWorkflowEvent>[2]) {
+  recordWorkflowEvent(env.LEARNING, telemetryContext(env), event);
+}
+
+function logRequest(
+  env: Env,
+  request: Request,
+  actor: M14Actor,
+  status: number,
+  startedAt: number,
+  error?: unknown,
+) {
+  console.log(
+    JSON.stringify(
+      safeLog({
+        timestamp: new Date().toISOString(),
+        service: 'office',
+        environment: env.ENVIRONMENT ?? 'unknown',
+        release: telemetryContext(env).release,
+        request_id: actor.requestId,
+        route_class: routeClassForPath(new URL(request.url).pathname),
+        operation: 'OFFICE_REQUEST',
+        result: status >= 500 ? 'FAILURE' : status >= 400 ? 'REJECTED' : 'SUCCESS',
+        http_status: status,
+        duration_ms: Date.now() - startedAt,
+        error_code: error ? toErrorCode(error) : undefined,
+      }),
+    ),
   );
 }
 async function readBody(request: Request) {
@@ -107,7 +151,7 @@ function page() {
   return String.raw`<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POLINA VET Office</title><style>
 :root{--forest:#2f493b;--deep:#22382d;--cream:#f4efe5;--card:#fffdf8;--muted:#646b63;--line:#d8d0c3;--red:#a8483b;--soft:#e6eadf;--radius:14px}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:#252823;font:16px/1.5 Inter,system-ui,sans-serif}button,input,select,textarea{font:inherit}button{min-height:44px;border:1px solid var(--forest);border-radius:10px;padding:.65rem .9rem;background:var(--forest);color:#fff;cursor:pointer}button.secondary{background:transparent;color:var(--forest)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #c8794f;outline-offset:2px}.shell{max-width:1220px;margin:auto;padding:1rem}.top{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.75rem 0 1rem}.brand{font:700 1.35rem Georgia,serif;color:var(--deep)}.meta{color:var(--muted);font-size:.9rem}.nav{display:flex;gap:.4rem;overflow:auto;padding:.25rem 0 1rem}.nav button{white-space:nowrap;background:transparent;color:var(--forest);border-color:transparent}.nav button[aria-current=page]{background:var(--forest);color:#fff}.metrics,.grid,.layout,.list,.form-grid{display:grid;gap:1rem}.metrics{grid-template-columns:repeat(4,1fr)}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.metric,.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;box-shadow:0 8px 20px #2528230d}.metric b{display:block;font-size:1.7rem;color:var(--deep)}.metric span{font-size:.85rem;color:var(--muted)}.toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:end;margin:1rem 0}.field{display:grid;gap:.35rem}.field label{font-size:.86rem;font-weight:700}.field input,.field select,.field textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:.65rem}.field textarea{min-height:100px}.item{text-align:left;width:100%;display:grid;gap:.25rem;background:#fffdf8;color:#252823;border-color:var(--line)}.item-head{display:flex;justify-content:space-between;gap:.5rem}.tag{display:inline-block;border-radius:999px;background:var(--soft);padding:.15rem .5rem;font-size:.78rem}.alert{background:#f5e2dd;color:#7f2c23}.actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}.layout{grid-template-columns:minmax(0,1.4fr) minmax(300px,1fr)}.timeline{border-left:3px solid var(--soft);padding-left:1rem}.notice{padding:.75rem;border-radius:10px;background:#f5e2dd;color:#7f2c23}.empty,.state{padding:2rem;text-align:center;color:var(--muted)}dialog{border:0;border-radius:16px;max-width:720px;width:calc(100% - 1rem);padding:0;background:transparent}dialog::backdrop{background:#22382d66}.form-grid{grid-template-columns:1fr 1fr}.full{grid-column:1/-1}@media(max-width:800px){.metrics,.grid,.layout{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}@media(max-width:420px){.shell{padding:.75rem}.metrics,.grid{grid-template-columns:1fr 1fr}.metric{padding:.75rem}.nav{margin-inline:-.75rem;padding-inline:.75rem}}
 </style></head><body><div class="shell"><header class="top"><div><div class="brand">POLINA VET Office</div><small class="meta">Операционная ветеринарная запись · приватный доступ</small></div><button class="secondary" id="refresh">Обновить</button></header><nav class="nav" aria-label="Навигация Office"><button data-view="home">Главная</button><button data-view="inquiries">Обращения</button><button data-view="patients">Пациенты</button><button data-view="holdings">Хозяйства</button><button data-view="encounters">Приёмы</button><button data-view="followups">Повторные</button><button data-view="search">Поиск</button></nav><main id="app" tabindex="-1"></main></div><dialog id="dialog"><div class="panel" id="dialog-content"></div></dialog><script>
-const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let view='home';const api=async(p,o={})=>{const r=await fetch(p,{...o,headers:{'Content-Type':'application/json',...(o.headers||{})}}),d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Операция не выполнена');return d},fd=f=>Object.fromEntries(new FormData(f).entries());
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let view='home';const friction=async(eventName,extra={})=>{try{navigator.sendBeacon('/api/telemetry/client',new Blob([JSON.stringify({eventName,...extra})],{type:'application/json'}))}catch{}};const api=async(p,o={})=>{const r=await fetch(p,{...o,headers:{'Content-Type':'application/json',...(o.headers||{})}}),d=await r.json().catch(()=>({}));if(!r.ok){if(r.status===422)friction('CLIENT_VALIDATION_BLOCKED',{validationErrorCount:Array.isArray(d.fields)?d.fields.length:1});throw Error(d.error||'Операция не выполнена')}return d},fd=f=>Object.fromEntries(new FormData(f).entries());
 const btn=(label,action,secondary=false)=>'<button data-action="'+action+'" class="'+(secondary?'secondary':'')+'">'+label+'</button>';const field=(label,name,type='text',extra='')=>'<div class="field"><label for="f-'+name+'">'+label+'</label><input id="f-'+name+'" name="'+name+'" type="'+type+'" '+extra+'></div>';
 async function render(){document.querySelectorAll('[data-view]').forEach(x=>x.setAttribute('aria-current',x.dataset.view===view?'page':'false'));try{if(view==='home')await home();else if(view==='inquiries')await inquiries();else if(view==='patients')await patients();else if(view==='holdings')await holdings();else if(view==='encounters')await encounters();else if(view==='followups')await followups();else await search()}catch(e){$('app').innerHTML='<div class="notice" role="alert">'+esc(e.message)+'</div>'}}
 const shell=(title,body,actions='')=>'<section><header class="top"><div><p class="meta">POLINA VET Office</p><h1>'+title+'</h1></div><div class="actions">'+actions+'</div></header>'+body+'</section>';
@@ -121,7 +165,7 @@ async function search(){ $('app').innerHTML=shell('Поиск','<div class="tool
 function bind(){document.querySelectorAll('[data-view]').forEach(x=>x.onclick=()=>{view=x.dataset.view;render()});document.querySelectorAll('[data-action]').forEach(x=>x.onclick=()=>action(x.dataset.action))}
 async function action(a){if(['home','inquiries','patients','holdings','encounters','followups','search'].includes(a)){view=a;return render()}if(a==='new-client')return openClient();if(a==='new-animal')return openAnimal();if(a==='new-holding')return openHolding();if(a==='new-group')return openGroup();if(a==='new-encounter')return openEncounter();if(a==='new-inquiry')return openInquiry();if(a==='do-search'){const d=await api('/api/search',{method:'POST',body:JSON.stringify({q:$('global-q').value})});$('results').innerHTML=(d.items.map(x=>'<button class="item" data-result="'+esc(x.entity_type)+'" data-id="'+esc(x.id)+'"><b>'+esc(x.label)+'</b><span class="meta">'+esc(x.entity_type)+' · '+esc(x.detail)+'</span></button>').join('')||'<div class="empty">Ничего не найдено.</div>');document.querySelectorAll('[data-result]').forEach(x=>x.onclick=()=>openResult(x.dataset.result,x.dataset.id))}}
 async function openResult(type,id){if(type==='ANIMAL')return showPatient(id);if(type==='HOLDING'||type==='ANIMAL_GROUP')return showHolding(id);if(type==='ENCOUNTER')return showEncounter(id);if(type==='INQUIRY')return showInquiry(id);view='patients';render()}
-function form(title,fields,submit){$('dialog-content').innerHTML='<form id="form" class="panel"><h2>'+title+'</h2><div class="form-grid">'+fields+'</div><div class="actions"><button type="button" class="secondary" id="cancel">Отмена</button><button type="submit">Сохранить</button></div><p id="form-error" role="alert"></p></form>';$('dialog').showModal();$('cancel').onclick=()=>$('dialog').close();$('form').onsubmit=async e=>{e.preventDefault();try{await submit(fd(e.currentTarget));$('dialog').close();render()}catch(err){$('form-error').textContent=err.message}}}
+function form(title,fields,submit){$('dialog-content').innerHTML='<form id="form" class="panel"><h2>'+title+'</h2><div class="form-grid">'+fields+'</div><div class="actions"><button type="button" class="secondary" id="cancel">Отмена</button><button type="submit">Сохранить</button></div><p id="form-error" role="alert"></p></form>';$('dialog').showModal();$('cancel').onclick=()=>$('dialog').close();$('form').onsubmit=async e=>{e.preventDefault();try{await submit(fd(e.currentTarget));$('dialog').close();render()}catch(err){friction('CLIENT_RUNTIME_FAILURE',{errorCode:'UNHANDLED_CLIENT_ERROR'});$('form-error').textContent='Операция не выполнена'}}}
 async function opts(path){const d=await api(path);return d.items.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.display_name||x.name||x.locality||x.species_code)+' · '+esc(x.locality||'')+'</option>').join('')}
 function openClient(){form('Новый клиент',field('Имя владельца','displayName','text','required maxlength="160"')+field('Местность','locality')+field('Контакт','contactValue')+'<div class="field"><label for="f-contactType">Тип</label><select id="f-contactType" name="contactType"><option>PHONE</option><option>TELEGRAM</option><option>EMAIL</option><option>OTHER</option></select></div>'+field('Заметка','notes'),async f=>{const d=await api('/api/clients',{method:'POST',body:JSON.stringify({displayName:f.displayName,locality:f.locality,notes:f.notes,contacts:f.contactValue?[{type:f.contactType,value:f.contactValue,isPrimary:true}]:[]})});if(d.duplicates)throw Error('Возможно, такая запись уже существует. Проверьте список перед повторным сохранением.')})}
 async function openAnimal(){const [cs,hs]=await Promise.all([opts('/api/clients'),opts('/api/holdings')]);form('Новый пациент','<div class="field"><label for="f-domain">Контекст</label><select id="f-domain" name="domain"><option>PET</option><option>FARM</option></select></div>'+field('Вид','speciesCode','text','required')+field('Имя (необязательно)','name')+field('Метка','identifier')+'<div class="field"><label for="f-clientId">Владелец</label><select id="f-clientId" name="clientId"><option value="">Не указан</option>'+cs+'</select></div><div class="field"><label for="f-holdingId">Хозяйство</label><select id="f-holdingId" name="holdingId"><option value="">Не указано</option>'+hs+'</select></div><div class="field"><label for="f-sex">Пол</label><select id="f-sex" name="sex"><option>UNKNOWN</option><option>MALE</option><option>FEMALE</option></select></div>'+field('Порода','breed')+field('Возраст текстом','ageText')+field('Заметка','notes'),async f=>api('/api/animals',{method:'POST',body:JSON.stringify(f)}))}
@@ -167,8 +211,33 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
     if (!result.ok)
       return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
     const duplicates = await findClientMatches(env.DB, result.value);
-    if (duplicates.length && raw.confirmDuplicate !== true) return response({ duplicates }, 409);
-    return response({ id: await createClient(env.DB, result.value, actor) }, 201);
+    if (duplicates.length && raw.confirmDuplicate !== true) {
+      emitWorkflow(env, {
+        eventName: 'DUPLICATE_CANDIDATE_SHOWN',
+        routeClass: 'api_clients',
+        operation: 'CREATE_CLIENT',
+        result: 'CONFLICT',
+        domain: 'NONE',
+      });
+      return response({ duplicates }, 409);
+    }
+    const id = await createClient(env.DB, result.value, actor);
+    emitWorkflow(env, {
+      eventName: 'CLIENT_CREATED',
+      routeClass: 'api_clients',
+      operation: 'CREATE_CLIENT',
+      result: 'SUCCESS',
+      domain: 'NONE',
+    });
+    if (duplicates.length)
+      emitWorkflow(env, {
+        eventName: 'NEW_RECORD_CREATED_AFTER_DUPLICATE_WARNING',
+        routeClass: 'api_clients',
+        operation: 'CREATE_CLIENT',
+        result: 'SUCCESS',
+        domain: 'NONE',
+      });
+    return response({ id }, 201);
   }
   const client = path.match(/^\/api\/clients\/([^/]+)$/);
   if (client && request.method === 'PATCH') {
@@ -193,7 +262,16 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
     const result = validateHoldingInput(await readBody(request));
     if (!result.ok)
       return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
-    return response({ id: await createHolding(env.DB, result.value, actor) }, 201);
+    const id = await createHolding(env.DB, result.value, actor);
+    emitWorkflow(env, {
+      eventName: 'HOLDING_CREATED',
+      routeClass: 'api_holdings',
+      operation: 'CREATE_HOLDING',
+      result: 'SUCCESS',
+      domain: 'FARM',
+      subjectType: 'HOLDING',
+    });
+    return response({ id }, 201);
   }
   const holding = path.match(/^\/api\/holdings\/([^/]+)$/);
   if (holding && request.method === 'PATCH') {
@@ -220,7 +298,16 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
     const result = validateAnimalInput(await readBody(request));
     if (!result.ok)
       return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
-    return response({ id: await createAnimal(env.DB, result.value, actor) }, 201);
+    const id = await createAnimal(env.DB, result.value, actor);
+    emitWorkflow(env, {
+      eventName: 'ANIMAL_CREATED',
+      routeClass: 'api_animals',
+      operation: 'CREATE_ANIMAL',
+      result: 'SUCCESS',
+      domain: result.value.domain,
+      subjectType: 'ANIMAL',
+    });
+    return response({ id }, 201);
   }
   const animal = path.match(/^\/api\/animals\/([^/]+)$/);
   if (animal && request.method === 'PATCH') {
@@ -248,7 +335,16 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
     const result = validateAnimalGroupInput(await readBody(request));
     if (!result.ok)
       return response({ error: 'Проверьте поля', fields: result.issues.map((x) => x.field) }, 422);
-    return response({ id: await createAnimalGroup(env.DB, result.value, actor) }, 201);
+    const id = await createAnimalGroup(env.DB, result.value, actor);
+    emitWorkflow(env, {
+      eventName: 'ANIMAL_GROUP_CREATED',
+      routeClass: 'api_animal_groups',
+      operation: 'CREATE_ANIMAL_GROUP',
+      result: 'SUCCESS',
+      domain: 'FARM',
+      subjectType: 'ANIMAL_GROUP',
+    });
+    return response({ id }, 201);
   }
   const animalGroup = path.match(/^\/api\/animal-groups\/([^/]+)$/);
   if (animalGroup && request.method === 'PATCH') {
@@ -279,7 +375,22 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
         422,
       );
     const created = await createEncounter(env.DB, result.value, actor);
-    return created.ok ? response({ id: created.id }, 201) : errorResponse(created.error);
+    if (!created.ok) return errorResponse(created.error);
+    emitWorkflow(env, {
+      eventName: 'ENCOUNTER_STARTED',
+      routeClass: 'api_encounters',
+      operation: 'CREATE_ENCOUNTER',
+      result: 'SUCCESS',
+      domain: result.value.animalId ? 'PET' : 'FARM',
+      subjectType: result.value.animalId
+        ? 'ANIMAL'
+        : result.value.animalGroupId
+          ? 'ANIMAL_GROUP'
+          : 'HOLDING',
+      encounterType: result.value.encounterType,
+      source: result.value.source === 'INQUIRY' ? 'INQUIRY' : 'MANUAL',
+    });
+    return response({ id: created.id }, 201);
   }
   if (path === '/api/followups' && request.method === 'GET') {
     const r = await env.DB.prepare(
@@ -292,7 +403,16 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
       valid = validateClinicalChild('followup', raw);
     if (!valid.ok) return response({ error: 'Проверьте повторное действие' }, 422);
     const created = await createFollowUp(env.DB, raw as unknown as FollowUpInput, actor);
-    return created.ok ? response({ id: created.id }, 201) : errorResponse(created.error);
+    if (!created.ok) return errorResponse(created.error);
+    emitWorkflow(env, {
+      eventName: 'FOLLOWUP_CREATED',
+      routeClass: 'api_followups',
+      operation: 'CREATE_FOLLOWUP',
+      result: 'SUCCESS',
+      domain: raw.animalId ? 'PET' : 'FARM',
+      subjectType: raw.animalId ? 'ANIMAL' : raw.animalGroupId ? 'ANIMAL_GROUP' : 'HOLDING',
+    });
+    return response({ id: created.id }, 201);
   }
   const p = path.match(/^\/api\/patients\/([^/]+)$/);
   if (p && request.method === 'GET') {
@@ -320,7 +440,16 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
       valid = validateClinicalChild('vaccination', raw);
     if (!valid.ok) return response({ error: 'Проверьте вакцинацию' }, 422);
     const r = await recordVaccination(env.DB, raw as unknown as VaccinationInput, actor);
-    return r.ok ? response({ id: r.id }, 201) : errorResponse(r.error);
+    if (!r.ok) return errorResponse(r.error);
+    emitWorkflow(env, {
+      eventName: 'VACCINATION_RECORDED',
+      routeClass: 'api_vaccinations',
+      operation: 'RECORD_VACCINATION',
+      result: 'SUCCESS',
+      domain: raw.animalId ? 'PET' : 'FARM',
+      subjectType: raw.animalId ? 'ANIMAL' : 'ANIMAL_GROUP',
+    });
+    return response({ id: r.id }, 201);
   }
   const diagnosis = path.match(/^\/api\/diagnoses\/([^/]+)$/);
   if (diagnosis && request.method === 'PATCH') {
@@ -354,13 +483,89 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
           { error: 'Проверьте поля приёма', fields: valid.issues.map((x) => x.field) },
           422,
         );
+      const before = await env.DB.prepare(
+        'SELECT status, encounter_type, animal_id, animal_group_id, holding_id FROM encounters WHERE id = ?',
+      )
+        .bind(id)
+        .first<{
+          status: string;
+          encounter_type: 'AT_SITE' | 'FIELD_VISIT' | 'REMOTE';
+          animal_id: string | null;
+          animal_group_id: string | null;
+          holding_id: string | null;
+        }>();
       const r = await updateEncounter(env.DB, id, valid.value, Number(raw.recordVersion), actor);
-      return r.ok ? response({ success: true }) : errorResponse(r.error);
+      if (!r.ok) {
+        if (r.error === 'conflict')
+          emitWorkflow(env, {
+            eventName: 'VERSION_CONFLICT',
+            routeClass: 'api_encounters',
+            operation: 'UPDATE_ENCOUNTER',
+            result: 'CONFLICT',
+            errorCode: 'CONFLICT',
+          });
+        return errorResponse(r.error);
+      }
+      const subjectType = before?.animal_id
+        ? 'ANIMAL'
+        : before?.animal_group_id
+          ? 'ANIMAL_GROUP'
+          : 'HOLDING';
+      emitWorkflow(env, {
+        eventName: before?.status === 'COMPLETED' ? 'ENCOUNTER_CORRECTED' : 'ENCOUNTER_DRAFT_SAVED',
+        routeClass: 'api_encounters',
+        operation: 'UPDATE_ENCOUNTER',
+        result: 'SUCCESS',
+        domain: before?.animal_id ? 'PET' : 'FARM',
+        subjectType,
+        encounterType: before?.encounter_type,
+        changedFieldCount: Object.keys(valid.value).length,
+      });
+      return response({ success: true });
     }
     if (sub === 'complete' && request.method === 'POST') {
       const raw = await readBody(request),
         r = await completeEncounter(env.DB, id, Number(raw.recordVersion), actor);
-      return r.ok ? response({ success: true }) : errorResponse(r.error);
+      if (!r.ok) {
+        if (r.error === 'conflict')
+          emitWorkflow(env, {
+            eventName: 'VERSION_CONFLICT',
+            routeClass: 'api_encounters',
+            operation: 'COMPLETE_ENCOUNTER',
+            result: 'CONFLICT',
+            errorCode: 'CONFLICT',
+          });
+        return errorResponse(r.error);
+      }
+      const completed = await env.DB.prepare(
+        'SELECT started_at, completed_at, encounter_type, animal_id, animal_group_id FROM encounters WHERE id = ?',
+      )
+        .bind(id)
+        .first<{
+          started_at: string;
+          completed_at: string;
+          encounter_type: 'AT_SITE' | 'FIELD_VISIT' | 'REMOTE';
+          animal_id: string | null;
+          animal_group_id: string | null;
+        }>();
+      const workflowDurationMs = completed?.completed_at
+        ? Math.max(0, Date.parse(completed.completed_at) - Date.parse(completed.started_at))
+        : undefined;
+      emitWorkflow(env, {
+        eventName: 'ENCOUNTER_COMPLETED',
+        routeClass: 'api_encounters',
+        operation: 'COMPLETE_ENCOUNTER',
+        result: 'SUCCESS',
+        domain: completed?.animal_id ? 'PET' : 'FARM',
+        subjectType: completed?.animal_id
+          ? 'ANIMAL'
+          : completed?.animal_group_id
+            ? 'ANIMAL_GROUP'
+            : 'HOLDING',
+        encounterType: completed?.encounter_type,
+        workflowDurationMs,
+      });
+      return response({ success: true });
     }
     if (
       sub === 'diagnoses' ||
@@ -391,12 +596,84 @@ async function m14Api(request: Request, env: Env, actor: M14Actor, path: string)
                   { ...raw, encounterId: id } as unknown as VaccinationInput,
                   actor,
                 );
-      return r.ok ? response({ id: r.id }, 201) : errorResponse(r.error);
+      if (!r.ok) {
+        if (r.error === 'conflict')
+          emitWorkflow(env, {
+            eventName: 'VERSION_CONFLICT',
+            routeClass: sub === 'diagnoses' ? 'api_diagnoses' : 'api_encounters',
+            operation: 'ADD_CLINICAL_CHILD',
+            result: 'CONFLICT',
+            errorCode: 'CONFLICT',
+          });
+        return errorResponse(r.error);
+      }
+      const childEvent =
+        sub === 'diagnoses'
+          ? 'DIAGNOSIS_ADDED'
+          : sub === 'medications'
+            ? 'MEDICATION_ADDED'
+            : sub === 'procedures'
+              ? 'PROCEDURE_ADDED'
+              : 'VACCINATION_RECORDED';
+      emitWorkflow(env, {
+        eventName: childEvent,
+        routeClass: sub === 'diagnoses' ? 'api_diagnoses' : 'api_encounters',
+        operation: 'ADD_CLINICAL_CHILD',
+        result: 'SUCCESS',
+        domain:
+          sub === 'diagnoses' || sub === 'medications' || sub === 'procedures' ? 'PET' : 'FARM',
+      });
+      return response({ id: r.id }, 201);
     }
   }
   if (path === '/api/search' && request.method === 'POST') {
+    const startedAt = Date.now();
     const raw = await readBody(request);
-    return response({ items: await searchM14(env.DB, typeof raw.q === 'string' ? raw.q : '') });
+    const items = await searchM14(env.DB, typeof raw.q === 'string' ? raw.q : '');
+    emitWorkflow(env, {
+      eventName: 'SEARCH_EXECUTED',
+      routeClass: 'api_search',
+      operation: 'SEARCH',
+      result: 'SUCCESS',
+      resultCount: items.length,
+      durationMs: Date.now() - startedAt,
+    });
+    return response({ items });
+  }
+  if (path === '/api/telemetry/client' && request.method === 'POST') {
+    const raw = await readBody(request);
+    const clientEvents = new Set([
+      'CLIENT_VALIDATION_BLOCKED',
+      'UNSAVED_NAVIGATION_WARNING',
+      'CLIENT_NETWORK_RETRY',
+      'CLIENT_RUNTIME_FAILURE',
+    ] as const);
+    const eventName = raw.eventName;
+    if (typeof eventName !== 'string' || !clientEvents.has(eventName as never))
+      return errorResponse('validation');
+    const validationErrorCount =
+      typeof raw.validationErrorCount === 'number' && Number.isInteger(raw.validationErrorCount)
+        ? raw.validationErrorCount
+        : undefined;
+    recordClientFrictionEvent(
+      env.LEARNING,
+      telemetryContext(env),
+      {
+        eventName: eventName as
+          | 'CLIENT_VALIDATION_BLOCKED'
+          | 'UNSAVED_NAVIGATION_WARNING'
+          | 'CLIENT_NETWORK_RETRY'
+          | 'CLIENT_RUNTIME_FAILURE',
+        operation: 'CLIENT_FRICTION',
+        errorCode:
+          typeof raw.errorCode === 'string' && raw.errorCode === 'UNHANDLED_CLIENT_ERROR'
+            ? 'UNHANDLED_CLIENT_ERROR'
+            : undefined,
+        validationErrorCount,
+      },
+      'api_client_telemetry',
+    );
+    return new Response(null, { status: 204, headers: privateHeaders() });
   }
   return null;
 }
@@ -497,30 +774,42 @@ export default {
       role: identity.role,
       requestId: crypto.randomUUID(),
     };
+    const startedAt = Date.now();
     try {
+      if (
+        url.pathname.startsWith('/api/') &&
+        !officeMutationOriginAllowed(request, env.OFFICE_ORIGIN)
+      ) {
+        const denied = errorResponse('forbidden', 403);
+        logRequest(env, request, actor, denied.status, startedAt, 'forbidden');
+        return denied;
+      }
       if (url.pathname.startsWith('/api/')) {
         const first = await m14Api(request, env, actor, url.pathname);
-        if (first) return first;
+        if (first) {
+          logRequest(env, request, actor, first.status, startedAt);
+          return first;
+        }
         const second = await m13Api(request, env, actor.actor, url.pathname);
-        if (second) return second;
-        return errorResponse('not_found');
+        if (second) {
+          logRequest(env, request, actor, second.status, startedAt);
+          return second;
+        }
+        const missing = errorResponse('not_found');
+        logRequest(env, request, actor, missing.status, startedAt, 'not_found');
+        return missing;
       }
-      return new Response(page(), {
+      const pageResponse = new Response(page(), {
         headers: new Headers({
           ...Object.fromEntries(headers),
           'Content-Type': 'text/html; charset=utf-8',
         }),
       });
+      logRequest(env, request, actor, pageResponse.status, startedAt);
+      return pageResponse;
     } catch (error) {
-      console.error(
-        JSON.stringify(
-          safeLog({
-            operation: 'office_request',
-            request_id: actor.requestId,
-            error_category: error instanceof Error ? error.message : 'internal_error',
-          }),
-        ),
-      );
+      const errorCode = toErrorCode(error);
+      logRequest(env, request, actor, 500, startedAt, errorCode);
       return response(
         { error: 'Операция не выполнена', category: 'INTERNAL_ERROR', request_id: actor.requestId },
         500,
@@ -529,8 +818,63 @@ export default {
   },
   async scheduled(_controller: ScheduledController, env: Env) {
     if (env.ENVIRONMENT === 'production') {
-      const count = await purgeExpired(env.DB);
-      console.log(JSON.stringify(safeLog({ operation: 'retention', count })));
+      try {
+        const count = await purgeExpired(env.DB);
+        console.log(
+          JSON.stringify(
+            safeLog({
+              service: 'office',
+              environment: env.ENVIRONMENT,
+              release: telemetryContext(env).release,
+              route_class: 'scheduled_retention',
+              operation: 'RETENTION',
+              result: 'SUCCESS',
+              duration_ms: 0,
+            }),
+          ),
+        );
+        void count;
+      } catch (error) {
+        console.log(
+          JSON.stringify(
+            safeLog({
+              service: 'office',
+              environment: env.ENVIRONMENT,
+              release: telemetryContext(env).release,
+              route_class: 'scheduled_retention',
+              operation: 'RETENTION',
+              result: 'FAILURE',
+              error_code: 'SCHEDULED_JOB_ERROR',
+            }),
+          ),
+        );
+        void error;
+      }
+    }
+    try {
+      const snapshot = await collectDailySnapshot(env.DB);
+      for (const [metricName, metricValue] of Object.entries(snapshot))
+        recordDailySnapshot(
+          env.LEARNING,
+          telemetryContext(env),
+          metricName as Parameters<typeof recordDailySnapshot>[2],
+          metricValue,
+        );
+    } catch (error) {
+      console.log(
+        JSON.stringify(
+          safeLog({
+            service: 'office',
+            environment: env.ENVIRONMENT,
+            release: telemetryContext(env).release,
+            route_class: 'scheduled_snapshot',
+            operation: 'DAILY_SNAPSHOT',
+            result: 'FAILURE',
+            error_code: 'SCHEDULED_JOB_ERROR',
+          }),
+        ),
+      );
+      void error;
     }
   },
 };
