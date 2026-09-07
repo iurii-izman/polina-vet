@@ -10,7 +10,7 @@
 
 The first explicit product alpha is packaged as `v0.1.0-alpha.1` from the secure pause baseline; the packaging merge is `4eb4af7da9f01a1a4e4db077a248ca01c7872f61`. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development remains paused.
 
-Production Office activation is **BLOCKED — OWNER IDENTITY INPUT REQUIRED**. The exact owner-approved Access identity set is not present in repository configuration or current documentation and must not be guessed. Office therefore remains fail-closed with `OFFICE_AUTH_BYPASS=false`; public Intake remains disabled with `PUBLIC_INTAKE_ENABLED=false`; real observation has not started. This is the single operational blocker for daily veterinary use.
+Production Office activation is **BLOCKED — INTERACTIVE IDENTITY ACCEPTANCE PENDING**. The owner supplied the exact approved identity set; a separate production Cloudflare Access application/policy is configured for `office.lina.aipipeline.cc`, and the allowlist is stored in Worker secret storage rather than source control. The approved identity login has not completed because the Access verification email was not received during this run, so Office workflow acceptance is not evidenced. Office remains fail-closed with `OFFICE_AUTH_BYPASS=false`; public Intake remains disabled with `PUBLIC_INTAKE_ENABLED=false`; real observation has not started.
 
 The alpha package does not claim Article 22 notification, legal compliance, clinical availability, or a 24/7 service. Article 22 evidence remains pending under R3. The only permitted untracked local exception is `output/`.
 
@@ -28,7 +28,7 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 | Public indexability | ENABLED only on the verified production build | Preview, staging, local, and explicit non-indexable builds remain blocked by `robots.txt` and page metadata. |
 | Public analytics | OFF | No verified owner-controlled Plausible domain/configuration. |
 | Production D1 | PROVISIONED and migrated | `polina-vet-operations-production`; `0001` and `0002_m14_core` applied; zero inquiry, clinical, and audit rows; foreign-key check clean. |
-| Office Worker | FIXED SOURCE DEPLOYED FAIL-CLOSED / ACTIVATION BLOCKED | Version `f1a03d88-b99c-40c3-a747-18821c74a424`; `OFFICE_AUTH_BYPASS=false`; production Access application/team/audience and the exact approved identity set are not configured, so unauthenticated access returns 401 and Office is not usable yet. |
+| Office Worker | CONFIGURED FAIL-CLOSED / ACTIVATION BLOCKED | Current production secret-change deployment `b0356307-7a3d-4889-8b9f-11add36e8f41`; `OFFICE_AUTH_BYPASS=false`; production Access application/policy, team domain, audience, and owner-supplied identity secret are configured. Unauthenticated requests reach the Access challenge; approved identity login and Office PET/FARM acceptance remain unverified. |
 | Intake Worker | FIXED SOURCE DEPLOYED DISABLED | Version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; `PUBLIC_INTAKE_ENABLED=false`; disabled requests return 404 and no public processing is active. |
 | Turnstile | CONFIGURED | Production widget is scoped to `lina.aipipeline.cc`; secret is stored in Worker secret storage and is never committed or printed. |
 | Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
@@ -41,13 +41,13 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 
 - **R1:** verify ownership and migrate the public canonical identity to `lina.vet`; then re-run SEO, redirect, Search Console, and sitemap checks. Never leave both origins independently indexable.
 - **R2:** provide and verify owner-controlled external channels and, separately, any Plausible site/domain configuration. Keep public analytics off until explicit configuration exists.
-- **R3:** supply the exact production Access application/team/audience and approved identity set before Office can become usable; complete the Article 22 evidence gate before enabling real Intake. Production Telegram remains optional and disabled. See `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`.
+- **R3:** complete approved-identity runtime acceptance for Office, then run the controlled synthetic PET/FARM/adversarial checks and clean all synthetic state before considering any Intake enablement. Complete the Article 22 evidence gate before real Intake; production Telegram remains optional and disabled. See `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`.
 
 The owner-approved launch override is: **launch accepted with notification evidence deferred**. This records an operational decision; it does not convert the PMR gate into a pass or authorize real Intake processing.
 
 ## Intentionally unresolved facts
 
-Polina's full name/title/employer wording, contacts, geography, availability, education, real cases, reviewed red-flag wording, final RO/Moldavian policy wording, legal status, permanent domain ownership, external channels, production Access identities, Telegram credentials, and Article 22 route/filing evidence remain owner-supplied or externally verified inputs.
+Polina's full name/title/employer wording, contacts, geography, availability, education, real cases, reviewed red-flag wording, final RO/Moldavian policy wording, legal status, permanent domain ownership, external channels, Telegram credentials, approved identity runtime acceptance, and Article 22 route/filing evidence remain owner-supplied or externally verified inputs.
 
 ## Restart rule
 
