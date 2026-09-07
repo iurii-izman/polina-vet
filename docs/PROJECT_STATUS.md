@@ -2,8 +2,17 @@
 
 **As of:** 2026-09-07
 **Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation
-**Current branch:** `main` after security hardening merge
-**Closure merge:** `139f1f93e26b1639355e32e8fb686783602ef74a` (PR #24)
+**Current baseline:** `main` after the secure observation-baseline merge
+**Baseline merge:** `7e87475add37a7d626d0efdc3d2a64db1230a9d2` (PR #25)
+**Security hardening merge:** `139f1f93e26b1639355e32e8fb686783602ef74a` (PR #24)
+
+## Alpha packaging state
+
+The first explicit product alpha is being packaged as `v0.1.0-alpha.1` from the secure pause baseline. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development remains paused.
+
+Production Office activation is **BLOCKED — OWNER IDENTITY INPUT REQUIRED**. The exact owner-approved Access identity set is not present in repository configuration or current documentation and must not be guessed. Office therefore remains fail-closed with `OFFICE_AUTH_BYPASS=false`; public Intake remains disabled with `PUBLIC_INTAKE_ENABLED=false`; real observation has not started. This is the single operational blocker for daily veterinary use.
+
+The alpha package does not claim Article 22 notification, legal compliance, clinical availability, or a 24/7 service. Article 22 evidence remains pending under R3. The only permitted untracked local exception is `output/`.
 
 ## Launch decision
 
@@ -19,7 +28,7 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 | Public indexability | ENABLED only on the verified production build | Preview, staging, local, and explicit non-indexable builds remain blocked by `robots.txt` and page metadata. |
 | Public analytics | OFF | No verified owner-controlled Plausible domain/configuration. |
 | Production D1 | PROVISIONED and migrated | `polina-vet-operations-production`; `0001` and `0002_m14_core` applied; zero inquiry, clinical, and audit rows; foreign-key check clean. |
-| Office Worker | FIXED SOURCE DEPLOYED FAIL-CLOSED / ACTIVATION BLOCKED | Version `f1a03d88-b99c-40c3-a747-18821c74a424`; `OFFICE_AUTH_BYPASS=false`; production Access team/audience and the exact approved identity set are not configured, so unauthenticated access returns 401 and Office is not usable yet. |
+| Office Worker | FIXED SOURCE DEPLOYED FAIL-CLOSED / ACTIVATION BLOCKED | Version `f1a03d88-b99c-40c3-a747-18821c74a424`; `OFFICE_AUTH_BYPASS=false`; production Access application/team/audience and the exact approved identity set are not configured, so unauthenticated access returns 401 and Office is not usable yet. |
 | Intake Worker | FIXED SOURCE DEPLOYED DISABLED | Version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; `PUBLIC_INTAKE_ENABLED=false`; disabled requests return 404 and no public processing is active. |
 | Turnstile | CONFIGURED | Production widget is scoped to `lina.aipipeline.cc`; secret is stored in Worker secret storage and is never committed or printed. |
 | Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
