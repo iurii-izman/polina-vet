@@ -30,6 +30,7 @@
     "test:m13": "pnpm --filter @polina-vet/operations test",
     "test:m14": "node --test --experimental-strip-types packages/operations/src/m14.test.ts",
     "test:m14-5": "node --test --experimental-strip-types packages/operations/src/m14-5.test.ts",
+    "test:security": "node --test --experimental-strip-types packages/operations/src/security.test.ts packages/operations/src/body.test.ts packages/operations/src/retention.test.ts packages/operations/src/m13-contract.test.ts apps/web/src/lib/security.test.ts",
     "preview:check": "pnpm --filter @polina-vet/web preview:check",
     "preview:cloudflare:check": "pnpm --filter @polina-vet/web preview:cloudflare:check",
     "release:validate": "node scripts/validate-release.mjs && pnpm build && node scripts/validate-seo.mjs",

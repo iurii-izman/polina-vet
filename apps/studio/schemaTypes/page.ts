@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { languages } from './shared';
+import { portableTextBlock } from './portableText';
 
 export const page = defineType({
   name: 'page',
@@ -37,6 +38,6 @@ export const page = defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-    defineField({ name: 'body', title: 'Текст', type: 'array', of: [{ type: 'block' }] }),
+    defineField({ name: 'body', title: 'Текст', type: 'array', of: [portableTextBlock] }),
   ],
 });

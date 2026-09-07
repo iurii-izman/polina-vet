@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { languages, primaryDomains, riskLevels } from './shared';
+import { portableTextBlock } from './portableText';
 
 export const article = defineType({
   name: 'article',
@@ -160,7 +161,7 @@ export const article = defineType({
       title: 'Текст и смысловые блоки',
       type: 'array',
       of: [
-        defineArrayMember({ type: 'block' }),
+        portableTextBlock,
         defineArrayMember({ type: 'practicalActions' }),
         defineArrayMember({ type: 'dontDoBlock' }),
         defineArrayMember({ type: 'redFlagCategory' }),

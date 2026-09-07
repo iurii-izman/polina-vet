@@ -7,7 +7,7 @@ import type {
   InquiryOutcome,
 } from './domain.js';
 import { canTransition } from './domain.js';
-import { retentionUntil } from './retentionPolicy.js';
+import { inquiryRetentionDeadline } from './retentionPolicy.js';
 
 export type D1Result<T = unknown> = { results?: T[]; success?: boolean; meta?: unknown };
 export type D1Statement = {
@@ -69,7 +69,7 @@ function inquiryValues(input: PublicInquiryInput | OfficeInquiryInput, now: stri
     null,
     'privacyNoticeVersion' in input ? input.privacyNoticeVersion : null,
     'privacyAcknowledged' in input && input.privacyAcknowledged ? now : null,
-    null,
+    inquiryRetentionDeadline(now),
     input.utmSource ?? null,
     input.utmMedium ?? null,
     input.utmCampaign ?? null,
@@ -208,7 +208,10 @@ export async function updateStatus(
     return { ok: false as const, error: 'invalid_transition' };
   if (status === 'CLOSED' && !outcome) return { ok: false as const, error: 'outcome_required' };
   const closedAt = status === 'CLOSED' ? iso() : null;
-  const retentionDate = status === 'CLOSED' ? retentionUntil(new Date()) : null;
+  const retentionDate = inquiryRetentionDeadline(
+    current.created_at,
+    status === 'CLOSED' ? closedAt : current.closed_at,
+  );
   await db
     .prepare(
       'UPDATE inquiries SET status = ?, outcome = ?, closed_at = ?, retention_until = ?, updated_at = ? WHERE id = ?',
@@ -281,7 +284,7 @@ export async function addNote(db: OperationsDb, id: string, body: string, actor:
 export async function retentionDryRun(db: OperationsDb, now = new Date()) {
   const result = await db
     .prepare(
-      "SELECT public_ref FROM inquiries WHERE status = 'CLOSED' AND retention_until IS NOT NULL AND retention_until <= ? ORDER BY retention_until ASC",
+      "SELECT public_ref FROM inquiries WHERE COALESCE(retention_until, datetime(created_at, '+365 days')) <= ? ORDER BY COALESCE(retention_until, datetime(created_at, '+365 days')) ASC",
     )
     .bind(now.toISOString())
     .all<{ public_ref: string }>();

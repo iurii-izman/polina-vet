@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createPublicReference } from './ids.ts';
-import { notifyNewInquiry } from './notifications.ts';
+import { notifyNewInquiry, safeTelegramLocality } from './notifications.ts';
 import { retentionUntil } from './retentionPolicy.ts';
 
 test('D1 migration remains inquiry-centred and privacy constrained', async () => {
@@ -56,4 +56,12 @@ test('Telegram adapter excludes inquiry PII', async () => {
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('Telegram locality display preserves normal Unicode and removes spoofing controls', () => {
+  assert.equal(safeTelegramLocality('Кицканы'), 'Кицканы');
+  assert.equal(safeTelegramLocality('Țaraclia'), 'Țaraclia');
+  assert.equal(safeTelegramLocality('North\r\n\tDistrict\u202e'), 'North District');
+  assert.equal(safeTelegramLocality('\u0000\u0007'), 'Не указана');
+  assert.equal(safeTelegramLocality('x'.repeat(200)).length, 120);
 });

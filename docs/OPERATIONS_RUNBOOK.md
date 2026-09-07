@@ -4,7 +4,7 @@ This is the current operator runbook for the M14.5 pause baseline. Never paste s
 
 ## Production endpoints and resources
 
-- Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `d77c7f72-c465-4670-be50-d8a7025613ac`).
+- Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `2f00f6bc-8cb6-4522-bf2f-513303cc0f7e`).
 - Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `e438a3d5-55ab-4888-839e-eead6b1aab94`).
 - Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current version `fc31a944-e411-4556-9023-7587df57e6fc`).
 - D1: `polina-vet-operations-production`; binding `DB`; database ID is maintained in the Wrangler production config.
