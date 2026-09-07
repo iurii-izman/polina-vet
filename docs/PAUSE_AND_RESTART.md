@@ -20,6 +20,8 @@ Not allowed without a new explicit request:
 - legal, clinical, availability, or ownership claims based on placeholders;
 - a new datastore, CRM, AI diagnosis path, or integration “for later.”
 
+The known `js-yaml` audit findings through Sanity CLI tooling are recorded in `PROJECT_STATUS.md`. Do not silently upgrade the frozen Astro/Sanity stack during the pause; address the advisory through a tested upstream-compatible dependency change or an explicitly approved toolchain maintenance task.
+
 ## Restart gate
 
 Before any new milestone:

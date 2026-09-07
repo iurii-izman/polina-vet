@@ -24,6 +24,7 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 | Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
 | Private learning telemetry | CONFIGURED / REAL OBSERVATION NOT YET STARTED | Production dataset is separate from public analytics. Synthetic events do not start the clock. |
 | Sanity | VERIFIED | Published editorial verification passed; no private operational data is stored in Sanity. |
+| Dependency audit | REVIEW REQUIRED | `pnpm audit --prod` reports 2 high and 4 moderate `js-yaml` advisories through Sanity CLI tooling; no compatible upstream patched graph was available during closure, so this remains a tracked maintenance item. |
 
 ## Open external follow-ups
 
