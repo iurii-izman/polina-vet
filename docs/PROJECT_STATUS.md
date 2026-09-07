@@ -8,7 +8,7 @@
 
 ## Alpha packaging state
 
-The first explicit product alpha is being packaged as `v0.1.0-alpha.1` from the secure pause baseline. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development remains paused.
+The first explicit product alpha is packaged as `v0.1.0-alpha.1` from the secure pause baseline; the packaging merge is `4eb4af7da9f01a1a4e4db077a248ca01c7872f61`. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development remains paused.
 
 Production Office activation is **BLOCKED — OWNER IDENTITY INPUT REQUIRED**. The exact owner-approved Access identity set is not present in repository configuration or current documentation and must not be guessed. Office therefore remains fail-closed with `OFFICE_AUTH_BYPASS=false`; public Intake remains disabled with `PUBLIC_INTAKE_ENABLED=false`; real observation has not started. This is the single operational blocker for daily veterinary use.
 
