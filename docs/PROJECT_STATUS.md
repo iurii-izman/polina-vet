@@ -2,7 +2,8 @@
 
 **As of:** 2026-09-07
 **Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation
-**Current branch:** `chore/finalize-m14-5-pause-baseline` until closure merge
+**Current branch:** `main` after closure merge
+**Closure merge:** `9b5020fb4eca27f91d31b1f81128c334dc2c2d6` (PR #21)
 
 ## Launch decision
 
