@@ -6,6 +6,13 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{ "pattern": "office-polina-vet.aipipeline.cc", "custom_domain": true }],
+  "version_metadata": { "binding": "VERSION_METADATA" },
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": false },
+    "traces": { "enabled": true, "head_sampling_rate": 1 },
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -17,6 +24,7 @@
   "vars": {
     "ENVIRONMENT": "staging",
     "OFFICE_AUTH_BYPASS": "false",
+    "OFFICE_ORIGIN": "https://office-polina-vet.aipipeline.cc",
     "ACCESS_TEAM_DOMAIN": "",
     "ACCESS_AUDIENCE": "",
     "OFFICE_IDENTITIES": "",
@@ -25,6 +33,7 @@
   "env": {
     "staging": {
       "name": "polina-vet-office-staging",
+      "version_metadata": { "binding": "VERSION_METADATA" },
       "routes": [{ "pattern": "office-polina-vet.aipipeline.cc", "custom_domain": true }],
       "d1_databases": [
         {
@@ -35,9 +44,19 @@
           "migrations_pattern": "../intake/migrations/*/migration.sql",
         },
       ],
+      "analytics_engine_datasets": [
+        { "binding": "LEARNING", "dataset": "polina_vet_learning_staging" },
+      ],
+      "observability": {
+        "enabled": true,
+        "redact_query_string": true,
+        "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": false },
+        "traces": { "enabled": true, "head_sampling_rate": 1 },
+      },
       "vars": {
         "ENVIRONMENT": "staging",
         "OFFICE_AUTH_BYPASS": "false",
+        "OFFICE_ORIGIN": "https://office-polina-vet.aipipeline.cc",
         "ACCESS_TEAM_DOMAIN": "",
         "ACCESS_AUDIENCE": "",
         "OFFICE_IDENTITIES": "",
@@ -45,6 +64,7 @@
     },
     "production": {
       "name": "polina-vet-office-production",
+      "version_metadata": { "binding": "VERSION_METADATA" },
       "routes": [{ "pattern": "office.lina.aipipeline.cc", "custom_domain": true }],
       "d1_databases": [
         {
@@ -55,9 +75,19 @@
           "migrations_pattern": "../intake/migrations/*/migration.sql",
         },
       ],
+      "analytics_engine_datasets": [
+        { "binding": "LEARNING", "dataset": "polina_vet_learning_production" },
+      ],
+      "observability": {
+        "enabled": true,
+        "redact_query_string": true,
+        "logs": { "enabled": true, "head_sampling_rate": 0.1, "invocation_logs": false },
+        "traces": { "enabled": true, "head_sampling_rate": 0.1 },
+      },
       "vars": {
         "ENVIRONMENT": "production",
         "OFFICE_AUTH_BYPASS": "false",
+        "OFFICE_ORIGIN": "https://office.lina.aipipeline.cc",
         "ACCESS_TEAM_DOMAIN": "",
         "ACCESS_AUDIENCE": "",
         "OFFICE_IDENTITIES": "",

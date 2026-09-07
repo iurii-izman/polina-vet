@@ -1,3 +1,38 @@
+const safeErrorCodes = new Set([
+  'VALIDATION_ERROR',
+  'NOT_FOUND',
+  'CONFLICT',
+  'UNAUTHORIZED',
+  'FORBIDDEN',
+  'DB_CONSTRAINT_ERROR',
+  'DB_READ_ERROR',
+  'DB_WRITE_ERROR',
+  'EXTERNAL_SERVICE_ERROR',
+  'SCHEDULED_JOB_ERROR',
+  'TELEMETRY_ERROR',
+  'INTERNAL_ERROR',
+  'UNHANDLED_CLIENT_ERROR',
+]);
+const toSafeErrorCode = (value: unknown) => {
+  if (typeof value === 'string' && safeErrorCodes.has(value)) return value;
+  switch (value) {
+    case 'not_found':
+    case 'subject_not_found':
+      return 'NOT_FOUND';
+    case 'conflict':
+    case 'already_completed':
+    case 'subject_mismatch':
+      return 'CONFLICT';
+    case 'forbidden':
+      return 'FORBIDDEN';
+    case 'validation':
+    case 'payload_too_large':
+      return 'VALIDATION_ERROR';
+    default:
+      return 'INTERNAL_ERROR';
+  }
+};
+
 export function parseAllowedOrigins(value: string | undefined): string[] {
   return (value ?? '')
     .split(',')
@@ -9,6 +44,19 @@ export function parseAllowedOrigins(value: string | undefined): string[] {
 export function allowedOrigin(request: Request, origins: string[]): string | null {
   const origin = request.headers.get('Origin');
   return origin && origins.includes(origin) ? origin : null;
+}
+
+const mutationMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+export function officeMutationOriginAllowed(request: Request, configuredOrigin?: string): boolean {
+  if (!mutationMethods.has(request.method)) return true;
+  if (!configuredOrigin) return false;
+  try {
+    const expected = new URL(configuredOrigin).origin;
+    return request.headers.get('Origin') === expected;
+  } catch {
+    return false;
+  }
 }
 
 export function privateHeaders(): Headers {
@@ -33,16 +81,32 @@ export function json(
 }
 
 export function safeLog(event: Record<string, unknown>) {
-  const allowed = [
+  const output: Record<string, string | number> = {};
+  const stringFields = [
+    'timestamp',
+    'service',
+    'environment',
+    'release',
     'request_id',
-    'public_ref',
+    'route_class',
     'operation',
-    'status',
-    'latency_ms',
-    'error_category',
-    'count',
+    'result',
   ];
-  return Object.fromEntries(Object.entries(event).filter(([key]) => allowed.includes(key)));
+  for (const field of stringFields) {
+    const value = event[field];
+    if (typeof value === 'string' && value.length <= 160) output[field] = value;
+  }
+  if ('http_status' in event && Number.isInteger(event.http_status))
+    output.http_status = Number(event.http_status);
+  if (
+    'duration_ms' in event &&
+    typeof event.duration_ms === 'number' &&
+    Number.isFinite(event.duration_ms)
+  )
+    output.duration_ms = Math.max(0, Math.round(event.duration_ms));
+  if ('error_code' in event || 'error_category' in event)
+    output.error_code = toSafeErrorCode(event.error_code ?? event.error_category);
+  return output;
 }
 
 export async function verifyAccessJwt(

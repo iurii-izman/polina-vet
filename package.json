@@ -29,6 +29,7 @@
     "test:a11y": "pnpm --filter @polina-vet/web test:a11y",
     "test:m13": "pnpm --filter @polina-vet/operations test",
     "test:m14": "node --test --experimental-strip-types packages/operations/src/m14.test.ts",
+    "test:m14-5": "node --test --experimental-strip-types packages/operations/src/m14-5.test.ts",
     "preview:check": "pnpm --filter @polina-vet/web preview:check",
     "preview:cloudflare:check": "pnpm --filter @polina-vet/web preview:cloudflare:check",
     "release:validate": "node scripts/validate-release.mjs && pnpm build && node scripts/validate-seo.mjs",
