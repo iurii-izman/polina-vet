@@ -5,8 +5,8 @@ This is the current operator runbook for the M14.5 pause baseline. Never paste s
 ## Production endpoints and resources
 
 - Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `2f00f6bc-8cb6-4522-bf2f-513303cc0f7e`).
-- Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `e438a3d5-55ab-4888-839e-eead6b1aab94`).
-- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current version `fc31a944-e411-4556-9023-7587df57e6fc`).
+- Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; disabled).
+- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current version `f1a03d88-b99c-40c3-a747-18821c74a424`; fail-closed).
 - D1: `polina-vet-operations-production`; binding `DB`; database ID is maintained in the Wrangler production config.
 - Learning telemetry: Analytics Engine dataset `polina_vet_learning_production`, separate from public analytics.
 - Turnstile sitekey: `0x4AAAAAAErEOf48kdeZYNJZ`, scoped to `lina.aipipeline.cc`; the secret is stored only in Worker secret storage.
@@ -20,6 +20,8 @@ pnpm --filter @polina-vet/office exec wrangler deployments list --name polina-ve
 ```
 
 The secret command is for names/types only. Do not use commands or scripts that print secret values.
+
+The final security hardening deployment verified the following production boundary: unauthenticated Office returns `401` with `no-store`, disabled Intake submission returns `404`, production D1 reports zero inquiry, clinical, audit, and client rows, and the production Office deployment exposes the separate learning telemetry binding. No production Access identity set was supplied, so Office activation stops at the identity gate.
 
 ## Safe release sequence
 

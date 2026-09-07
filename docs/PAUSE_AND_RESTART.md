@@ -4,6 +4,8 @@
 
 M1–M14.5 is closed for this implementation cycle. The site is in real-world observation readiness, not a promise of ongoing development. M15 and M16 are not started, and no later milestone is implied.
 
+The final security hardening cycle is closed on `main` merge `139f1f93e26b1639355e32e8fb686783602ef74a`. The seven original findings are resolved; production Office is deployed fail-closed but awaits the owner-supplied Access identity set, and public Intake remains disabled pending the documented R3 gates. The transitive dependency advisory maintenance item is tracked as R4.
+
 Allowed while paused:
 
 - production incident response and safe rollback/recovery;
