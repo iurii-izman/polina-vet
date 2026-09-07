@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { languages, primaryDomains, riskLevels } from './shared';
+import { portableTextBlock } from './portableText';
 
 export const clinicalCase = defineType({
   name: 'clinicalCase',
@@ -101,7 +102,7 @@ export const clinicalCase = defineType({
       type: 'boolean',
       validation: (Rule) => Rule.required(),
     }),
-    defineField({ name: 'body', title: 'Текст', type: 'array', of: [{ type: 'block' }] }),
+    defineField({ name: 'body', title: 'Текст', type: 'array', of: [portableTextBlock] }),
   ],
   validation: (Rule) =>
     Rule.custom((document) => {

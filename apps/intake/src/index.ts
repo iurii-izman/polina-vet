@@ -1,9 +1,11 @@
 import {
   allowedOrigin,
   createInquiry,
+  PayloadTooLargeError,
   json,
   notifyNewInquiry,
   parseAllowedOrigins,
+  readJsonBody,
   safeLog,
   validatePublicInquiry,
 } from '@polina-vet/operations';
@@ -48,16 +50,6 @@ async function verifyTurnstile(token: unknown, request: Request, env: Env) {
   return result.success === true;
 }
 
-async function parseBody(request: Request) {
-  const contentType = request.headers.get('Content-Type') ?? '';
-  if (!contentType.toLowerCase().startsWith('application/json')) return null;
-  const length = Number(request.headers.get('Content-Length') ?? 0);
-  if (length > maxBodyBytes) return null;
-  const body = await request.arrayBuffer();
-  if (body.byteLength > maxBodyBytes) return null;
-  return JSON.parse(new TextDecoder().decode(body)) as Record<string, unknown>;
-}
-
 async function handleSubmit(request: Request, env: Env) {
   if (env.PUBLIC_INTAKE_ENABLED !== 'true') return fail('Intake is not active', 404);
   const origins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
@@ -75,8 +67,12 @@ async function handleSubmit(request: Request, env: Env) {
     return fail('A valid idempotency key is required');
   let body: Record<string, unknown> | null;
   try {
-    body = await parseBody(request);
-  } catch {
+    const contentType = request.headers.get('Content-Type') ?? '';
+    if (!contentType.toLowerCase().startsWith('application/json'))
+      return fail('A JSON request is required');
+    body = await readJsonBody(request, maxBodyBytes);
+  } catch (error) {
+    if (error instanceof PayloadTooLargeError) return fail('Payload too large', 413);
     body = null;
   }
   if (!body) return fail('A JSON request is required');

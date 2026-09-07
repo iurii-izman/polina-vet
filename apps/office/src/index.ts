@@ -31,9 +31,11 @@ import {
   searchM14,
   collectDailySnapshot,
   officeMutationOriginAllowed,
+  PayloadTooLargeError,
   recordClientFrictionEvent,
   recordDailySnapshot,
   recordWorkflowEvent,
+  readJsonBody,
   routeClassForPath,
   toErrorCode,
   setFollowUp,
@@ -140,11 +142,7 @@ function logRequest(
   );
 }
 async function readBody(request: Request) {
-  const length = Number(request.headers.get('Content-Length') ?? 0);
-  if (length > maxBodyBytes) throw new Error('payload_too_large');
-  const raw = await request.arrayBuffer();
-  if (raw.byteLength > maxBodyBytes) throw new Error('payload_too_large');
-  return JSON.parse(new TextDecoder().decode(raw)) as Record<string, unknown>;
+  return readJsonBody(request, maxBodyBytes);
 }
 
 function page() {
@@ -808,6 +806,11 @@ export default {
       logRequest(env, request, actor, pageResponse.status, startedAt);
       return pageResponse;
     } catch (error) {
+      if (error instanceof PayloadTooLargeError) {
+        const tooLarge = errorResponse('payload_too_large', 413);
+        logRequest(env, request, actor, tooLarge.status, startedAt, 'payload_too_large');
+        return tooLarge;
+      }
       const errorCode = toErrorCode(error);
       logRequest(env, request, actor, 500, startedAt, errorCode);
       return response(

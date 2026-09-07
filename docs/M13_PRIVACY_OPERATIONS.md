@@ -27,4 +27,4 @@ If continued storage is required by applicable law or is reasonably necessary to
 
 ## Scheduled retention
 
-At closure, the system sets `retention_until` to 365 days after the closure timestamp. The daily UTC Office Cron runs a dry-run-equivalent query and deletes only `CLOSED` rows whose `retention_until` has passed. Deletion evidence follows the current destruction-confirmation requirements; no production data is copied into tests or CI.
+At creation, the system assigns an absolute `retention_until` of 365 days from the Inquiry creation timestamp. At closure, the system keeps the earlier of the existing absolute deadline and 365 days after closure. The daily UTC Office Cron deletes any Inquiry whose applicable deadline has passed, regardless of whether it is `NEW`, `IN_PROGRESS`, `WAITING`, `FOLLOW_UP`, or `CLOSED`. Deletion evidence follows the current destruction-confirmation requirements; no production data is copied into tests or CI. The deletion targets only the Inquiry graph; longitudinal clinical records remain isolated by the M14 foreign-key rules.

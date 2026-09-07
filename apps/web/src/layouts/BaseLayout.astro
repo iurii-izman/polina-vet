@@ -8,6 +8,7 @@ import { getDraftModeProps } from '../lib/sanity/draft-mode';
 import SanityVisualEditing from 'polina-vet-preview/visual-editing';
 import DisableDraftMode from 'polina-vet-preview/disable-draft-mode';
 import { absoluteUrl, robotsForPage, siteIndexable, siteUrl } from '../lib/site';
+import { safeJsonLd } from '../lib/safeJsonLd';
 
 interface Props {
   title: string;
@@ -47,7 +48,7 @@ if (!siteIndexable || draftMode) {
     <meta property="og:url" content={absoluteUrl(Astro.url.pathname)} />
     <meta property="og:title" content={`${title} — ${siteTitle}`} />
     <meta property="og:description" content={resolvedDescription} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    <script is:inline type="application/ld+json" set:html={safeJsonLd({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       name: siteTitle,

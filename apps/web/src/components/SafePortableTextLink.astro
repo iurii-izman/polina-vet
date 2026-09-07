@@ -1,0 +1,10 @@
+---
+import type { MarkProps } from 'astro-portabletext/types';
+import { safePortableTextHref } from '../lib/safePortableTextHref';
+
+type LinkMark = { href?: unknown };
+const { node } = Astro.props as MarkProps<LinkMark>;
+const href = safePortableTextHref(node.markDef?.href);
+---
+
+{href ? <a href={href}><slot /></a> : <span data-portabletext-unsafe-link="true"><slot /></span>}

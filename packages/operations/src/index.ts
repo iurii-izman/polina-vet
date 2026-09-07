@@ -5,6 +5,7 @@ export * from './notifications.js';
 export * from './retention.js';
 export * from './retentionPolicy.js';
 export * from './security.js';
+export * from './body.js';
 export * from './m14.js';
 export * from './errors.js';
 export * from './learning.js';

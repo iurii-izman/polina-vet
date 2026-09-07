@@ -3,6 +3,7 @@ import { PortableText } from 'astro-portabletext';
 import type { TypedObject } from 'astro-portabletext/types';
 
 import type { Page } from '../lib/sanity/sanity.types';
+import SafePortableTextLink from './SafePortableTextLink.astro';
 
 interface Props {
   value: Page['body'] | TypedObject[] | null | undefined;
@@ -11,4 +12,4 @@ interface Props {
 const { value } = Astro.props;
 ---
 
-{value?.length ? <PortableText value={value as NonNullable<Page['body']>} /> : null}
+{value?.length ? <PortableText value={value as NonNullable<Page['body']>} components={{ mark: { link: SafePortableTextLink } }} /> : null}

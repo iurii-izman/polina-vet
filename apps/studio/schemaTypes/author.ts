@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { portableTextBlock } from './portableText';
 
 export const author = defineType({
   name: 'author',
@@ -30,7 +31,7 @@ export const author = defineType({
       name: 'bio',
       title: 'Биография',
       type: 'array',
-      of: [defineArrayMember({ type: 'block' })],
+      of: [portableTextBlock],
     }),
     defineField({
       name: 'education',

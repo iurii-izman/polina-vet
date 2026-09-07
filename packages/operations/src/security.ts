@@ -112,6 +112,12 @@ export function safeLog(event: Record<string, unknown>) {
   return output;
 }
 
+export function normalizeAccessIdentities(identities: string[] | undefined): string[] {
+  return [
+    ...new Set((identities ?? []).map((identity) => identity.trim().toLowerCase()).filter(Boolean)),
+  ];
+}
+
 export async function verifyAccessJwt(
   request: Request,
   config: { teamDomain?: string; audience?: string; identities?: string[] },
@@ -176,13 +182,10 @@ export async function verifyAccessJwt(
       signature,
       new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
     );
-    if (
-      !valid ||
-      !payload.email ||
-      (config.identities?.length && !config.identities.includes(payload.email))
-    )
-      return null;
-    return { actor: payload.email, role: 'TECH_ADMIN' as const };
+    const allowedIdentities = normalizeAccessIdentities(config.identities);
+    const email = typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : '';
+    if (!valid || !email || !allowedIdentities.includes(email)) return null;
+    return { actor: email, role: 'TECH_ADMIN' as const };
   } catch {
     return null;
   }
