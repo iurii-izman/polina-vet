@@ -6,7 +6,7 @@ This is the current operator runbook for the M14.5 pause baseline. Never paste s
 
 - Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `2f00f6bc-8cb6-4522-bf2f-513303cc0f7e`).
 - Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; disabled).
-- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current version `f1a03d88-b99c-40c3-a747-18821c74a424`; fail-closed).
+- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current secret-change deployment `b0356307-7a3d-4889-8b9f-11add36e8f41`; fail-closed).
 - D1: `polina-vet-operations-production`; binding `DB`; database ID is maintained in the Wrangler production config.
 - Learning telemetry: Analytics Engine dataset `polina_vet_learning_production`, separate from public analytics.
 - Turnstile sitekey: `0x4AAAAAAErEOf48kdeZYNJZ`, scoped to `lina.aipipeline.cc`; the secret is stored only in Worker secret storage.
@@ -21,7 +21,7 @@ pnpm --filter @polina-vet/office exec wrangler deployments list --name polina-ve
 
 The secret command is for names/types only. Do not use commands or scripts that print secret values.
 
-The final security hardening deployment verified the following production boundary: unauthenticated Office returns `401` with `no-store`, disabled Intake submission returns `404`, production D1 reports zero inquiry, clinical, audit, and client rows, and the production Office deployment exposes the separate learning telemetry binding. No production Access identity set was supplied, so Office activation stops at the identity gate.
+The current production boundary is: unauthenticated Office requests reach the separate Cloudflare Access challenge, disabled Intake submission returns `404`, production D1 reports zero inquiry, clinical, audit, and client rows, and the production Office deployment exposes the separate learning telemetry binding. The owner-supplied identity allowlist is stored as a Worker secret and is not printed or committed. Approved identity login and Office workflow acceptance remain pending because the verification email was not received during the activation run.
 
 ## Safe release sequence
 
@@ -40,6 +40,8 @@ Never copy production D1 into local, staging, tests, exports, or screenshots. Ne
 ## Office and Access
 
 `OFFICE_AUTH_BYPASS=false` is mandatory in production. A production Office request must fail closed unless a valid Cloudflare Access JWT is verified server-side against the configured team domain, audience, and approved identity allowlist. Do not broaden identities or create an Access application without exact owner-supplied values and an authenticated control-plane change.
+
+The production Access application and policy are now configured for the exact Office hostname. Do not treat the Access challenge as Office acceptance: complete an approved identity login, then verify PET/FARM happy paths and unauthorized/adversarial cases with synthetic data before any Intake activation decision.
 
 ## Intake activation
 
