@@ -1,4 +1,8 @@
-# POLINA VET — Architecture v1.0
+# POLINA VET — Architecture v1.1
+
+## Current lifecycle state
+
+The M1–M14.5 architecture and public launch baseline is closed. The public site is static-first and may run on the temporary production origin while the permanent `lina.vet` migration remains an R1 follow-up. Development is paused; production changes require an explicit owner request and must preserve the boundaries below.
 
 ## Product shape
 
@@ -118,13 +122,18 @@ If the launch corpus does not justify search, navigation and related-content dis
 
 ## Deployment
 
-Production:
-Sanity publish → webhook → Astro build → validation → deploy.
+Production public site:
+Sanity publish → Astro build with the explicit production origin/indexability flags → SEO/content validation → static Worker deploy.
+
+Private operational plane:
+public Intake Worker → isolated production D1 → protected Office Worker → PII-free notification adapter. Sanity and public analytics are not stores for private inquiries. Private M14.5 learning telemetry uses a separate Analytics Engine dataset from any public analytics provider.
+
+Production Intake remains fail-closed with `PUBLIC_INTAKE_ENABLED=false` until the external Access, notification, and legal evidence gates described in `PROJECT_STATUS.md` and `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md` are satisfied.
 
 Preview:
 server/draft-aware environment with Sanity preview/visual editing when implemented.
 
-Do not bind the architecture to a hosting vendor until hosting is selected.
+Cloudflare is the selected current runtime for the static Worker, private Workers, D1, Access boundary, Turnstile, and Analytics Engine. This is an implementation fact, not permission to add more Cloudflare infrastructure without a concrete requirement.
 
 ## Quality gates
 
@@ -148,3 +157,7 @@ Policy-as-code should block:
 - invalid hreflang mappings.
 
 Warnings/dashboard rather than hard failures are appropriate for routine review-due states.
+
+## Pause boundary
+
+No new product milestone, workflow, integration, CMS type, AI capability, or public medical content is implied by this architecture after M14.5. Observation, incident response, content governance, and owner-controlled external setup are operational follow-ups; M15/M16 remain unstarted.

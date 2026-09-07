@@ -1,5 +1,7 @@
 # M13 External Activation Inputs
 
+This document is a historical M13 activation snapshot. For the current state, use `PROJECT_STATUS.md`, `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`, and `OPERATIONS_RUNBOOK.md`.
+
 The implementation intentionally does not invent or print owner-controlled values. This checkpoint resolves the infrastructure that can be created safely with the available Cloudflare account access while keeping public intake inactive until the current PMR privacy prerequisite is evidenced.
 
 ## Already resolved
@@ -30,7 +32,7 @@ The implementation intentionally does not invent or print owner-controlled value
 - Intake consent is required, non-prechecked, versioned as `1.0`, and timestamped by the Intake Worker.
 - Production D1 schema parity is verified; production worker configuration remains `PUBLIC_INTAKE_ENABLED=false`.
 - Fail-closed production deployments are present: Intake version `6c5785c4-5234-41a9-9de4-b73386947820` and Office version `54d92ce9-2fcf-488b-a36d-706dfb5c9727`. Intake health is reachable, writes return 404 while disabled, and unauthenticated Office access returns 401.
-- The static production site was updated at `lina.aipipeline.cc`; its temporary `X-Robots-Tag: noindex, nofollow, noarchive` boundary and production Intake CSP origin were verified.
+- The static production site was updated at `lina.aipipeline.cc`; its current robots/indexability state is controlled by the explicit production build flags and verified by the live origin checks.
 - Production Intake has no Worker secrets yet. Production Access variables are intentionally blank, so Office remains fail-closed until the Access application/team domain/audience and the two approved identities are configured through Cloudflare controls.
 
 Do not paste secrets into GitHub, this repository, or the PR body.

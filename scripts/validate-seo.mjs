@@ -23,11 +23,19 @@ for (const file of htmlFiles) {
     throw new Error(`Potential secret leaked into ${file}`);
 }
 const robots = await readFile(join(dist, 'robots.txt'), 'utf8');
-if (!robots.includes('Disallow: /'))
-  throw new Error('Static release must be non-indexable by default.');
 const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]));
 if (!sitemapUrls.length) throw new Error('Empty sitemap.');
+const expectedIndexable =
+  process.env.SITE_INDEXABLE === 'true' && process.env.DEPLOYMENT_TARGET === 'production';
+if (expectedIndexable) {
+  if (robots.includes('Disallow: /'))
+    throw new Error('Indexable production release must not disallow the whole site.');
+} else if (!robots.includes('Disallow: /')) {
+  throw new Error(
+    'Non-production or explicitly non-indexable release must be blocked by robots.txt.',
+  );
+}
 for (const url of sitemapUrls) {
   const page = await readFile(join(dist, url.pathname, 'index.html'), 'utf8');
   if (!page.includes(`href="${url.href}"`))

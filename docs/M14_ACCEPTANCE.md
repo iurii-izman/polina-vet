@@ -1,6 +1,6 @@
 # M14 Acceptance
 
-This document records the final M14 evidence before PR/merge. Production migration remains intentionally unapplied; no M14.5/M15 work is included.
+This document records the historical M14 evidence before the later M14.5 closure action. The production migration statement below is retained as evidence from that M14 decision point; current production state is maintained in `PROJECT_STATUS.md`.
 
 ## Repository
 
@@ -46,7 +46,7 @@ This document records the final M14 evidence before PR/merge. Production migrati
 - Final staging integrity counts: 2 synthetic patients, 1 holding, 1 group, 3 vaccinations, 2 follow-ups, and 7 audits for the known corrected encounter. Synthetic fixtures remain isolated in staging and contain no real PII.
 - Global search was verified as HTTP POST with query text in the JSON body, not the URL; the response returned the synthetic PET fixture.
 
-## Remaining release work
+## Historical remaining release work
 
 - Commit, push, create the PR, and merge only after the final preflight and repository checks remain green.
-- Production migration is intentionally not part of M14 closure and requires a separate explicit production-release decision.
+- Production migration was intentionally not part of the original M14 closure and required a separate explicit production-release decision. That later decision was made in the M14.5 closure brief; production now has `0002_m14_core` applied while remaining empty and fail-closed.

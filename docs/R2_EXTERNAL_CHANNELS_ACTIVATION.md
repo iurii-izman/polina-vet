@@ -22,7 +22,11 @@ Current verified project values remain canonical and are not R2 blockers: Telegr
 
 R1 is Final Domain & Public Launch Activation. R2 is External Channels & Growth Activation. They are independent but related: external profiles may be prepared before R1, while permanent website references and Google Business website URLs should preferably use `lina.vet` after R1. Plausible activation requires an explicit opt-in and never follows from `SITE_INDEXABLE`.
 
-R2 must not enable indexing, change Preview/Studio/staging access, or alter the temporary noindex policy.
+R2 must not change Preview/Studio/staging access or infer analytics consent from indexability. The temporary public origin can be indexable for the launch baseline, independently of R2.
+
+Private M14.5 Analytics Engine telemetry is a separate, PII-free operational dataset and is not public Plausible. Public Plausible remains disabled because no owner-controlled site/domain configuration was verified.
+
+Production Telegram remains unconfigured. Staging verification does not authorize production notifications.
 
 Tracking issue: [#12](https://github.com/iurii-izman/polina-vet/issues/12).
 

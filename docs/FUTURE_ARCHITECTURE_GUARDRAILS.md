@@ -1,6 +1,6 @@
 # Future Architecture Guardrails
 
-This document records durable constraints for future milestones. It is not a roadmap and does not authorize building any of the capabilities named below.
+This document records durable constraints for future milestones. It is not a roadmap and does not authorize building any new capability during the M14.5 development pause. The private operations foundation exists because it was explicitly required by M13/M14; it does not authorize expanding it.
 
 ## Public editorial CMS is not a private operational system
 
@@ -8,9 +8,9 @@ The Sanity production dataset is for public editorial knowledge: authors, source
 
 Public content consent and anonymisation rules remain separate from private operational data controls.
 
-## Future operational entities
+## Operational boundary after M14.5
 
-If a concrete milestone requires operational workflows, the domain may eventually include clients, animals, farms, inquiries, cases, tasks, and communication events. Do not implement these entities now or preemptively model them in the public CMS.
+Clients, animals, holdings, encounters, inquiries, cases, tasks, and communication events belong only in the isolated private operations plane when a concrete approved workflow requires them. Do not add private entities to Sanity or the public Astro data path. Keep production Intake disabled until the current R3 external gates are complete.
 
 Prefer stable IDs and explicit relationships. Do not couple integrations or consequential workflows to display names or mutable slugs.
 
@@ -28,4 +28,4 @@ The strategic boundary is: maximize automation around the professional veterinar
 
 ## Avoid premature infrastructure
 
-Do not add a CRM, n8n, agent swarm, knowledge graph, vector database, client portal, telephony, workflow engine, or private operational database until a concrete milestone requires one and defines its data boundary, access control, provenance, auditability, and human-review behavior.
+Do not add a CRM, n8n, agent swarm, knowledge graph, vector database, client portal, telephony, workflow engine, second notification channel, or second operational database until a concrete post-pause milestone requires one and defines its data boundary, access control, provenance, auditability, retention, and human-review behavior.
