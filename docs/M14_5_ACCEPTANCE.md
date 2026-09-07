@@ -36,5 +36,6 @@ Trace status must be recorded truthfully as `CONFIGURED`, `VERIFIED`, `CONFIGURE
 - Production database `polina-vet-operations-production` has migrations `0001` and `0002_m14_core` applied, zero inquiry/clinical/audit rows, and a clean foreign-key check.
 - Production Turnstile is provisioned for the temporary public origin and its Worker secret is present by name. The sitekey is kept in the deployment runbook, not in this acceptance record.
 - Production Cloudflare Access has no application configured. Approved Office identities and production Telegram credentials were not supplied; Office stays fail-closed and Intake stays disabled.
+- The current production deployments are recorded in `OPERATIONS_RUNBOOK.md`; the web origin verifier passed after the final public deployment.
 - The corrected public build has absolute temporary-origin canonical, Open Graph, sitemap, and alternate links. Public Plausible remains disabled.
 - The PMR Article 22 notification prerequisite remains unresolved. The owner override accepts launch with notification evidence deferred; this is not a legal-compliance claim.

@@ -14,12 +14,12 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 
 | Area | State | Evidence / boundary |
 | --- | --- | --- |
-| Public web | LIVE on temporary origin | Static Cloudflare Worker `polina-vet-production`; canonical/OG/sitemap/alternate hosts are generated from the explicit origin. |
+| Public web | LIVE on temporary origin | Static Cloudflare Worker `polina-vet-production`, version `d77c7f72-c465-4670-be50-d8a7025613ac`; canonical/OG/sitemap/alternate hosts are generated from the explicit origin. |
 | Public indexability | ENABLED only on the verified production build | Preview, staging, local, and explicit non-indexable builds remain blocked by `robots.txt` and page metadata. |
 | Public analytics | OFF | No verified owner-controlled Plausible domain/configuration. |
 | Production D1 | PROVISIONED and migrated | `polina-vet-operations-production`; `0001` and `0002_m14_core` applied; zero inquiry, clinical, and audit rows; foreign-key check clean. |
-| Office Worker | DEPLOYED FAIL-CLOSED / NOT OPERATIONAL | `OFFICE_AUTH_BYPASS=false`; no production Access application or approved identity set is configured. |
-| Intake Worker | DEPLOYED DISABLED | `PUBLIC_INTAKE_ENABLED=false`; no real public processing or production smoke is authorized. |
+| Office Worker | DEPLOYED FAIL-CLOSED / NOT OPERATIONAL | Version `fc31a944-e411-4556-9023-7587df57e6fc`; `OFFICE_AUTH_BYPASS=false`; no production Access application or approved identity set is configured. |
+| Intake Worker | DEPLOYED DISABLED | Version `e438a3d5-55ab-4888-839e-eead6b1aab94`; `PUBLIC_INTAKE_ENABLED=false`; no real public processing or production smoke is authorized. |
 | Turnstile | CONFIGURED | Production widget is scoped to `lina.aipipeline.cc`; secret is stored in Worker secret storage and is never committed or printed. |
 | Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
 | Private learning telemetry | CONFIGURED / REAL OBSERVATION NOT YET STARTED | Production dataset is separate from public analytics. Synthetic events do not start the clock. |
