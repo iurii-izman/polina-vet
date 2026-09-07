@@ -2,8 +2,8 @@
 
 **As of:** 2026-09-07
 **Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation
-**Current branch:** `main` after closure merge
-**Closure merge:** `9b5020fb4eca27f91d31b1f81128c334dc2c2d6` (PR #21)
+**Current branch:** `main` after security hardening merge
+**Closure merge:** `139f1f93e26b1639355e32e8fb686783602ef74a` (PR #24)
 
 ## Launch decision
 
@@ -15,23 +15,24 @@ This launch does not claim legal compliance, clinical availability, 24/7 coverag
 
 | Area | State | Evidence / boundary |
 | --- | --- | --- |
-| Public web | LIVE on temporary origin | Static Cloudflare Worker `polina-vet-production`, version `d77c7f72-c465-4670-be50-d8a7025613ac`; canonical/OG/sitemap/alternate hosts are generated from the explicit origin. |
+| Public web | LIVE on temporary origin | Static Cloudflare Worker `polina-vet-production`, version `2f00f6bc-8cb6-4522-bf2f-513303cc0f7e`; canonical/OG/sitemap/alternate hosts are generated from the explicit origin. |
 | Public indexability | ENABLED only on the verified production build | Preview, staging, local, and explicit non-indexable builds remain blocked by `robots.txt` and page metadata. |
 | Public analytics | OFF | No verified owner-controlled Plausible domain/configuration. |
 | Production D1 | PROVISIONED and migrated | `polina-vet-operations-production`; `0001` and `0002_m14_core` applied; zero inquiry, clinical, and audit rows; foreign-key check clean. |
-| Office Worker | DEPLOYED FAIL-CLOSED / NOT OPERATIONAL | Version `fc31a944-e411-4556-9023-7587df57e6fc`; `OFFICE_AUTH_BYPASS=false`; no production Access application or approved identity set is configured. |
-| Intake Worker | DEPLOYED DISABLED | Version `e438a3d5-55ab-4888-839e-eead6b1aab94`; `PUBLIC_INTAKE_ENABLED=false`; no real public processing or production smoke is authorized. |
+| Office Worker | FIXED SOURCE DEPLOYED FAIL-CLOSED / ACTIVATION BLOCKED | Version `f1a03d88-b99c-40c3-a747-18821c74a424`; `OFFICE_AUTH_BYPASS=false`; production Access team/audience and the exact approved identity set are not configured, so unauthenticated access returns 401 and Office is not usable yet. |
+| Intake Worker | FIXED SOURCE DEPLOYED DISABLED | Version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; `PUBLIC_INTAKE_ENABLED=false`; disabled requests return 404 and no public processing is active. |
 | Turnstile | CONFIGURED | Production widget is scoped to `lina.aipipeline.cc`; secret is stored in Worker secret storage and is never committed or printed. |
 | Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
-| Private learning telemetry | CONFIGURED / REAL OBSERVATION NOT YET STARTED | Production dataset is separate from public analytics. Synthetic events do not start the clock. |
-| Sanity | VERIFIED | Published editorial verification passed; no private operational data is stored in Sanity. |
-| Dependency audit | REVIEW REQUIRED | `pnpm audit --prod` reports 2 high and 4 moderate `js-yaml` advisories through Sanity CLI tooling; no compatible upstream patched graph was available during closure, so this remains a tracked maintenance item. |
+| Private learning telemetry | CONFIGURED / READY / REAL OBSERVATION NOT YET STARTED | Production dataset `polina_vet_learning_production` is separate from public analytics and is bound to the fixed production Office Worker. Synthetic events do not start the clock. |
+| Sanity | VERIFIED / LOCAL TOKEN REVOKED | Published editorial verification passed; no private operational data is stored in Sanity. The ignored `POLINA VET Local Preview` token was revoked and the local value was removed. |
+| Security hardening | CLOSED | Original scan had 7 findings; F1–F7 are resolved. Final Standard rescan `19752b76-87c4-4356-ba44-6da79e109685` reported 0 reportable findings with partial source coverage because delegated workers and external control-plane evidence were unavailable. |
+| Dependency audit | R4 OPEN | `pnpm audit --prod --audit-level=moderate` reports 2 high and 4 moderate transitive advisories through Sanity CLI tooling; no compatible upstream patched graph was available, tracked in [R4](R4_UPSTREAM_DEPENDENCY_SECURITY_MAINTENANCE.md) and GitHub issue [#23](https://github.com/iurii-izman/polina-vet/issues/23). |
 
 ## Open external follow-ups
 
 - **R1:** verify ownership and migrate the public canonical identity to `lina.vet`; then re-run SEO, redirect, Search Console, and sitemap checks. Never leave both origins independently indexable.
 - **R2:** provide and verify owner-controlled external channels and, separately, any Plausible site/domain configuration. Keep public analytics off until explicit configuration exists.
-- **R3:** complete production Access, approved identities, Telegram configuration, and the Article 22 evidence gate before enabling real Intake. See `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`.
+- **R3:** supply the exact production Access application/team/audience and approved identity set before Office can become usable; complete the Article 22 evidence gate before enabling real Intake. Production Telegram remains optional and disabled. See `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`.
 
 The owner-approved launch override is: **launch accepted with notification evidence deferred**. This records an operational decision; it does not convert the PMR gate into a pass or authorize real Intake processing.
 
