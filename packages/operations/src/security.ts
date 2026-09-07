@@ -104,7 +104,10 @@ export function safeLog(event: Record<string, unknown>) {
     Number.isFinite(event.duration_ms)
   )
     output.duration_ms = Math.max(0, Math.round(event.duration_ms));
-  if ('error_code' in event || 'error_category' in event)
+  if (
+    (typeof event.error_code !== 'undefined' && event.error_code !== null) ||
+    (typeof event.error_category !== 'undefined' && event.error_category !== null)
+  )
     output.error_code = toSafeErrorCode(event.error_code ?? event.error_category);
   return output;
 }
