@@ -11,10 +11,10 @@ const configs = [
   ['apps/intake/wrangler.jsonc', 'polina-vet-intake', 'intake-polina-vet.aipipeline.cc'],
   ['apps/office/wrangler.jsonc', 'polina-vet-office', 'office-polina-vet.aipipeline.cc'],
 ];
-for (const [file, name, hostname] of configs) {
-  const text = await readFile(resolve(root, file), 'utf8');
-  const lines = text.split('\n');
-  const jsonText = lines
+
+function parseJsonc(text) {
+  const jsonText = text
+    .split('\n')
     .filter((line) => !line.trimStart().startsWith('//'))
     .map((line, index, remainingLines) => {
       const nextLine = remainingLines[index + 1]?.trimStart();
@@ -25,7 +25,12 @@ for (const [file, name, hostname] of configs) {
       return line.trimEnd().slice(0, -1);
     })
     .join('\n');
-  const json = JSON.parse(jsonText);
+  return JSON.parse(jsonText);
+}
+
+for (const [file, name, hostname] of configs) {
+  const text = await readFile(resolve(root, file), 'utf8');
+  const json = parseJsonc(text);
   if (json.name !== name || json.workers_dev !== false || json.preview_urls !== false) {
     throw new Error(`Invalid isolated Worker configuration: ${file}`);
   }
@@ -53,19 +58,7 @@ for (const file of ['apps/intake/wrangler.jsonc', 'apps/office/wrangler.jsonc'])
     throw new Error(`OFFICE_AUTH_BYPASS must remain false in ${file}`);
 
   if (file === 'apps/intake/wrangler.jsonc') {
-    const jsonText = text
-      .split('\n')
-      .filter((line) => !line.trimStart().startsWith('//'))
-      .map((line, index, remainingLines) => {
-        const nextLine = remainingLines[index + 1]?.trimStart();
-        const trailingComma = line.trimEnd().endsWith(',');
-        const nextIsClosing = nextLine?.startsWith('}') || nextLine?.startsWith(']');
-
-        if (!trailingComma || !nextIsClosing) return line;
-        return line.trimEnd().slice(0, -1);
-      })
-      .join('\n');
-    const json = JSON.parse(jsonText);
+    const json = parseJsonc(text);
     if (
       json.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
       json.env?.staging?.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
