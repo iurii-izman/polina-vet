@@ -49,10 +49,29 @@ for (const [file, name, hostname] of configs) {
 }
 for (const file of ['apps/intake/wrangler.jsonc', 'apps/office/wrangler.jsonc']) {
   const text = await readFile(resolve(root, file), 'utf8');
-  if (
-    /OFFICE_AUTH_BYPASS\s*"?\s*:\s*"?true/i.test(text) ||
-    /PUBLIC_INTAKE_ENABLED\s*"?\s*:\s*"?true/i.test(text)
-  )
-    throw new Error(`Activation gate must remain fail-closed in ${file}`);
+  if (/OFFICE_AUTH_BYPASS\s*"?\s*:\s*"?true/i.test(text))
+    throw new Error(`OFFICE_AUTH_BYPASS must remain false in ${file}`);
+
+  if (file === 'apps/intake/wrangler.jsonc') {
+    const jsonText = text
+      .split('\n')
+      .filter((line) => !line.trimStart().startsWith('//'))
+      .map((line, index, remainingLines) => {
+        const nextLine = remainingLines[index + 1]?.trimStart();
+        const trailingComma = line.trimEnd().endsWith(',');
+        const nextIsClosing = nextLine?.startsWith('}') || nextLine?.startsWith(']');
+
+        if (!trailingComma || !nextIsClosing) return line;
+        return line.trimEnd().slice(0, -1);
+      })
+      .join('\n');
+    const json = JSON.parse(jsonText);
+    if (
+      json.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
+      json.env?.staging?.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
+      json.env?.production?.vars?.PUBLIC_INTAKE_ENABLED !== 'true'
+    )
+      throw new Error('Intake must be disabled outside production and active in production.');
+  }
 }
 console.log(`Validated ${configs.length} isolated Cloudflare Worker configurations.`);

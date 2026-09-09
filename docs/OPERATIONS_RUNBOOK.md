@@ -4,12 +4,12 @@ This is the current operator runbook for the M14.5 pause baseline. Never paste s
 
 ## Production endpoints and resources
 
-- Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `2f00f6bc-8cb6-4522-bf2f-513303cc0f7e`).
-- Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `4e40cc17-5ed9-4330-b887-372ff9a3b6fc`; disabled).
-- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current secret-change deployment `b0356307-7a3d-4889-8b9f-11add36e8f41`; fail-closed).
+- Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `97a16620-00d3-4f84-9d17-679ac75bd797`).
+- Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `cdc98294-1751-4957-affd-670368d35928`; active).
+- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current secret-change deployment `6762c21c-6677-442d-85c3-c47b55a2b393`; fail-closed).
 - D1: `polina-vet-operations-production`; binding `DB`; database ID is maintained in the Wrangler production config.
 - Learning telemetry: Analytics Engine dataset `polina_vet_learning_production`, separate from public analytics.
-- Turnstile sitekey: `0x4AAAAAAErEOf48kdeZYNJZ`, scoped to `lina.aipipeline.cc`; the secret is stored only in Worker secret storage.
+- Turnstile sitekey: `0x4AAAAAAEtyB6Jmw_57IG3c`, scoped to `lina.aipipeline.cc`; the secret is stored only in Worker secret storage. One live production browser token passed Siteverify.
 
 Use the package-local Wrangler config explicitly:
 
@@ -21,7 +21,7 @@ pnpm --filter @polina-vet/office exec wrangler deployments list --name polina-ve
 
 The secret command is for names/types only. Do not use commands or scripts that print secret values.
 
-The current production boundary is: unauthenticated Office requests reach the separate Cloudflare Access challenge, disabled Intake submission returns `404`, production D1 reports zero inquiry, clinical, audit, and client rows, and the production Office deployment exposes the separate learning telemetry binding. The owner-supplied identity allowlist is stored as a Worker secret and is not printed or committed. Approved identity login and Office workflow acceptance remain pending because the verification email was not received during the activation run.
+The current production boundary is: unauthenticated Office requests reach the separate Cloudflare Access challenge, Intake accepts only exact-origin requests with active Turnstile and server-side validation, production D1 reports zero inquiry, clinical, audit, and client rows after synthetic cleanup, and the production Office deployment exposes the separate learning telemetry binding. The owner-supplied identity allowlist is stored as a Worker secret and is not printed or committed. Administrator Google login and prior synthetic Office acceptance passed; the second approved identity remains optional runtime follow-up.
 
 ## Safe release sequence
 
@@ -41,13 +41,13 @@ Never copy production D1 into local, staging, tests, exports, or screenshots. Ne
 
 `OFFICE_AUTH_BYPASS=false` is mandatory in production. A production Office request must fail closed unless a valid Cloudflare Access JWT is verified server-side against the configured team domain, audience, and approved identity allowlist. Do not broaden identities or create an Access application without exact owner-supplied values and an authenticated control-plane change.
 
-The production Access application and policy are now configured for the exact Office hostname. Do not treat the Access challenge as Office acceptance: complete an approved identity login, then verify PET/FARM happy paths and unauthorized/adversarial cases with synthetic data before any Intake activation decision.
+The production Access application and policy are configured for the exact Office hostname. The administrator Google login reached Office UI and the controlled PET/FARM synthetic acceptance was completed and cleaned. Do not broaden the exact two-identity allowlist or enable `OFFICE_AUTH_BYPASS`.
 
 ## Intake activation
 
-The production flag stays `PUBLIC_INTAKE_ENABLED=false`. Before any future enablement, all of the following must be evidenced: Access-protected Office; approved identity set; production Turnstile sitekey/secret; exact origin/CORS/CSP; rate limit, honeypot, server validation, idempotency, retention, audit, safe logging; published privacy notice/version and consent acknowledgement; Telegram PII-free notification configuration; Office URL; and the Article 22 evidence gate in `R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md`.
+The production flag is `PUBLIC_INTAKE_ENABLED=true` under the owner-authorized technical launch decision. Evidence includes Access-protected Office; exact two-identity set; production Turnstile sitekey/secret; exact origin/CORS/CSP; rate limit, honeypot, server validation, idempotency, retention, audit, safe logging; published privacy notice/version and consent acknowledgement; and the protected Office URL. Telegram remains cleanly disabled because secure production credentials are unavailable. Article 22 evidence remains pending and is not represented as legal compliance.
 
-Run synthetic acceptance only in a controlled environment, label any retained telemetry `SYNTHETIC`, remove all synthetic D1 rows/events, and verify zero leakage before enabling the flag. A notification failure must not expose PII or falsely report delivery.
+If a future controlled synthetic run is required, label any retained telemetry `SYNTHETIC`, remove all synthetic D1 rows/events, and verify zero leakage. The completed production E2E left D1 operational counts at zero and `PRAGMA foreign_key_check` clean. A notification failure must not expose PII or falsely report delivery.
 
 ## Observation and incident response
 

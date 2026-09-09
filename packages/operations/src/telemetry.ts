@@ -85,6 +85,19 @@ export type TelemetrySource = (typeof telemetrySources)[number];
 export const dataOrigins = ['SYNTHETIC', 'REAL', 'SYSTEM'] as const;
 export type DataOrigin = (typeof dataOrigins)[number];
 
+/**
+ * Production telemetry is real by default. A temporary, server-side acceptance
+ * secret may mark a controlled production verification run as synthetic; no
+ * request-controlled value participates in this decision.
+ */
+export function resolveOfficeTelemetryDataOrigin(
+  environment: string | undefined,
+  acceptanceDataOrigin: string | undefined,
+): DataOrigin {
+  if (environment !== 'production') return 'SYNTHETIC';
+  return acceptanceDataOrigin === 'SYNTHETIC' ? 'SYNTHETIC' : 'REAL';
+}
+
 export const snapshotMetrics = [
   'OPEN_DRAFTS_TOTAL',
   'OPEN_DRAFTS_LT_1D',
