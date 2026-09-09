@@ -6,6 +6,8 @@ dist/
 .astro/
 .wrangler/
 .output/
+coverage/
+*.tmp
 
 # env / secrets
 .env
@@ -22,6 +24,7 @@ playwright-report/
 test-results/
 blob-report/
 .playwright-cli/
+apps/web/tests/.auth/
 
 # Lighthouse
 .lighthouseci/

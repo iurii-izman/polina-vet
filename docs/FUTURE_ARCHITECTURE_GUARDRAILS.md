@@ -10,7 +10,7 @@ Public content consent and anonymisation rules remain separate from private oper
 
 ## Operational boundary after M14.5
 
-Clients, animals, holdings, encounters, inquiries, cases, tasks, and communication events belong only in the isolated private operations plane when a concrete approved workflow requires them. Do not add private entities to Sanity or the public Astro data path. Keep production Intake disabled until the current R3 external gates are complete.
+Clients, animals, holdings, encounters, inquiries, cases, tasks, and communication events belong only in the isolated private operations plane when a concrete approved workflow requires them. Do not add private entities to Sanity or the public Astro data path. Production Intake is active under the owner-authorized technical launch decision; Article 22 evidence remains a tracked external follow-up and is not a legal-compliance claim.
 
 Prefer stable IDs and explicit relationships. Do not couple integrations or consequential workflows to display names or mutable slugs.
 

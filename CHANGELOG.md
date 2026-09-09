@@ -2,6 +2,16 @@
 
 All notable product releases are recorded here. This project follows a Keep a Changelog-inspired format and uses semantic versioning concepts.
 
+## [0.1.0-alpha.2] — 2026-09-09
+
+Final alpha observation baseline after production activation and repository reconciliation.
+
+- Production Cloudflare Access activated and administrator Google Office authentication accepted.
+- Production Office operational and production Turnstile accepted.
+- Public Intake activated; synthetic production E2E completed and cleaned.
+- R3 technical activation completed with Article 22 evidence still deferred.
+- Runtime documentation, repository hygiene, and development-freeze state reconciled.
+
 ## [0.1.0-alpha.1] — 2026-09-07
 
 First operational alpha packaging for the closed M1–M14.5 baseline.

@@ -14,7 +14,7 @@ Report security concerns privately to the repository owner through the repositor
 
 ## Current baseline
 
-The final application security hardening baseline reported 0 reportable findings. The production Office remains fail-closed, `OFFICE_AUTH_BYPASS=false`, and public Intake remains disabled until its documented Access, privacy, operational, and compliance gates pass.
+The final application security hardening baseline reported 0 reportable application findings. The production Office is active, Access-protected, and fail-closed with `OFFICE_AUTH_BYPASS=false`; public Intake is active under the owner-authorized technical launch decision. Article 22 evidence remains pending and is not represented as legal compliance.
 
 Transitive dependency advisories are tracked separately in [R4](docs/R4_UPSTREAM_DEPENDENCY_SECURITY_MAINTENANCE.md). Re-run the production audit after dependency changes and prefer compatible upstream remediation over broad or unreviewed overrides.
 

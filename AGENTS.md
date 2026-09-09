@@ -6,7 +6,15 @@ Implement POLINA VET as the frozen Veterinary Guidance & Routing Hub defined by 
 
 Codex is an implementation engineer here. Do not redesign the product, reopen the information architecture, or invent missing facts.
 
-The M1–M14.5 implementation and launch baseline is now closed. Development is paused for real-world observation. Read `docs/PROJECT_STATUS.md` and `docs/PAUSE_AND_RESTART.md` before changing the repository. Do not start M15, M16, or any later milestone without an explicit new owner request.
+The M1–M14.5 implementation and launch baseline is now closed. Development is frozen for real-world observation. Read `docs/PROJECT_STATUS.md` and `docs/PAUSE_AND_RESTART.md` before changing the repository. Do not start M15, M16, or any later milestone without an explicit new owner request.
+
+## Required current-work read order
+
+1. `docs/PROJECT_STATUS.md`
+2. `docs/PAUSE_AND_RESTART.md`
+3. `docs/ARCHITECTURE.md`
+4. relevant current R1–R4 documents and ADRs
+5. frozen product documents where the requested work touches product behavior
 
 ## Canonical sources of truth
 

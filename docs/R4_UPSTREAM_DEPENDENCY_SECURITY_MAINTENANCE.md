@@ -6,17 +6,19 @@ Tracking issue: [#23](https://github.com/iurii-izman/polina-vet/issues/23)
 
 ## Scope
 
-The final security hardening audit retains six production dependency advisories in transitive Sanity/Vercel tooling paths. The affected packages are not part of the public runtime bundle, but they remain in the production dependency graph and require an upstream-compatible remediation.
+The 2026-09-09 production audit reports nine dependency advisories: four high and five moderate. They remain transitive through Sanity/Vercel tooling and Astro/Cloudflare build tooling; the affected packages are not part of the public runtime bundle, but they remain in the production dependency graph and require compatible remediation.
 
 ## Current dependency paths
 
-- `@sanity/cli` → `@sanity/server` → `@vercel/frameworks@3.29.0` → `js-yaml@3.13.1`
-- `@sanity/cli` → `@sanity/server` → `@vercel/frameworks@3.29.0` → `smol-toml@1.5.2`
-- `@sanity/cli` → `@sanity/server` → `typeid-js@1.2.0` → `uuid@10.0.0`
+- `@sanity/cli` → `@vercel/frameworks` → `js-yaml` (four advisories: one moderate, three high)
+- `@sanity/cli` → `@vercel/frameworks` → `smol-toml` (one moderate)
+- `@sanity/cli` → `typeid-js` → `uuid` (one moderate)
+- `@astrojs/cloudflare` → `@cloudflare/vite-plugin` → `miniflare` → `sharp` (one high)
+- `@sanity/cli` → `@sanity/cli-build` → `@module-federation/dts-plugin` → `adm-zip` (one moderate)
 
 ## Audit evidence
 
-As of 2026-09-07, `pnpm audit --prod --audit-level=moderate` reports four `js-yaml` advisories, one `smol-toml` advisory, and one `uuid` advisory. The latest compatible `@vercel/frameworks` release checked still declares the vulnerable `js-yaml` and `smol-toml` versions, and `typeid-js` still declares `uuid^10.0.0`.
+As of 2026-09-09, `pnpm audit --prod --audit-level=moderate` reports 9 vulnerabilities (4 high, 5 moderate): four `js-yaml`, one `smol-toml`, one `uuid`, one `sharp`, and one `adm-zip` advisory. The current paths are transitive and no compatible remediation has been verified during this freeze review.
 
 ## Follow-up
 

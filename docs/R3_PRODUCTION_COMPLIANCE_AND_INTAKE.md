@@ -1,31 +1,33 @@
-# R3 — Complete production compliance and deferred Intake obligations
+# R3 — Complete deferred Article 22 evidence and remaining operational follow-ups
 
 **Status:** OPEN / TECHNICAL ACTIVATION COMPLETE; ARTICLE 22 EVIDENCE DEFERRED
 **Tracking issue:** [#18](https://github.com/iurii-izman/polina-vet/issues/18)
 
 R3 is the remaining production-operations gate. The owner accepted public launch with notification evidence deferred. This is an operational override, not a legal-compliance conclusion.
 
-## Completed baseline
+## Completed
 
-- Production D1 exists and has `0001` plus `0002_m14_core` applied.
-- Production operational tables are empty and the foreign-key check is clean.
-- Production Turnstile is scoped only to `lina.aipipeline.cc`; the new production widget passed one live browser-token Siteverify path and the Worker secret is stored outside the repository.
-- Fixed security-hardening source is deployed; the current Office production deployment is `d5fb7d2f-0291-44ca-aee5-9bb99a29854f`, and the accepted production Intake deployment is `cdc98294-1751-4957-affd-670368d35928`.
-- A separate production Cloudflare Access application/policy protects the exact Office hostname. The configured team domain, audience, and owner-supplied identity allowlist are bound to production; the identity values are not stored in the repository.
-- Office remains fail-closed with `OFFICE_AUTH_BYPASS=false`; the production administrator Google login reached the real Office UI, and the prior synthetic PET/FARM acceptance and cleanup completed successfully. The second approved operational identity remains a runtime follow-up. Intake is enabled with `PUBLIC_INTAKE_ENABLED=true` after one live synthetic browser E2E and complete cleanup.
-- Production Office has the separate `polina_vet_learning_production` Analytics Engine binding, with no real observation event started.
-- Public Intake is technically active under the owner-authorized launch decision. No real production inquiry was created; the one synthetic inquiry was deleted with all related rows.
+- Production Cloudflare Access is configured with an exact approved identity count of 2.
+- Office Access protection is accepted and the administrator Google login reached the real Office UI.
+- Production Office synthetic acceptance completed and all synthetic data was cleaned.
+- Production Turnstile is active and its live Siteverify path was accepted.
+- Production Intake E2E passed with `PUBLIC_INTAKE_ENABLED=true`; synthetic data was cleaned. A subsequent live inquiry is retained for veterinary operation.
+- Production D1 is migrated and foreign-key clean; one live inquiry is present and no client, clinical, or audit rows exist.
+- Production telemetry is active and ready; no genuine observation event has occurred.
 
-## Remaining R3 follow-ups
+## Remaining
 
-- Where practical, complete the second approved operational Google login. Preserve server-side JWT validation and `OFFICE_AUTH_BYPASS=false`.
-- Production Telegram remains optional; if enabled later, supply bot/chat credentials through Cloudflare secret storage and verify PII-free notification behavior.
-- Complete the Article 22 operator-notification evidence package; see `R3_ARTICLE_22_NOTIFICATION_PACKAGE.md`.
-- The technical Intake E2E is complete: one synthetic browser submission passed Turnstile, validation, JSON POST, D1 write, and cleanup. The current owner override permits technical launch with evidence deferred; it does not claim Article 22 compliance.
+1. Article 22 notification/evidence.
+2. Optional second approved identity runtime-login acceptance.
+3. Optional production Telegram configuration.
+
+Article 22 status: **PENDING**. Notification submitted: **NO**. Legal compliance claimed: **NO**.
+
+Owner decision: technical launch accepted with evidence deferred. This is not a legal-compliance conclusion.
 
 ## Safety classification
 
-The current PMR review remains **LEGAL PRODUCT GATE: FAIL / EXTERNAL PREREQUISITE OPEN**. The owner launch decision accepts technical release with evidence deferred; this is not a legal-compliance conclusion. The product does not claim Article 22 compliance, filing, registration, or legal advice. `PUBLIC_INTAKE_ENABLED=true` is the owner-authorized technical launch state.
+The current PMR review remains **LEGAL PRODUCT GATE: FAIL / EXTERNAL PREREQUISITE OPEN**. The product does not claim Article 22 compliance, filing, registration, or legal advice. `PUBLIC_INTAKE_ENABLED=true` is the owner-authorized technical launch state.
 
 ## Observation relation
 

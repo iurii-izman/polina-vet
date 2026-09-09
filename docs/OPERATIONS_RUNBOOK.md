@@ -21,7 +21,7 @@ pnpm --filter @polina-vet/office exec wrangler deployments list --name polina-ve
 
 The secret command is for names/types only. Do not use commands or scripts that print secret values.
 
-The current production boundary is: unauthenticated Office requests reach the separate Cloudflare Access challenge, Intake accepts only exact-origin requests with active Turnstile and server-side validation, production D1 reports zero inquiry, clinical, audit, and client rows after synthetic cleanup, and the production Office deployment exposes the separate learning telemetry binding. The owner-supplied identity allowlist is stored as a Worker secret and is not printed or committed. Administrator Google login and prior synthetic Office acceptance passed; the second approved identity remains optional runtime follow-up.
+The current production boundary is: unauthenticated Office requests reach the separate Cloudflare Access challenge, Intake accepts only exact-origin requests with active Turnstile and server-side validation, production D1 has one live inquiry and zero client, clinical, and audit rows after synthetic cleanup, and the production Office deployment exposes the separate learning telemetry binding. The owner-supplied identity allowlist is stored as a Worker secret and is not printed or committed. Administrator Google login and prior synthetic Office acceptance passed; the second approved identity remains optional runtime follow-up.
 
 ## Safe release sequence
 
@@ -33,7 +33,7 @@ The current production boundary is: unauthenticated Office requests reach the se
 
 ## D1 migration and recovery
 
-Production D1 currently has `0001` and `0002_m14_core` applied, zero operational rows, and a clean foreign-key check. Before a future migration, inspect schema and Time Travel status, record a non-secret operator bookmark, apply the versioned migration explicitly, and verify indexes/foreign keys. See `BACKUP_RECOVERY.md`.
+Production D1 currently has `0001` and `0002_m14_core` applied, one live inquiry, no client/clinical/audit rows, and a clean foreign-key check. Before a future migration, inspect schema and Time Travel status, record a non-secret operator bookmark, apply the versioned migration explicitly, and verify indexes/foreign keys. See `BACKUP_RECOVERY.md`.
 
 Never copy production D1 into local, staging, tests, exports, or screenshots. Never delete a dataset or run an in-place restore without explicit incident approval.
 
@@ -43,11 +43,13 @@ Never copy production D1 into local, staging, tests, exports, or screenshots. Ne
 
 The production Access application and policy are configured for the exact Office hostname. The administrator Google login reached Office UI and the controlled PET/FARM synthetic acceptance was completed and cleaned. Do not broaden the exact two-identity allowlist or enable `OFFICE_AUTH_BYPASS`.
 
-## Intake activation
+## Intake operation and shutdown
 
-The production flag is `PUBLIC_INTAKE_ENABLED=true` under the owner-authorized technical launch decision. Evidence includes Access-protected Office; exact two-identity set; production Turnstile sitekey/secret; exact origin/CORS/CSP; rate limit, honeypot, server validation, idempotency, retention, audit, safe logging; published privacy notice/version and consent acknowledgement; and the protected Office URL. Telegram remains cleanly disabled because secure production credentials are unavailable. Article 22 evidence remains pending and is not represented as legal compliance.
+The production flag is `PUBLIC_INTAKE_ENABLED=true` under the owner-authorized technical launch decision. Evidence includes Access-protected Office; exact two-identity set; production Turnstile sitekey/secret; exact origin/CORS/CSP; rate limit, honeypot, server validation, idempotency, retention, audit, safe logging; published privacy notice/version and consent acknowledgement; and the protected Office URL. Telegram remains disabled cleanly because secure production credentials are unavailable. Article 22 evidence remains pending and is not represented as legal compliance.
 
-If a future controlled synthetic run is required, label any retained telemetry `SYNTHETIC`, remove all synthetic D1 rows/events, and verify zero leakage. The completed production E2E left D1 operational counts at zero and `PRAGMA foreign_key_check` clean. A notification failure must not expose PII or falsely report delivery.
+For an emergency shutdown, set `PUBLIC_INTAKE_ENABLED=false`, verify the public form is unavailable, preserve only safe evidence, and record the owner/operator decision. Restore only after the incident is understood and the relevant checks pass.
+
+If a future controlled synthetic run is required, label any retained telemetry `SYNTHETIC`, remove only confirmed synthetic D1 rows/events, and verify zero leakage. The current production D1 has one live inquiry and `PRAGMA foreign_key_check` is clean. A notification failure must not expose PII or falsely report delivery.
 
 ## Observation and incident response
 

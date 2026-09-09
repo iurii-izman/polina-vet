@@ -16,7 +16,7 @@ R2 is a release/activation gate, not a product milestone. It does not block M12 
 - Plausible account/site/domain configuration if analytics collection is activated;
 - any future verified social profile intended for public display.
 
-Current verified project values remain canonical and are not R2 blockers: Telegram, phone, and map/location are CURRENT.
+Production Telegram is currently disabled cleanly because no production credentials are configured. Phone and map/location remain owner-controlled content inputs; no unverified channel is rendered.
 
 ## Relation to R1
 
@@ -24,7 +24,7 @@ R1 is Final Domain & Public Launch Activation. R2 is External Channels & Growth 
 
 R2 must not change Preview/Studio/staging access or infer analytics consent from indexability. The temporary public origin can be indexable for the launch baseline, independently of R2.
 
-Private M14.5 Analytics Engine telemetry is a separate, PII-free operational dataset and is not public Plausible. Public Plausible remains disabled because no owner-controlled site/domain configuration was verified.
+Private M14.5 Analytics Engine telemetry is already ACTIVE as a separate, PII-free operational dataset and is unrelated to public Plausible. Public Plausible remains disabled because no owner-controlled site/domain configuration was verified.
 
 Production Telegram remains unconfigured. Staging verification does not authorize production notifications.
 
