@@ -6,7 +6,7 @@ This is the current operator runbook for the M14.5 pause baseline. Never paste s
 
 - Public web: `https://lina.aipipeline.cc` via `polina-vet-production` (current version `97a16620-00d3-4f84-9d17-679ac75bd797`).
 - Intake: `https://intake.lina.aipipeline.cc` via `polina-vet-intake-production` (current version `cdc98294-1751-4957-affd-670368d35928`; active).
-- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current secret-change deployment `6762c21c-6677-442d-85c3-c47b55a2b393`; fail-closed).
+- Office: `https://office.lina.aipipeline.cc` via `polina-vet-office-production` (current deployment `d5fb7d2f-0291-44ca-aee5-9bb99a29854f`; fail-closed).
 - D1: `polina-vet-operations-production`; binding `DB`; database ID is maintained in the Wrangler production config.
 - Learning telemetry: Analytics Engine dataset `polina_vet_learning_production`, separate from public analytics.
 - Turnstile sitekey: `0x4AAAAAAEtyB6Jmw_57IG3c`, scoped to `lina.aipipeline.cc`; the secret is stored only in Worker secret storage. One live production browser token passed Siteverify.

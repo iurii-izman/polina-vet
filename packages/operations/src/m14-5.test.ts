@@ -4,7 +4,6 @@ import {
   buildTelemetryEvent,
   recordDailySnapshot,
   recordWorkflowEvent,
-  resolveOfficeTelemetryDataOrigin,
   routeClassForPath,
 } from './telemetry.ts';
 import { collectDailySnapshot } from './learning.ts';
@@ -33,13 +32,6 @@ test('telemetry records are schema-v1 and contain only controlled dimensions', (
     Object.keys(event).filter((key) => key.includes('query') || key.includes('id')),
     [],
   );
-});
-
-test('production telemetry remains real unless the server-side acceptance override is exact', () => {
-  assert.equal(resolveOfficeTelemetryDataOrigin('production', undefined), 'REAL');
-  assert.equal(resolveOfficeTelemetryDataOrigin('production', 'synthetic'), 'REAL');
-  assert.equal(resolveOfficeTelemetryDataOrigin('production', 'SYNTHETIC'), 'SYNTHETIC');
-  assert.equal(resolveOfficeTelemetryDataOrigin('staging', undefined), 'SYNTHETIC');
 });
 
 test('telemetry rejects arbitrary metadata and clinical-looking fields', () => {

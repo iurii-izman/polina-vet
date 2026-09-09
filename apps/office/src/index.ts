@@ -36,7 +36,6 @@ import {
   recordDailySnapshot,
   recordWorkflowEvent,
   readJsonBody,
-  resolveOfficeTelemetryDataOrigin,
   routeClassForPath,
   toErrorCode,
   setFollowUp,
@@ -80,8 +79,6 @@ interface Env {
   OFFICE_IDENTITIES?: string;
   OFFICE_ORIGIN?: string;
   LEARNING?: AnalyticsEngineDataset;
-  /** Temporary server-side secret for a controlled production acceptance run. */
-  OFFICE_ACCEPTANCE_DATA_ORIGIN?: string;
   VERSION_METADATA?: { id: string; tag: string; timestamp: string };
   RELEASE?: string;
 }
@@ -110,10 +107,7 @@ function telemetryContext(env: Env) {
     service: 'office' as const,
     release:
       env.RELEASE?.trim() || env.VERSION_METADATA?.id || env.VERSION_METADATA?.tag || 'unversioned',
-    dataOrigin: resolveOfficeTelemetryDataOrigin(
-      env.ENVIRONMENT,
-      env.OFFICE_ACCEPTANCE_DATA_ORIGIN,
-    ),
+    dataOrigin: env.ENVIRONMENT === 'production' ? ('REAL' as const) : ('SYNTHETIC' as const),
   };
 }
 

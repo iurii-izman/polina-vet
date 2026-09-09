@@ -10,7 +10,7 @@ R3 is the remaining production-operations gate. The owner accepted public launch
 - Production D1 exists and has `0001` plus `0002_m14_core` applied.
 - Production operational tables are empty and the foreign-key check is clean.
 - Production Turnstile is scoped only to `lina.aipipeline.cc`; the new production widget passed one live browser-token Siteverify path and the Worker secret is stored outside the repository.
-- Fixed security-hardening source is deployed; the current Office production secret-change deployment is `6762c21c-6677-442d-85c3-c47b55a2b393`, and the accepted production Intake deployment is `cdc98294-1751-4957-affd-670368d35928`.
+- Fixed security-hardening source is deployed; the current Office production deployment is `d5fb7d2f-0291-44ca-aee5-9bb99a29854f`, and the accepted production Intake deployment is `cdc98294-1751-4957-affd-670368d35928`.
 - A separate production Cloudflare Access application/policy protects the exact Office hostname. The configured team domain, audience, and owner-supplied identity allowlist are bound to production; the identity values are not stored in the repository.
 - Office remains fail-closed with `OFFICE_AUTH_BYPASS=false`; the production administrator Google login reached the real Office UI, and the prior synthetic PET/FARM acceptance and cleanup completed successfully. The second approved operational identity remains a runtime follow-up. Intake is enabled with `PUBLIC_INTAKE_ENABLED=true` after one live synthetic browser E2E and complete cleanup.
 - Production Office has the separate `polina_vet_learning_production` Analytics Engine binding, with no real observation event started.
