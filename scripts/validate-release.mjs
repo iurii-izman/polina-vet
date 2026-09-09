@@ -11,10 +11,10 @@ const configs = [
   ['apps/intake/wrangler.jsonc', 'polina-vet-intake', 'intake-polina-vet.aipipeline.cc'],
   ['apps/office/wrangler.jsonc', 'polina-vet-office', 'office-polina-vet.aipipeline.cc'],
 ];
-for (const [file, name, hostname] of configs) {
-  const text = await readFile(resolve(root, file), 'utf8');
-  const lines = text.split('\n');
-  const jsonText = lines
+
+function parseJsonc(text) {
+  const jsonText = text
+    .split('\n')
     .filter((line) => !line.trimStart().startsWith('//'))
     .map((line, index, remainingLines) => {
       const nextLine = remainingLines[index + 1]?.trimStart();
@@ -25,7 +25,12 @@ for (const [file, name, hostname] of configs) {
       return line.trimEnd().slice(0, -1);
     })
     .join('\n');
-  const json = JSON.parse(jsonText);
+  return JSON.parse(jsonText);
+}
+
+for (const [file, name, hostname] of configs) {
+  const text = await readFile(resolve(root, file), 'utf8');
+  const json = parseJsonc(text);
   if (json.name !== name || json.workers_dev !== false || json.preview_urls !== false) {
     throw new Error(`Invalid isolated Worker configuration: ${file}`);
   }
@@ -49,10 +54,17 @@ for (const [file, name, hostname] of configs) {
 }
 for (const file of ['apps/intake/wrangler.jsonc', 'apps/office/wrangler.jsonc']) {
   const text = await readFile(resolve(root, file), 'utf8');
-  if (
-    /OFFICE_AUTH_BYPASS\s*"?\s*:\s*"?true/i.test(text) ||
-    /PUBLIC_INTAKE_ENABLED\s*"?\s*:\s*"?true/i.test(text)
-  )
-    throw new Error(`Activation gate must remain fail-closed in ${file}`);
+  if (/OFFICE_AUTH_BYPASS\s*"?\s*:\s*"?true/i.test(text))
+    throw new Error(`OFFICE_AUTH_BYPASS must remain false in ${file}`);
+
+  if (file === 'apps/intake/wrangler.jsonc') {
+    const json = parseJsonc(text);
+    if (
+      json.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
+      json.env?.staging?.vars?.PUBLIC_INTAKE_ENABLED === 'true' ||
+      json.env?.production?.vars?.PUBLIC_INTAKE_ENABLED !== 'true'
+    )
+      throw new Error('Intake must be disabled outside production and active in production.');
+  }
 }
 console.log(`Validated ${configs.length} isolated Cloudflare Worker configurations.`);
