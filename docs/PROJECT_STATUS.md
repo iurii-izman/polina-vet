@@ -1,16 +1,15 @@
 # POLINA VET — Current Project Status
 
 **As of:** 2026-09-09
-**Lifecycle:** M1–M14.5 closure baseline; development paused for real-world observation
-**Current baseline:** `main` after the secure observation-baseline merge
-**Baseline merge:** `7e87475add37a7d626d0efdc3d2a64db1230a9d2` (PR #25)
-**Security hardening merge:** `139f1f93e26b1639355e32e8fb686783602ef74a` (PR #24)
+**Lifecycle:** ALPHA / DEVELOPMENT FROZEN / OBSERVATION
+**Current baseline:** `main` after R3 production activation; alpha.2 records the final freeze snapshot
+**R3 activation merge:** `9134bcd9af3b579d480f8ec08ac596d75e4aab3b` (PR #29)
 
 ## Alpha packaging state
 
-The first explicit product alpha is packaged as `v0.1.0-alpha.1` from the secure pause baseline; the packaging merge is `4eb4af7da9f01a1a4e4db077a248ca01c7872f61`. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development remains paused.
+The first explicit product alpha is packaged as `v0.1.0-alpha.1` from the secure pause baseline. The final freeze snapshot is `v0.1.0-alpha.2`. The public site is live and indexable on `https://lina.aipipeline.cc`; the repository remains private, M1–M14.5 is closed, and development is frozen.
 
-Production Office is **ACTIVE / ACCESS-PROTECTED**. The exact approved identity set is bound to the separate production Cloudflare Access application for `office.lina.aipipeline.cc`; the allowlist remains in Worker secret storage rather than source control. The production administrator Google login reached the real Office UI, and the prior synthetic PET/FARM acceptance and cleanup completed successfully. The second approved operational identity remains a small runtime follow-up. Office remains fail-closed with `OFFICE_AUTH_BYPASS=false`; production Intake is active after one synthetic E2E and cleanup with `PUBLIC_INTAKE_ENABLED=true`; real observation has not started.
+Production Office is **ACTIVE / ACCESS-PROTECTED**. The exact approved identity set is bound to the separate production Cloudflare Access application for `office.lina.aipipeline.cc`; the allowlist remains in Worker secret storage rather than source control. The production administrator Google login reached the real Office UI, and the prior synthetic PET/FARM acceptance and cleanup completed successfully. The second approved operational identity remains an optional runtime follow-up. Office remains fail-closed with `OFFICE_AUTH_BYPASS=false`; production Intake is active after one synthetic E2E and cleanup with `PUBLIC_INTAKE_ENABLED=true`; real observation has not started.
 
 The alpha package does not claim Article 22 notification, legal compliance, clinical availability, or a 24/7 service. Article 22 evidence remains pending under R3. The only permitted untracked local exception is `output/`.
 
@@ -27,15 +26,15 @@ This launch does not claim legal compliance, clinical availability, or 24/7 cove
 | Public web | LIVE on temporary origin | Static Cloudflare Worker `polina-vet-production`, version `97a16620-00d3-4f84-9d17-679ac75bd797`; canonical/OG/sitemap/alternate hosts are generated from the explicit origin. |
 | Public indexability | ENABLED only on the verified production build | Preview, staging, local, and explicit non-indexable builds remain blocked by `robots.txt` and page metadata. |
 | Public analytics | OFF | No verified owner-controlled Plausible domain/configuration. |
-| Production D1 | PROVISIONED and migrated | `polina-vet-operations-production`; `0001` and `0002_m14_core` applied; zero inquiry, clinical, and audit rows; foreign-key check clean. |
+| Production D1 | MIGRATED / CLEAN | `polina-vet-operations-production`; migrations current; one live inquiry, zero client/clinical/audit rows, and foreign-key check clean. |
 | Office Worker | ACTIVE / ACCESS-PROTECTED / FAIL-CLOSED | Current production deployment `d5fb7d2f-0291-44ca-aee5-9bb99a29854f`; `OFFICE_AUTH_BYPASS=false`; production Access application/policy, team domain, audience, and exact two-identity secret are configured. Administrator Google login reached Office UI; second approved identity runtime login remains pending. |
 | Intake Worker | ACTIVE / E2E ACCEPTED | Version `cdc98294-1751-4957-affd-670368d35928`; `PUBLIC_INTAKE_ENABLED=true`; one live synthetic browser submission passed Turnstile, validation, JSON POST, D1 write, and cleanup. |
 | Turnstile | ACTIVE / SITEVERIFY VERIFIED | New production widget is scoped only to `lina.aipipeline.cc`; `TURNSTILE_SECRET_KEY` is stored as a Worker secret and is never committed or printed. One live production browser token passed the end-to-end Siteverify path. |
-| Telegram | NOT CONFIGURED in production | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
-| Private learning telemetry | ACTIVE / READY / REAL OBSERVATION NOT YET STARTED | Production dataset `polina_vet_learning_production` is separate from public analytics and is bound to the production Office Worker. Synthetic events do not start the clock. |
+| Telegram | DISABLED CLEANLY | No production bot/chat credentials were supplied. Failure must never expose PII or block a future database write. |
+| Private learning telemetry | ACTIVE / READY / REAL OBSERVATION NOT YET STARTED | Production dataset `polina_vet_learning_production` is separate from public analytics and is bound to the production Office Worker. No genuine `REAL` telemetry event has been verified; synthetic events do not start the clock. |
 | Sanity | VERIFIED / LOCAL TOKEN REVOKED | Published editorial verification passed; no private operational data is stored in Sanity. The ignored `POLINA VET Local Preview` token was revoked and the local value was removed. |
 | Security hardening | CLOSED | Original scan had 7 findings; F1–F7 are resolved. Final Standard rescan `19752b76-87c4-4356-ba44-6da79e109685` reported 0 reportable findings with partial source coverage because delegated workers and external control-plane evidence were unavailable. |
-| Dependency audit | R4 OPEN | `pnpm audit --prod --audit-level=moderate` reports 2 high and 4 moderate transitive advisories through Sanity CLI tooling; no compatible upstream patched graph was available, tracked in [R4](R4_UPSTREAM_DEPENDENCY_SECURITY_MAINTENANCE.md) and GitHub issue [#23](https://github.com/iurii-izman/polina-vet/issues/23). |
+| Dependency audit | R4 OPEN | `pnpm audit --prod --audit-level=moderate` reports 4 high and 5 moderate transitive advisories through Sanity/Vercel and Astro/Cloudflare tooling; no compatible remediation was verified during the freeze review, tracked in [R4](R4_UPSTREAM_DEPENDENCY_SECURITY_MAINTENANCE.md) and GitHub issue [#23](https://github.com/iurii-izman/polina-vet/issues/23). |
 
 ## Open external follow-ups
 

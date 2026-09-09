@@ -2,52 +2,54 @@
 
 Multilingual veterinary guidance, intake, and private clinical operations for pets and farm animals.
 
-[Open the live public site](https://lina.aipipeline.cc)
+[![CI](https://github.com/iurii-izman/polina-vet/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iurii-izman/polina-vet/actions/workflows/ci.yml)
 
-**Alpha · Live public site · Development paused for observation**
+[Live site](https://lina.aipipeline.cc)
+
+**Alpha · Live · Development frozen for real-world observation**
 
 ## Current status
 
-| Area              | State                                                |
-| ----------------- | ---------------------------------------------------- |
-| Public site       | LIVE / INDEXABLE on the temporary production origin  |
-| Production Office | BLOCKED — owner identity input required; fail-closed |
-| Public Intake     | DISABLED — `PUBLIC_INTAKE_ENABLED=false`             |
-| Production D1     | PROVISIONED / MIGRATED / EMPTY / foreign-key clean   |
-| Private telemetry | CONFIGURED / observation not started                 |
-| Security baseline | 0 reportable application findings                    |
-| M1–M14.5          | CLOSED                                               |
-| M15/M16           | NOT STARTED                                          |
-| Development       | PAUSED                                               |
+| Area              | State                             |
+| ----------------- | --------------------------------- |
+| Public site       | LIVE / INDEXABLE                  |
+| Production Office | ACTIVE / ACCESS-PROTECTED         |
+| Public Intake     | ACTIVE                            |
+| Production D1     | MIGRATED / CLEAN                  |
+| Private telemetry | ACTIVE / OBSERVATION READY        |
+| Telegram          | DISABLED CLEANLY                  |
+| Security baseline | 0 reportable application findings |
+| M1–M14.5          | CLOSED                            |
+| M15/M16           | NOT STARTED                       |
+| Development       | FROZEN / OBSERVATION              |
 
-The public product is launched. Daily veterinary use and real observation remain blocked until the exact owner-approved Cloudflare Access identities are supplied and production Office activation is completed. Article 22 evidence remains pending; this project does not claim legal compliance or notification completion.
+The public product is launched and the private operational plane is ready for daily veterinary use. Real observation has not started until the first genuine `REAL` telemetry event. Article 22 evidence remains pending; this project does not claim legal compliance or notification completion.
 
 ## Architecture
 
 ```mermaid
 flowchart TD
-  visitor[Public visitor] --> web[Astro static public site]
+  users[Public users] --> web[Astro public web]
   web --> sanity[Sanity editorial CMS]
-  visitor --> intake[Public Intake]
-  intake --> intakeWorker[Intake Worker]
-  intakeWorker --> d1[Private Operations D1]
-  vet[Authenticated veterinarian] --> access[Cloudflare Access]
+  form[Public form] --> intakeWorker[Intake Worker]
+  intakeWorker --> d1[Operations D1]
+  vet[Veterinarian] --> access[Cloudflare Access]
   access --> office[Office Worker]
-  office --> d1
-  d1 --> audit[Audit]
   office --> telemetry[Analytics Engine]
-  telemetry --> learning[Privacy-safe workflow learning]
+  telemetry --> learning[Privacy-safe structural learning]
+  office --> telegram[Optional Telegram adapter]
 ```
 
-Analytics Engine contains structural, privacy-safe workflow telemetry; it is not a clinical data store.
+Analytics Engine is privacy-safe workflow telemetry, not a clinical database. Sanity is public editorial content, not a private operational database.
 
 ## Privacy and safety boundary
 
 - **Public Sanity:** editorial and public content only.
 - **Private D1:** client, patient, holding, and clinical operational data.
 - **Analytics Engine:** privacy-safe structural workflow telemetry only.
+- **Telegram:** optional outbound notifications with minimized personal data; currently disabled cleanly.
 - **Clinical decisions:** controlled by a human veterinarian.
-- No public AI diagnosis, owner-facing dosing calculator, or emergency-response guarantee.
+- No public AI diagnosis, owner-facing dosing AI, or emergency-response guarantee.
 
 ## Stack
 
@@ -82,6 +84,6 @@ pnpm release:validate
 - [R3 — production compliance and Intake](docs/R3_PRODUCTION_COMPLIANCE_AND_INTAKE.md) · [issue #18](https://github.com/iurii-izman/polina-vet/issues/18)
 - [R4 — dependency maintenance](docs/R4_UPSTREAM_DEPENDENCY_SECURITY_MAINTENANCE.md) · [issue #23](https://github.com/iurii-izman/polina-vet/issues/23)
 
-## Development boundary
+## Frozen development boundary
 
-M1–M14.5 is the closed implementation baseline. M15 and M16 have not started. During the pause, only production operation, incident response, security/dependency maintenance, owner-controlled external setup, editorial governance, and evidence-driven small repairs are in scope.
+M1–M14.5 is the closed implementation baseline. M15 and M16 have not started. During the freeze, only real veterinary use, editorial work, security and bug fixes, incident response, R1–R4 follow-ups, and small evidence-driven repairs are in scope.

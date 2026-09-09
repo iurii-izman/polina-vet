@@ -1,23 +1,24 @@
 # Development Pause and Restart Contract
 
-## Pause state
+## Freeze state
 
-M1–M14.5 is closed for this implementation cycle. The site is in real-world observation readiness, not a promise of ongoing development. M15 and M16 are not started, and no later milestone is implied.
+M1–M14.5 is closed for this implementation cycle. The product is in real-world observation readiness, not a promise of ongoing development. M15 and M16 are not started, and no later milestone is implied.
 
-The final security hardening cycle is closed on `main` merge `139f1f93e26b1639355e32e8fb686783602ef74a`. The seven original findings are resolved; production Office is deployed fail-closed but awaits the owner-supplied Access identity set, and public Intake remains disabled pending the documented R3 gates. The transitive dependency advisory maintenance item is tracked as R4.
+The final security hardening cycle is closed. The seven original findings are resolved; production Office is active, Access-protected, and fail-closed, and public Intake is active under the owner-authorized technical launch decision. Article 22 evidence remains pending and the transitive dependency advisory maintenance item is tracked as R4.
 
-Allowed while paused:
+Allowed during the freeze:
 
 - production incident response and safe rollback/recovery;
+- real Office and Intake use;
 - owner-controlled R1/R2/R3 external setup;
 - routine Sanity editorial governance that preserves medical review rules;
 - security fixes and dependency fixes necessary to keep the deployed system safe;
 - evidence collection that does not add synthetic observation data or private patient data.
 
-Not allowed without a new explicit request:
+Not allowed without a new explicit owner restart request:
 
 - new product features, new IA, new verticals, or a new workflow;
-- enabling Intake, Access bypass, public analytics, or unapproved notifications;
+- changing Intake, Access, public analytics, or notification configuration without owner-controlled inputs and evidence;
 - M15/M16 design or implementation;
 - legal, clinical, availability, or ownership claims based on placeholders;
 - a new datastore, CRM, AI diagnosis path, or integration “for later.”

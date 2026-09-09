@@ -1,6 +1,6 @@
-# POLINA VET — Codex Restart Prompt (post-M14.5 pause)
+# POLINA VET — Codex Restart Prompt (post-M14.5 observation freeze)
 
-The bootstrap prompt is archived at `docs/archive/CODEX_START_PROMPT_v1.0_BOOTSTRAP.md`. This file is the active restart contract.
+The bootstrap prompt is archived at `docs/archive/CODEX_START_PROMPT_v1.0_BOOTSTRAP.md`. This file is the active restart contract. The project already exists; do not bootstrap it. The current phase is real-world observation with development frozen.
 
 ## Before any work
 
